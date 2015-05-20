@@ -1,29 +1,30 @@
 package org.zalando.stups.tokens;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -41,8 +42,10 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     public AccessTokenRefresher(final AccessTokensBuilder configuration) {
         this.configuration = configuration;
-
         scheduler = Executors.newSingleThreadScheduledExecutor();
+    }
+
+    void start() {
         scheduler.schedule(this, 1, TimeUnit.SECONDS);
     }
 
@@ -77,6 +80,8 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
                     } catch (final Throwable t) {
                         if (oldToken == null || shouldWarn(oldToken)) {
                             LOG.warn("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
+                        } else {
+                            LOG.debug("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
                         }
                     }
                 }
@@ -84,6 +89,18 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         } catch (final Throwable t) {
             LOG.error("Unexpected problem during token refresh run!", t);
         }
+    }
+
+    private static String joinScopes(final Collection<Object> scopes) {
+        final Iterator<Object> iter = scopes.iterator();
+
+        final StringBuilder scope = new StringBuilder(iter.next().toString());
+        while (iter.hasNext()) {
+            scope.append(' ');
+            scope.append(iter.next().toString());
+        }
+
+        return scope.toString();
     }
 
     private AccessToken createToken(final AccessTokenConfiguration tokenConfig) {
@@ -109,12 +126,14 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
             final HttpPost request = new HttpPost(configuration.getAccessTokenUri());
 
             // prepare the request body
-            final AccessTokenRequest accessTokenRequest = new AccessTokenRequest(userCredentials.getUsername(),
-                    userCredentials.getPassword(), tokenConfig.getScopes());
-            final StringEntity accessTokenRequestBody = new StringEntity(OBJECT_MAPPER
-                    .writeValueAsString(accessTokenRequest));
-            accessTokenRequestBody.setContentType("application/json");
-            request.setEntity(accessTokenRequestBody);
+
+            final List<NameValuePair> values = new ArrayList<NameValuePair>() {{
+                add(new BasicNameValuePair("grant_type", "password"));
+                add(new BasicNameValuePair("username", userCredentials.getUsername()));
+                add(new BasicNameValuePair("password", userCredentials.getPassword()));
+                add(new BasicNameValuePair("scope", joinScopes(tokenConfig.getScopes())));
+            }};
+            request.setEntity(new UrlEncodedFormEntity(values));
 
             // enable basic auth for the request
             final AuthCache authCache = new BasicAuthCache();
@@ -176,44 +195,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         scheduler.shutdown();
     }
 
-    private static final class AccessTokenRequest {
-        @JsonProperty("grant_type")
-        private final String grantType = "password";
-
-        @JsonProperty("username")
-        private final String username;
-
-        @JsonProperty("password")
-        private final String password;
-
-        @JsonProperty("scope")
-        private final String scope;
-
-        private static String join(final Collection<Object> scopes) {
-            final Iterator<Object> iter = scopes.iterator();
-
-            final StringBuilder scope = new StringBuilder(iter.next().toString());
-            while (iter.hasNext()) {
-                scope.append(' ');
-                scope.append(iter.next().toString());
-            }
-
-            return scope.toString();
-        }
-
-        public AccessTokenRequest(final String username, final String password, Collection<Object> scopes) {
-            this.username = username;
-            this.password = password;
-            this.scope = join(scopes);
-        }
-
-        public AccessTokenRequest(final String username, final String password, final String scope) {
-            this.username = username;
-            this.password = password;
-            this.scope = scope;
-        }
-    }
-
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private static final class AccessTokenResponse {
         @JsonProperty("access_token")
         private String accessToken;

@@ -96,6 +96,9 @@ public class AccessTokensBuilder {
             throw new IllegalArgumentException("no scopes defined");
         }
         locked = true;
-        return new AccessTokenRefresher(this);
+        final AccessTokenRefresher refresher = new AccessTokenRefresher(this);
+        refresher.run();
+        refresher.start();
+        return refresher;
     }
 }

@@ -1,5 +1,6 @@
 package org.zalando.stups.tokens;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.File;
@@ -20,6 +21,7 @@ public class JsonFileBackedClientCredentialsProvider extends AbstractJsonFileBac
         return read(JsonBackedClientCredentials.class);
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private static class JsonBackedClientCredentials implements ClientCredentials {
         @JsonProperty("client_id")
         private String id;
