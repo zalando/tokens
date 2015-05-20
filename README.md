@@ -2,6 +2,18 @@
 
 A Java library that keeps OAuth 2.0 service access tokens in memory for your usage.
 
+## Maven dependency
+
+![Maven Central](https://img.shields.io/maven-central/v/io.sarnowski/swagger1st.svg)
+
+```xml
+<dependency>
+    <groupId>org.zalando.stups</groupId>
+    <artifactId>tokens</artifactId>
+    <version>see above</version>
+</dependency>
+```
+
 ## Usage
 
 ```java
@@ -17,7 +29,10 @@ AccessTokens tokens = Tokens.createAccessTokensWithUri(new URI("https://example.
 
 while (true) {
     final String token = tokens.get("exampleRO");
-    System.out.println("RO token: " + token);
+    
+    Request.Get("https://api.example.com")
+           .addHeader("Authorization", "Bearer " + token)
+           .execute():
 
     Thread.sleep(1000);
 }
