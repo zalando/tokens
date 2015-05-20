@@ -4,7 +4,7 @@ A Java library that keeps OAuth 2.0 service access tokens in memory for your usa
 
 ## Maven dependency
 
-![Maven Central](https://img.shields.io/maven-central/v/io.sarnowski/swagger1st.svg)
+![Maven Central](https://img.shields.io/maven-central/v/org.zalando.stups/tokens.svg)
 
 ```xml
 <dependency>
