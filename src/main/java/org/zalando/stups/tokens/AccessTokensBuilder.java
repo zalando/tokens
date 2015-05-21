@@ -1,6 +1,7 @@
 package org.zalando.stups.tokens;
 
 import java.net.URI;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -8,8 +9,8 @@ import java.util.Set;
 public class AccessTokensBuilder {
     private final URI accessTokenUri;
 
-    private ClientCredentialsProvider clientCredentialsProvider = new JsonFileBackedClientCredentialsProvider();
-    private UserCredentialsProvider userCredentialsProvider = new JsonFileBackedUserCredentialsProvider();
+    private ClientCredentialsProvider clientCredentialsProvider = null;
+    private UserCredentialsProvider userCredentialsProvider = null;
     private int refreshPercentLeft = 40;
     private int warnPercentLeft = 20;
 
@@ -33,7 +34,8 @@ public class AccessTokensBuilder {
         }
     }
 
-    public AccessTokensBuilder usingClientCredentialsProvider(final ClientCredentialsProvider clientCredentialsProvider) {
+    public AccessTokensBuilder usingClientCredentialsProvider(
+            final ClientCredentialsProvider clientCredentialsProvider) {
         checkLock();
         checkNotNull("clientCredentialsProvider", clientCredentialsProvider);
         this.clientCredentialsProvider = clientCredentialsProvider;
@@ -62,6 +64,7 @@ public class AccessTokensBuilder {
     public AccessTokenConfiguration manageToken(final Object tokenId) {
         checkLock();
         checkNotNull("tokenId", tokenId);
+
         final AccessTokenConfiguration config = new AccessTokenConfiguration(tokenId, this);
         accessTokenConfigurations.add(config);
         return config;
@@ -95,7 +98,20 @@ public class AccessTokensBuilder {
         if (accessTokenConfigurations.size() == 0) {
             throw new IllegalArgumentException("no scopes defined");
         }
+
         locked = true;
+        if (clientCredentialsProvider == null) {
+
+            // use default
+            clientCredentialsProvider = new JsonFileBackedClientCredentialsProvider();
+        }
+
+        if (userCredentialsProvider == null) {
+
+            // use default
+            userCredentialsProvider = new JsonFileBackedUserCredentialsProvider();
+        }
+
         final AccessTokenRefresher refresher = new AccessTokenRefresher(this);
         refresher.run();
         refresher.start();
