@@ -76,12 +76,12 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
                         LOG.trace("Refreshing access token {}...", tokenConfig.getTokenId());
                         final AccessToken newToken = createToken(tokenConfig);
                         accessTokens.put(tokenConfig.getTokenId(), newToken);
-                        LOG.debug("Refreshed access token {}.", tokenConfig.getTokenId());
+                        LOG.info("Refreshed access token {}.", tokenConfig.getTokenId());
                     } catch (final Throwable t) {
                         if (oldToken == null || shouldWarn(oldToken, configuration)) {
                             LOG.warn("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
                         } else {
-                            LOG.debug("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
+                            LOG.info("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
                         }
                     }
                 }
@@ -179,8 +179,11 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     @Override
     public AccessToken getAccessToken(Object tokenId) throws AccessTokenUnavailableException {
         final AccessToken token = accessTokens.get(tokenId);
-        if (token == null || token.isExpired()) {
-            throw new AccessTokenUnavailableException();
+        if (token == null) {
+            throw new AccessTokenUnavailableException("no token available");
+        }
+        if (token.isExpired()) {
+            throw new AccessTokenUnavailableException("token expired");
         }
         return token;
     }
