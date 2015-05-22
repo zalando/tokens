@@ -49,19 +49,19 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         scheduler.schedule(this, 1, TimeUnit.SECONDS);
     }
 
-    private int percentLeft(final AccessToken token) {
+    static int percentLeft(final AccessToken token) {
         final long now = System.currentTimeMillis();
         final long validUntil = token.getValidUntil().getTime();
         final long hundredPercentSeconds = token.getInitialValidSeconds();
-        final long secondsLeft = validUntil - now;
-        return (int) (secondsLeft / hundredPercentSeconds * 100);
+        final long secondsLeft = (validUntil - now) / 1000;
+        return (int) ((double)secondsLeft / (double)hundredPercentSeconds * (double)100);
     }
 
-    private boolean shouldRefresh(final AccessToken token) {
+    static boolean shouldRefresh(final AccessToken token, AccessTokensBuilder configuration) {
         return percentLeft(token) <= configuration.getRefreshPercentLeft();
     }
 
-    private boolean shouldWarn(final AccessToken token) {
+    static boolean shouldWarn(final AccessToken token, AccessTokensBuilder configuration) {
         return percentLeft(token) <= configuration.getWarnPercentLeft();
     }
 
@@ -71,14 +71,14 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
             for (final AccessTokenConfiguration tokenConfig : configuration.getAccessTokenConfigurations()) {
                 final AccessToken oldToken = accessTokens.get(tokenConfig.getTokenId());
                 // TODO optionally check with tokeninfo endpoint regularly (every x% of time)
-                if (oldToken == null || shouldRefresh(oldToken)) {
+                if (oldToken == null || shouldRefresh(oldToken, configuration)) {
                     try {
                         LOG.trace("Refreshing access token {}...", tokenConfig.getTokenId());
                         final AccessToken newToken = createToken(tokenConfig);
                         accessTokens.put(tokenConfig.getTokenId(), newToken);
                         LOG.debug("Refreshed access token {}.", tokenConfig.getTokenId());
                     } catch (final Throwable t) {
-                        if (oldToken == null || shouldWarn(oldToken)) {
+                        if (oldToken == null || shouldWarn(oldToken, configuration)) {
                             LOG.warn("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
                         } else {
                             LOG.debug("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
