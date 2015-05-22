@@ -69,7 +69,6 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     @Override
     public void run() {
         try {
-            LOG.info("checking tokens...");
             for (final AccessTokenConfiguration tokenConfig : configuration.getAccessTokenConfigurations()) {
                 final AccessToken oldToken = accessTokens.get(tokenConfig.getTokenId());
                 // TODO optionally check with tokeninfo endpoint regularly (every x% of time)
