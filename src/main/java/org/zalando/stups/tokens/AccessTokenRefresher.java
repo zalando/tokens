@@ -151,7 +151,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
                 // success status code?
                 final int status = response.getStatusLine().getStatusCode();
                 if (status < 200 || status >= 300) {
-                    throw new AccessTokenEndpointException(response.getStatusLine().toString());
+                    throw AccessTokenEndpointException.from(response);
                 }
 
                 // get json response
