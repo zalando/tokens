@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    <parent>
+        <groupId>org.zalando.stups.build</groupId>
+        <artifactId>stups-parent</artifactId>
+        <version>4</version>
+        <relativePath />
+    </parent>
     <groupId>org.zalando.stups</groupId>
     <artifactId>tokens</artifactId>
     <version>0.6.0-SNAPSHOT</version>
@@ -27,10 +32,15 @@
         </developer>
     </developers>
 
+    <properties>
+        <coveralls.dryRun>true</coveralls.dryRun>
+        <main.basedir>${basedir}</main.basedir>
+    </properties>
+
     <scm>
-        <connection>scm:git:git@github.com:zalando-stups/tokens.git</connection>
-        <developerConnection>scm:git:git@github.com:zalando-stups/tokens.git</developerConnection>
-        <url>git@github.com:zalando-stups/tokens.git</url>
+        <connection>scm:git:https://github.com/zalando-stups/tokens.git</connection>
+        <developerConnection>scm:git:https://github.com/zalando-stups/tokens.git</developerConnection>
+        <url>https://github.com/zalando-stups/tokens</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -66,6 +76,41 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.7.4.201502262128</version>
+                    <executions>
+                        <execution>
+                            <id>default-prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>default-prepare-agent-integration</id>
+                            <goals>
+                                <goal>prepare-agent-integration</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>default-report</id>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>default-report-integration</id>
+                            <goals>
+                                <goal>report-integration</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -76,54 +121,32 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.2</version>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <dryRun>${coveralls.dryRun}</dryRun>
+                    <jacocoReports>
+                        <jacocoReport>target/site/jacoco/jacoco.xml</jacocoReport>
+                    </jacocoReports>
+                </configuration>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>travis</id>
+            <properties>
+                <coveralls.dryRun>false</coveralls.dryRun>
+            </properties>
+        </profile>
+    </profiles>
 
     <distributionManagement>
         <snapshotRepository>
