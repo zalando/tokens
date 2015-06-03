@@ -1,0 +1,14 @@
+language: java
+
+jdk:
+    - oraclejdk8
+
+script:
+    - mvn install
+
+after_success:
+  - mvn coveralls:report -Ptravis
+
+notifications:
+    email:
+      on_failure: change
