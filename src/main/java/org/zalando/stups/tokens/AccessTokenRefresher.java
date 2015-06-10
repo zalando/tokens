@@ -15,9 +15,16 @@
  */
 package org.zalando.stups.tokens;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
@@ -36,19 +43,21 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 class AccessTokenRefresher implements AccessTokens, Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenRefresher.class);
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    private static final long ONE_YEAR_SECONDS = 3600 * 24 * 365;
+    private static final String FIXED_TOKENS_ENV_VAR = "OAUTH2_ACCESS_TOKENS";
 
     private final AccessTokensBuilder configuration;
     private final ScheduledExecutorService scheduler;
@@ -60,7 +69,28 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
+    protected void initializeFixedTokensFromEnvironment() {
+        final String csv = System.getProperty(FIXED_TOKENS_ENV_VAR);
+        if (csv != null) {
+            LOG.info("Initializing fixed access tokens from {} environment variable..", FIXED_TOKENS_ENV_VAR);
+
+            final String[] tokens = csv.split(",");
+            final long expiresInSeconds = ONE_YEAR_SECONDS;
+            final Date validUntil = new Date(System.currentTimeMillis() + (expiresInSeconds * 1000));
+            for (String token : tokens) {
+                final String[] keyValue = token.split("=");
+                if (keyValue.length == 2) {
+                    LOG.info("Using fixed access token {}..", keyValue[0]);
+                    accessTokens.put(keyValue[0], new AccessToken(keyValue[1], "fixed", expiresInSeconds, validUntil));
+                } else {
+                    LOG.error("Could not create access token from {}", token);
+                }
+            }
+        }
+    }
+
     void start() {
+        initializeFixedTokensFromEnvironment();
         LOG.info("Starting to refresh tokens regularly...");
         scheduler.scheduleAtFixedRate(this, 1, 1, TimeUnit.SECONDS);
     }
@@ -70,14 +100,14 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         final long validUntil = token.getValidUntil().getTime();
         final long hundredPercentSeconds = token.getInitialValidSeconds();
         final long secondsLeft = (validUntil - now) / 1000;
-        return (int) ((double)secondsLeft / (double)hundredPercentSeconds * (double)100);
+        return (int) ((double) secondsLeft / (double) hundredPercentSeconds * (double) 100);
     }
 
-    static boolean shouldRefresh(final AccessToken token, AccessTokensBuilder configuration) {
+    static boolean shouldRefresh(final AccessToken token, final AccessTokensBuilder configuration) {
         return percentLeft(token) <= configuration.getRefreshPercentLeft();
     }
 
-    static boolean shouldWarn(final AccessToken token, AccessTokensBuilder configuration) {
+    static boolean shouldWarn(final AccessToken token, final AccessTokensBuilder configuration) {
         return percentLeft(token) <= configuration.getWarnPercentLeft();
     }
 
@@ -86,10 +116,12 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         try {
             for (final AccessTokenConfiguration tokenConfig : configuration.getAccessTokenConfigurations()) {
                 final AccessToken oldToken = accessTokens.get(tokenConfig.getTokenId());
+
                 // TODO optionally check with tokeninfo endpoint regularly (every x% of time)
                 if (oldToken == null || shouldRefresh(oldToken, configuration)) {
                     try {
                         LOG.trace("Refreshing access token {}...", tokenConfig.getTokenId());
+
                         final AccessToken newToken = createToken(tokenConfig);
                         accessTokens.put(tokenConfig.getTokenId(), newToken);
                         LOG.info("Refreshed access token {}.", tokenConfig.getTokenId());
@@ -122,34 +154,35 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     private AccessToken createToken(final AccessTokenConfiguration tokenConfig) {
         try {
+
             // collect credentials
             final ClientCredentials clientCredentials = configuration.getClientCredentialsProvider().get();
             final UserCredentials userCredentials = configuration.getUserCredentialsProvider().get();
 
             // prepare basic auth credentials
             final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(
-                    new AuthScope(configuration.getAccessTokenUri().getHost(),
-                            configuration.getAccessTokenUri().getPort()),
-                    new UsernamePasswordCredentials(clientCredentials.getId(),
-                            clientCredentials.getSecret()));
+            credentialsProvider.setCredentials(new AuthScope(configuration.getAccessTokenUri().getHost(),
+                    configuration.getAccessTokenUri().getPort()),
+                new UsernamePasswordCredentials(clientCredentials.getId(), clientCredentials.getSecret()));
 
             // create a new client that targets our host with basic auth enabled
-            final CloseableHttpClient client = HttpClients.custom()
-                    .setDefaultCredentialsProvider(credentialsProvider)
-                    .build();
+            final CloseableHttpClient client = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider)
+                                                          .build();
             final HttpHost host = new HttpHost(configuration.getAccessTokenUri().getHost(),
                     configuration.getAccessTokenUri().getPort(), configuration.getAccessTokenUri().getScheme());
             final HttpPost request = new HttpPost(configuration.getAccessTokenUri());
 
             // prepare the request body
 
-            final List<NameValuePair> values = new ArrayList<NameValuePair>() {{
-                add(new BasicNameValuePair("grant_type", "password"));
-                add(new BasicNameValuePair("username", userCredentials.getUsername()));
-                add(new BasicNameValuePair("password", userCredentials.getPassword()));
-                add(new BasicNameValuePair("scope", joinScopes(tokenConfig.getScopes())));
-            }};
+            final List<NameValuePair> values = new ArrayList<NameValuePair>() {
+
+                {
+                    add(new BasicNameValuePair("grant_type", "password"));
+                    add(new BasicNameValuePair("username", userCredentials.getUsername()));
+                    add(new BasicNameValuePair("password", userCredentials.getPassword()));
+                    add(new BasicNameValuePair("scope", joinScopes(tokenConfig.getScopes())));
+                }
+            };
             request.setEntity(new UrlEncodedFormEntity(values));
 
             // enable basic auth for the request
@@ -163,6 +196,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
             // execute!
             final CloseableHttpResponse response = client.execute(host, request, localContext);
             try {
+
                 // success status code?
                 final int status = response.getStatusLine().getStatusCode();
                 if (status < 200 || status >= 300) {
@@ -176,7 +210,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
                 // create new access token object
                 final Date validUntil = new Date(System.currentTimeMillis()
-                        + (accessTokenResponse.expiresInSeconds * 1000));
+                            + (accessTokenResponse.expiresInSeconds * 1000));
 
                 return new AccessToken(accessTokenResponse.getAccessToken(), accessTokenResponse.getTokenType(),
                         accessTokenResponse.getExpiresInSeconds(), validUntil);
@@ -189,19 +223,21 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     }
 
     @Override
-    public String get(Object tokenId) throws AccessTokenUnavailableException {
+    public String get(final Object tokenId) throws AccessTokenUnavailableException {
         return getAccessToken(tokenId).getToken();
     }
 
     @Override
-    public AccessToken getAccessToken(Object tokenId) throws AccessTokenUnavailableException {
+    public AccessToken getAccessToken(final Object tokenId) throws AccessTokenUnavailableException {
         final AccessToken token = accessTokens.get(tokenId);
         if (token == null) {
             throw new AccessTokenUnavailableException("no token available");
         }
+
         if (token.isExpired()) {
             throw new AccessTokenUnavailableException("token expired");
         }
+
         return token;
     }
 
