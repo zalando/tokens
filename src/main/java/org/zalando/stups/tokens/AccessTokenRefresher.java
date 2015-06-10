@@ -50,6 +50,9 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+    private static final long ONE_YEAR_SECONDS = 3600*24*365;
+    private static final String FIXED_TOKENS_ENV_VAR = "OAUTH2_ACCESS_TOKENS";
+
     private final AccessTokensBuilder configuration;
     private final ScheduledExecutorService scheduler;
 
@@ -60,7 +63,25 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
+    void initializeFixedTokensFromEnvironment() {
+        final String csv = System.getenv(FIXED_TOKENS_ENV_VAR);
+        if (csv != null) {
+            LOG.info("Initializing fixed access tokens from {} environment variable..", FIXED_TOKENS_ENV_VAR);
+            final String[] tokens = csv.split(",");
+            final long expiresInSeconds = ONE_YEAR_SECONDS;
+            final Date validUntil = new Date(System.currentTimeMillis() + (expiresInSeconds * 1000));
+            for (String token : tokens) {
+                final String[] keyValue = token.split("=");
+                if (keyValue.length == 2) {
+                    LOG.info("Using fixed access token {}..", keyValue[0]);
+                    accessTokens.put(keyValue[0], new AccessToken(keyValue[1], "fixed", expiresInSeconds, validUntil));
+                }
+            }
+        }
+    }
+
     void start() {
+        initializeFixedTokensFromEnvironment();
         LOG.info("Starting to refresh tokens regularly...");
         scheduler.scheduleAtFixedRate(this, 1, 1, TimeUnit.SECONDS);
     }
