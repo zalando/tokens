@@ -25,9 +25,9 @@ public class AccessTokenRefresherInitTest {
 
     @Test
     public void testInitializeFromEnvironment() {
-        System.setProperty("OAUTH2_ACCESS_TOKENS", "kio=1234567890,pierone=987654321");
 
-        AccessTokenRefresher refresher = new AccessTokenRefresher(config(30, 10));
+        AccessTokenRefresher refresher = new TestAccessTokenRefresher(config(30, 10),
+                "kio=1234567890,pierone=987654321");
         refresher.initializeFixedTokensFromEnvironment();
         Assert.assertEquals(refresher.get("kio"), "1234567890");
         Assert.assertEquals(refresher.get("pierone"), "987654321");
@@ -35,9 +35,9 @@ public class AccessTokenRefresherInitTest {
 
     @Test(expected = AccessTokenUnavailableException.class)
     public void testInitializeFromEnvironmentFailure() {
-        System.setProperty("OAUTH2_ACCESS_TOKENS", "kio=,pierone=987654321");
+        // System.setProperty("OAUTH2_ACCESS_TOKENS", "kio=,pierone=987654321");
 
-        AccessTokenRefresher refresher = new AccessTokenRefresher(config(30, 10));
+        AccessTokenRefresher refresher = new TestAccessTokenRefresher(config(30, 10), "kio=,pierone=987654321");
         refresher.initializeFixedTokensFromEnvironment();
 
         // this works
@@ -55,5 +55,21 @@ public class AccessTokenRefresherInitTest {
         } catch (URISyntaxException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    private static class TestAccessTokenRefresher extends AccessTokenRefresher {
+
+        private final String fixedToken;
+
+        public TestAccessTokenRefresher(final AccessTokensBuilder configuration, final String fixedToken) {
+            super(configuration);
+            this.fixedToken = fixedToken;
+        }
+
+        @Override
+        protected String getFixedToken() {
+            return fixedToken;
+        }
+
     }
 }

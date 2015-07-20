@@ -70,7 +70,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     }
 
     protected void initializeFixedTokensFromEnvironment() {
-        final String csv = System.getProperty(FIXED_TOKENS_ENV_VAR);
+        final String csv = getFixedToken();
         if (csv != null) {
             LOG.info("Initializing fixed access tokens from {} environment variable..", FIXED_TOKENS_ENV_VAR);
 
@@ -87,6 +87,11 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
                 }
             }
         }
+    }
+
+    // visible for testing
+    protected String getFixedToken() {
+        return System.getenv(FIXED_TOKENS_ENV_VAR);
     }
 
     void start() {
