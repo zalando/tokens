@@ -127,9 +127,13 @@ public class AccessTokensBuilder {
             userCredentialsProvider = new JsonFileBackedUserCredentialsProvider();
         }
 
-        final AccessTokenRefresher refresher = new AccessTokenRefresher(this);
+        final AccessTokenRefresher refresher = getAccessTokenRefresher();
         refresher.run();
         refresher.start();
         return refresher;
+    }
+
+    protected AccessTokenRefresher getAccessTokenRefresher() {
+        return new AccessTokenRefresher(this);
     }
 }
