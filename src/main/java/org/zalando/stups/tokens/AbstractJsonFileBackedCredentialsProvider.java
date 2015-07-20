@@ -18,11 +18,12 @@ package org.zalando.stups.tokens;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
+import java.util.function.Supplier;
 
 public abstract class AbstractJsonFileBackedCredentialsProvider {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private final File file;
+    private final Supplier<File> fileSupplier;
 
     private static File getCredentialsDir() {
         final String dir = System.getenv("CREDENTIALS_DIR");
@@ -33,20 +34,20 @@ public abstract class AbstractJsonFileBackedCredentialsProvider {
     }
 
     public AbstractJsonFileBackedCredentialsProvider(final String filename) {
-        this(new File(getCredentialsDir(), filename));
+        this.fileSupplier = () -> new File(getCredentialsDir(), filename);
     }
 
     public AbstractJsonFileBackedCredentialsProvider(final File file) {
-        this.file = file;
+        this.fileSupplier = () -> file;
     }
 
     protected File getFile() {
-        return file;
+        return fileSupplier.get();
     }
 
     protected  <T> T read(final Class<T> cls) {
         try {
-            return OBJECT_MAPPER.readValue(file, cls);
+            return OBJECT_MAPPER.readValue(getFile(), cls);
         } catch (final Throwable e) {
             throw new CredentialsUnavailableException(e.getMessage(), e);
         }
