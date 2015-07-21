@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2015 Zalando SE (http://tech.zalando.com)
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -170,12 +170,12 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
             // prepare basic auth credentials
             final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
             credentialsProvider.setCredentials(new AuthScope(configuration.getAccessTokenUri().getHost(),
-                            configuration.getAccessTokenUri().getPort()),
-                    new UsernamePasswordCredentials(clientCredentials.getId(), clientCredentials.getSecret()));
+                    configuration.getAccessTokenUri().getPort()),
+                new UsernamePasswordCredentials(clientCredentials.getId(), clientCredentials.getSecret()));
 
             // create a new client that targets our host with basic auth enabled
             final CloseableHttpClient client = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider)
-                    .build();
+                                                          .build();
             final HttpHost host = new HttpHost(configuration.getAccessTokenUri().getHost(),
                     configuration.getAccessTokenUri().getPort(), configuration.getAccessTokenUri().getScheme());
             final HttpPost request = new HttpPost(configuration.getAccessTokenUri());
@@ -218,7 +218,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
                 // create new access token object
                 final Date validUntil = new Date(System.currentTimeMillis()
-                        + (accessTokenResponse.expiresInSeconds * 1000));
+                            + (accessTokenResponse.expiresInSeconds * 1000));
 
                 return new AccessToken(accessTokenResponse.getAccessToken(), accessTokenResponse.getTokenType(),
                         accessTokenResponse.getExpiresInSeconds(), validUntil);
