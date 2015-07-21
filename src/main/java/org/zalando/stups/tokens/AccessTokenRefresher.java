@@ -91,7 +91,11 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     // visible for testing
     protected String getFixedToken() {
-        return System.getenv(FIXED_TOKENS_ENV_VAR);
+        final String tokens = System.getProperty(FIXED_TOKENS_ENV_VAR);
+        if (tokens == null) {
+            return System.getenv(FIXED_TOKENS_ENV_VAR);
+        }
+        return tokens;
     }
 
     void start() {
