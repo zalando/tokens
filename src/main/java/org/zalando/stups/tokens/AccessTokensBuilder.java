@@ -128,7 +128,6 @@ public class AccessTokensBuilder {
         }
 
         final AccessTokenRefresher refresher = getAccessTokenRefresher();
-        refresher.run();
         refresher.start();
         return refresher;
     }

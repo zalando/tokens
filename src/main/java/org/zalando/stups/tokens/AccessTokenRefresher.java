@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2015 Zalando SE (http://tech.zalando.com)
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,16 +15,9 @@
  */
 package org.zalando.stups.tokens;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
@@ -43,13 +36,18 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 class AccessTokenRefresher implements AccessTokens, Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenRefresher.class);
@@ -101,6 +99,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     void start() {
         initializeFixedTokensFromEnvironment();
         LOG.info("Starting to refresh tokens regularly...");
+        run();
         scheduler.scheduleAtFixedRate(this, 1, 1, TimeUnit.SECONDS);
     }
 
@@ -171,12 +170,12 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
             // prepare basic auth credentials
             final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
             credentialsProvider.setCredentials(new AuthScope(configuration.getAccessTokenUri().getHost(),
-                    configuration.getAccessTokenUri().getPort()),
-                new UsernamePasswordCredentials(clientCredentials.getId(), clientCredentials.getSecret()));
+                            configuration.getAccessTokenUri().getPort()),
+                    new UsernamePasswordCredentials(clientCredentials.getId(), clientCredentials.getSecret()));
 
             // create a new client that targets our host with basic auth enabled
             final CloseableHttpClient client = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider)
-                                                          .build();
+                    .build();
             final HttpHost host = new HttpHost(configuration.getAccessTokenUri().getHost(),
                     configuration.getAccessTokenUri().getPort(), configuration.getAccessTokenUri().getScheme());
             final HttpPost request = new HttpPost(configuration.getAccessTokenUri());
@@ -219,7 +218,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
                 // create new access token object
                 final Date validUntil = new Date(System.currentTimeMillis()
-                            + (accessTokenResponse.expiresInSeconds * 1000));
+                        + (accessTokenResponse.expiresInSeconds * 1000));
 
                 return new AccessToken(accessTokenResponse.getAccessToken(), accessTokenResponse.getTokenType(),
                         accessTokenResponse.getExpiresInSeconds(), validUntil);
