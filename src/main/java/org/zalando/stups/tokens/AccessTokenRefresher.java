@@ -42,12 +42,13 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static java.util.stream.Collectors.joining;
 
 class AccessTokenRefresher implements AccessTokens, Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenRefresher.class);
@@ -148,16 +149,8 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         }
     }
 
-    private static String joinScopes(final Collection<Object> scopes) {
-        final Iterator<Object> iter = scopes.iterator();
-
-        final StringBuilder scope = new StringBuilder(iter.next().toString());
-        while (iter.hasNext()) {
-            scope.append(' ');
-            scope.append(iter.next().toString());
-        }
-
-        return scope.toString();
+    private static String joinScopes(final Collection<String> scopes) {
+        return scopes.stream().collect(joining(" "));
     }
 
     private AccessToken createToken(final AccessTokenConfiguration tokenConfig) {
