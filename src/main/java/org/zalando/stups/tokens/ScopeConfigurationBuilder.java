@@ -35,20 +35,20 @@ abstract class ScopeConfigurationBuilder {
     protected abstract AccessTokenConfiguration.ScopeConfiguration build();
 
     static class Static extends ScopeConfigurationBuilder {
-        private final Set<String> scopes;
+        private final Set<Object> scopes;
 
         public Static(final AccessTokenConfigurationBuilder builder,
-                final Set<String> scopes) {
+                final Set<Object> scopes) {
             super(builder);
             this.scopes = scopes;
         }
 
-        public Static addScope(final String scope) {
+        public Static addScope(final Object scope) {
             scopes.add(scope);
             return this;
         }
 
-        public Static addScopes(final Collection<String> newScopes) {
+        public Static addScopes(final Collection<Object> newScopes) {
             scopes.addAll(newScopes);
             return this;
         }
@@ -61,10 +61,10 @@ abstract class ScopeConfigurationBuilder {
 
     static class Dynamic extends ScopeConfigurationBuilder {
 
-        private final Supplier<Set<String>> scopeSupplier;
+        private final Supplier<Set<Object>> scopeSupplier;
 
         public Dynamic(final AccessTokenConfigurationBuilder builder,
-                final Supplier<Set<String>> scopeSupplier) {
+                final Supplier<Set<Object>> scopeSupplier) {
             super(builder);
             this.scopeSupplier = scopeSupplier;
         }

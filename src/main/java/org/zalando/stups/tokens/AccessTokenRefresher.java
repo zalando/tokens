@@ -149,8 +149,8 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         }
     }
 
-    private static String joinScopes(final Collection<String> scopes) {
-        return scopes.stream().collect(joining(" "));
+    private static String joinScopes(final Collection<Object> scopes) {
+        return scopes.stream().map(Object::toString).collect(joining(" "));
     }
 
     private AccessToken createToken(final AccessTokenConfiguration tokenConfig) {

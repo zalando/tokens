@@ -31,19 +31,19 @@ public class AccessTokenConfigurationBuilder {
         this.accessTokensBuilder = accessTokensBuilder;
     }
 
-    public ScopeConfigurationBuilder.Static addScope(final String scope) {
+    public ScopeConfigurationBuilder.Static addScope(final Object scope) {
         return new ScopeConfigurationBuilder.Static(this, new HashSet<>(singletonList(scope)));
     }
 
-    public ScopeConfigurationBuilder.Static addScopes(final Collection<String> scopes) {
+    public ScopeConfigurationBuilder.Static addScopes(final Collection<Object> scopes) {
         return new ScopeConfigurationBuilder.Static(this, new HashSet<>(scopes));
     }
 
-    public ScopeConfigurationBuilder.Dynamic addScope(final Supplier<String> scopeSupplier) {
+    public ScopeConfigurationBuilder.Dynamic addScope(final Supplier<Object> scopeSupplier) {
         return new ScopeConfigurationBuilder.Dynamic(this, () -> new HashSet<>(singletonList(scopeSupplier.get())));
     }
 
-    public ScopeConfigurationBuilder.Dynamic addScopes(final Supplier<Set<String>> scopeSupplier) {
+    public ScopeConfigurationBuilder.Dynamic addScopes(final Supplier<Set<Object>> scopeSupplier) {
         return new ScopeConfigurationBuilder.Dynamic(this, scopeSupplier);
     }
 

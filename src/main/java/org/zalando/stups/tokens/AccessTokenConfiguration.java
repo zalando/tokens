@@ -21,7 +21,7 @@ public class AccessTokenConfiguration {
 
     @FunctionalInterface
     interface ScopeConfiguration {
-        Set<String> getScopes();
+        Set<Object> getScopes();
     }
 
     private final Object tokenId;
@@ -37,7 +37,7 @@ public class AccessTokenConfiguration {
         return tokenId;
     }
 
-    Set<String> getScopes() {
+    Set<Object> getScopes() {
         return scopeConfiguration.getScopes();
     }
 }
