@@ -15,14 +15,14 @@
  */
 package org.zalando.stups.tokens;
 
-import java.io.File;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.File;
 
 public abstract class AbstractJsonFileBackedCredentialsProvider {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private final FileSupplier fileSupplier;
+    private final Supplier<File> fileSupplier;
 
     public AbstractJsonFileBackedCredentialsProvider(final String filename) {
         this.fileSupplier = new FileSupplier(filename);

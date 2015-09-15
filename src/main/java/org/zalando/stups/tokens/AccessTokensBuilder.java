@@ -16,7 +16,6 @@
 package org.zalando.stups.tokens;
 
 import java.net.URI;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -76,13 +75,10 @@ public class AccessTokensBuilder {
         return this;
     }
 
-    public AccessTokenConfiguration manageToken(final Object tokenId) {
+    public AccessTokenConfigurationBuilder manageToken(final Object tokenId) {
         checkLock();
         checkNotNull("tokenId", tokenId);
-
-        final AccessTokenConfiguration config = new AccessTokenConfiguration(tokenId, this);
-        accessTokenConfigurations.add(config);
-        return config;
+        return new AccessTokenConfigurationBuilder(tokenId, this);
     }
 
     URI getAccessTokenUri() {
@@ -103,6 +99,10 @@ public class AccessTokensBuilder {
 
     int getWarnPercentLeft() {
         return warnPercentLeft;
+    }
+
+    void addAccessTokenConfigurations(final AccessTokenConfiguration configuration) {
+        accessTokenConfigurations.add(configuration);
     }
 
     Set<AccessTokenConfiguration> getAccessTokenConfigurations() {

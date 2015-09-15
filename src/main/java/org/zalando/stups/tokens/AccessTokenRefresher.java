@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -149,15 +148,11 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     }
 
     private static String joinScopes(final Collection<Object> scopes) {
-        final Iterator<Object> iter = scopes.iterator();
-
-        final StringBuilder scope = new StringBuilder(iter.next().toString());
-        while (iter.hasNext()) {
-            scope.append(' ');
-            scope.append(iter.next().toString());
+        StringBuilder joined = new StringBuilder(scopes.size() * 15);
+        for (Object scope : scopes) {
+            joined.append(scope).append(" ");
         }
-
-        return scope.toString();
+        return joined.toString().trim();
     }
 
     private AccessToken createToken(final AccessTokenConfiguration tokenConfig) {

@@ -15,16 +15,16 @@
  */
 package org.zalando.stups.tokens;
 
-import java.io.File;
-
 import org.apache.http.util.Args;
+
+import java.io.File;
 
 /**
  * Replacement to make it compatible with Java7.
  *
- * @author  jbellmann
+ * @author jbellmann
  */
-class FileSupplier {
+class FileSupplier implements Supplier<File> {
 
     private File file;
     private final String filename;
@@ -38,6 +38,7 @@ class FileSupplier {
         this.filename = Args.notBlank(filename, "filename");
     }
 
+    @Override
     public synchronized File get() {
         if (file != null) {
             return file;
