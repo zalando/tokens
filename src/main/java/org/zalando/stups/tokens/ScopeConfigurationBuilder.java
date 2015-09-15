@@ -16,9 +16,9 @@
 package org.zalando.stups.tokens;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
-import java.util.function.Supplier;
+
+import static java.util.Collections.unmodifiableSet;
 
 abstract class ScopeConfigurationBuilder {
 
@@ -34,7 +34,7 @@ abstract class ScopeConfigurationBuilder {
 
     protected abstract AccessTokenConfiguration.ScopeConfiguration build();
 
-    static class Static extends ScopeConfigurationBuilder {
+    public static class Static extends ScopeConfigurationBuilder {
         private final Set<Object> scopes;
 
         public Static(final AccessTokenConfigurationBuilder builder,
@@ -55,11 +55,16 @@ abstract class ScopeConfigurationBuilder {
 
         @Override
         protected AccessTokenConfiguration.ScopeConfiguration build() {
-            return () -> Collections.unmodifiableSet(scopes);
+            return new AccessTokenConfiguration.ScopeConfiguration() {
+                @Override
+                public Set<Object> getScopes() {
+                    return unmodifiableSet(scopes);
+                }
+            };
         }
     }
 
-    static class Dynamic extends ScopeConfigurationBuilder {
+    public static class Dynamic extends ScopeConfigurationBuilder {
 
         private final Supplier<Set<Object>> scopeSupplier;
 
@@ -71,7 +76,12 @@ abstract class ScopeConfigurationBuilder {
 
         @Override
         protected AccessTokenConfiguration.ScopeConfiguration build() {
-            return () -> Collections.unmodifiableSet(scopeSupplier.get());
+            return new AccessTokenConfiguration.ScopeConfiguration() {
+                @Override
+                public Set<Object> getScopes() {
+                    return unmodifiableSet(scopeSupplier.get());
+                }
+            };
         }
     }
 }

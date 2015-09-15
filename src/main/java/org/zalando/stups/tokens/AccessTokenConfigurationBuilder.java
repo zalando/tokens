@@ -18,7 +18,6 @@ package org.zalando.stups.tokens;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static java.util.Collections.singletonList;
 
@@ -40,7 +39,12 @@ public class AccessTokenConfigurationBuilder {
     }
 
     public ScopeConfigurationBuilder.Dynamic addScope(final Supplier<Object> scopeSupplier) {
-        return new ScopeConfigurationBuilder.Dynamic(this, () -> new HashSet<>(singletonList(scopeSupplier.get())));
+        return new ScopeConfigurationBuilder.Dynamic(this, new Supplier<Set<Object>>() {
+            @Override
+            public Set<Object> get() {
+                return new HashSet<>(singletonList(scopeSupplier.get()));
+            }
+        });
     }
 
     public ScopeConfigurationBuilder.Dynamic addScopes(final Supplier<Set<Object>> scopeSupplier) {

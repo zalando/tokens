@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.zalando.stups.tokens;
+package org.zalando.stups.example;
 
 import org.junit.Test;
+import org.zalando.stups.tokens.AccessTokens;
+import org.zalando.stups.tokens.Supplier;
+import org.zalando.stups.tokens.Tokens;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Testing whether the API actually provides the functionality we expose in the README
@@ -43,10 +47,20 @@ public class TokensApiTest {
     public void testDynamicUsage() throws URISyntaxException {
         AccessTokens tokens = Tokens.createAccessTokensWithUri(new URI("https://example.com/access_tokens"))
                 .manageToken("a")
-                .addScope(() -> "x")
+                .addScope(new Supplier<Object>() {
+                    @Override
+                    public Object get() {
+                        return "x";
+                    }
+                })
                 .done()
                 .manageToken("b")
-                .addScopes(HashSet::new)
+                .addScopes(new Supplier<Set<Object>>() {
+                    @Override
+                    public Set<Object> get() {
+                        return new HashSet<>();
+                    }
+                })
                 .done()
                 .start();
     }

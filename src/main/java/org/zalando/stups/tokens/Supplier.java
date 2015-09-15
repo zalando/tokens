@@ -15,28 +15,16 @@
  */
 package org.zalando.stups.tokens;
 
-import java.util.Set;
+/**
+ * Backport of Java8 java.util.Supplier
+ */
+public interface Supplier<T> {
 
-public class AccessTokenConfiguration {
+    /**
+     * Gets a result.
+     *
+     * @return a result
+     */
+    T get();
 
-    interface ScopeConfiguration {
-        Set<Object> getScopes();
-    }
-
-    private final Object tokenId;
-
-    private final ScopeConfiguration scopeConfiguration;
-
-    AccessTokenConfiguration(final Object tokenId, final ScopeConfiguration scopeConfiguration) {
-        this.tokenId = tokenId;
-        this.scopeConfiguration = scopeConfiguration;
-    }
-
-    Object getTokenId() {
-        return tokenId;
-    }
-
-    Set<Object> getScopes() {
-        return scopeConfiguration.getScopes();
-    }
 }

@@ -48,8 +48,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.stream.Collectors.joining;
-
 class AccessTokenRefresher implements AccessTokens, Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenRefresher.class);
 
@@ -150,7 +148,11 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     }
 
     private static String joinScopes(final Collection<Object> scopes) {
-        return scopes.stream().map(Object::toString).collect(joining(" "));
+        StringBuilder joined = new StringBuilder(scopes.size() * 15);
+        for (Object scope : scopes) {
+            joined.append(scope).append(" ");
+        }
+        return joined.toString().trim();
     }
 
     private AccessToken createToken(final AccessTokenConfiguration tokenConfig) {
