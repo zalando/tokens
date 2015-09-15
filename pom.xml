@@ -9,7 +9,7 @@
     </parent>
     <groupId>org.zalando.stups</groupId>
     <artifactId>tokens</artifactId>
-    <version>0.9.1-SNAPSHOT</version>
+    <version>0.9.2-SNAPSHOT</version>
 
     <name>Tokens</name>
     <description>
@@ -35,8 +35,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <java.source>1.8</java.source>
-        <java.target>1.8</java.target>
+        <java.source>1.7</java.source>
+        <java.target>1.7</java.target>
 
         <coveralls.dryRun>true</coveralls.dryRun>
         <main.basedir>${basedir}</main.basedir>
@@ -46,8 +46,8 @@
         <connection>scm:git:https://github.com/zalando-stups/tokens.git</connection>
         <developerConnection>scm:git:https://github.com/zalando-stups/tokens.git</developerConnection>
         <url>https://github.com/zalando-stups/tokens</url>
-        <tag>HEAD</tag>
-    </scm>
+      <tag>HEAD</tag>
+  </scm>
 
     <dependencies>
         <dependency>
