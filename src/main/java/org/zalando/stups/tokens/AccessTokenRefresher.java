@@ -15,9 +15,16 @@
  */
 package org.zalando.stups.tokens;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
@@ -36,18 +43,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 class AccessTokenRefresher implements AccessTokens, Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenRefresher.class);
@@ -93,6 +95,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         if (tokens == null) {
             return System.getenv(FIXED_TOKENS_ENV_VAR);
         }
+
         return tokens;
     }
 
@@ -100,7 +103,9 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         initializeFixedTokensFromEnvironment();
         LOG.info("Starting to refresh tokens regularly...");
         run();
-        scheduler.scheduleAtFixedRate(this, 1, 1, TimeUnit.SECONDS);
+
+        // #10, increase 'period' to 5 to avoid flooding the endpoint
+        scheduler.scheduleAtFixedRate(this, 1, 5, TimeUnit.SECONDS);
     }
 
     static int percentLeft(final AccessToken token) {
