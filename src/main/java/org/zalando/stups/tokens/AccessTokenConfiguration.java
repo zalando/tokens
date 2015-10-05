@@ -24,7 +24,7 @@ public class AccessTokenConfiguration {
     private final Object tokenId;
     private final AccessTokensBuilder accessTokensBuilder;
 
-    private final Set<Object> scopes = new HashSet<Object>();
+    private final Set<Object> scopes = new HashSet<>();
 
     private boolean locked = false;
 
@@ -32,6 +32,7 @@ public class AccessTokenConfiguration {
         this.tokenId = tokenId;
         this.accessTokensBuilder = accessTokensBuilder;
     }
+
     private void checkLock() {
         if (locked) {
             throw new IllegalStateException("scope configuration already done");
@@ -51,7 +52,7 @@ public class AccessTokenConfiguration {
         return this;
     }
 
-    public AccessTokenConfiguration addScopes(final Collection<Object> scopes) {
+    public AccessTokenConfiguration addScopes(final Collection<?> scopes) {
         checkLock();
         checkNotNull("scopes", scopes);
         this.scopes.addAll(scopes);
