@@ -19,5 +19,8 @@ import java.net.URI;
 
 public interface HttpProviderFactory {
 
-    HttpProvider create(ClientCredentials clientCredentials, UserCredentials userCredentials, URI accessTokenUri);
+    HttpProvider create(ClientCredentials clientCredentials,
+                        UserCredentials userCredentials,
+                        URI accessTokenUri,
+                        HttpConfig httpConfig);
 }

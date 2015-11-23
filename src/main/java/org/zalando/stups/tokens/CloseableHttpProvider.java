@@ -23,6 +23,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -51,10 +52,20 @@ public class CloseableHttpProvider extends AbstractHttpProvider {
     private UserCredentials userCredentials;
     private URI accessTokenUri;
     private final HttpHost host;
+    private final RequestConfig requestConfig;
 
-    public CloseableHttpProvider(ClientCredentials clientCredentials, UserCredentials userCredentials, URI accessTokenUri) {
+    public CloseableHttpProvider(ClientCredentials clientCredentials,
+                                 UserCredentials userCredentials,
+                                 URI accessTokenUri,
+                                 HttpConfig httpConfig) {
         this.userCredentials = userCredentials;
         this.accessTokenUri = accessTokenUri;
+        requestConfig = RequestConfig.custom()
+                    	        .setSocketTimeout(httpConfig.getSocketTimeout())
+                    	        .setConnectTimeout(httpConfig.getConnectTimeout())
+                    	        .setConnectionRequestTimeout(httpConfig.getConnectionRequestTimeout())
+                    	        .setStaleConnectionCheckEnabled(httpConfig.isStaleConnectionCheckEnabled())
+                    	        .build();
 
         // prepare basic auth credentials
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -82,6 +93,7 @@ public class CloseableHttpProvider extends AbstractHttpProvider {
 
         final HttpPost request = new HttpPost(accessTokenUri);
         request.setEntity(new UrlEncodedFormEntity(values));
+        request.setConfig(requestConfig);
 
         try (final CloseableHttpResponse response = client.execute(host, request, localContext)) {
 

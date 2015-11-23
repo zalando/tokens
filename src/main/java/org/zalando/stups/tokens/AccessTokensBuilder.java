@@ -29,6 +29,7 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     private int refreshPercentLeft = 40;
     private int warnPercentLeft = 20;
 
+    private final HttpConfig httpConfig = new HttpConfig();
     private final Set<AccessTokenConfiguration> accessTokenConfigurations = new HashSet<AccessTokenConfiguration>();
 
     private boolean locked = false;
@@ -66,7 +67,32 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     }
 
     public AccessTokensBuilder usingHttpProviderFactory(HttpProviderFactory factory) {
+        checkLock();
         this.httpProviderFactory = factory;
+        return this;
+    }
+
+    public AccessTokensBuilder socketTimeout(final int socketTimeout){
+        checkLock();
+        this.httpConfig.setSocketTimeout(socketTimeout);
+        return this;
+    }
+
+    public AccessTokensBuilder connectTimeout(final int connectTimeout){
+        checkLock();
+        this.httpConfig.setConnectTimeout(connectTimeout);
+        return this;
+    }
+
+    public AccessTokensBuilder connectionRequestTimeout(final int connectionRequestTimeout){
+        checkLock();
+        this.httpConfig.setConnectionRequestTimeout(connectionRequestTimeout);
+        return this;
+    }
+
+    public AccessTokensBuilder staleConnectionCheckEnabled(final boolean staleConnectionCheckEnabled){
+        checkLock();
+        this.httpConfig.setStaleConnectionCheckEnabled(staleConnectionCheckEnabled);
         return this;
     }
 
@@ -144,6 +170,10 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         final AccessTokenRefresher refresher = getAccessTokenRefresher();
         refresher.start();
         return refresher;
+    }
+
+    public HttpConfig getHttpConfig() {
+        return httpConfig;
     }
 
     protected AccessTokenRefresher getAccessTokenRefresher() {

@@ -32,4 +32,6 @@ public interface TokenRefresherConfiguration {
     URI getAccessTokenUri();
 
     HttpProviderFactory getHttpProviderFactory();
+
+    HttpConfig getHttpConfig();
 }

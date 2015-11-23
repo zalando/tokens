@@ -82,7 +82,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         final ClientCredentials clientCredentials = configuration.getClientCredentialsProvider().get();
         final UserCredentials userCredentials = configuration.getUserCredentialsProvider().get();
         httpProvider = configuration.getHttpProviderFactory().create(clientCredentials,
-                userCredentials, configuration.getAccessTokenUri());
+                userCredentials, configuration.getAccessTokenUri(), configuration.getHttpConfig());
         run();
 
         // #10, increase 'period' to 5 to avoid flooding the endpoint

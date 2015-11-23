@@ -19,7 +19,10 @@ import java.net.URI;
 
 public class ClosableHttpProviderFactory implements HttpProviderFactory {
     @Override
-    public HttpProvider create(ClientCredentials clientCredentials, UserCredentials userCredentials, URI accessTokenUri) {
-        return new CloseableHttpProvider(clientCredentials, userCredentials, accessTokenUri);
+    public HttpProvider create(ClientCredentials clientCredentials,
+                               UserCredentials userCredentials,
+                               URI accessTokenUri,
+                               HttpConfig httpConfig) {
+        return new CloseableHttpProvider(clientCredentials, userCredentials, accessTokenUri, httpConfig);
     }
 }
