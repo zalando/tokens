@@ -32,6 +32,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -43,7 +44,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,12 +61,25 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     private final AccessTokensBuilder configuration;
     private final ScheduledExecutorService scheduler;
+    
+    private final RequestConfig requestConfig;
+    
+    private final int schedulingPeriod;
 
     private ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<Object, AccessToken>();
 
     public AccessTokenRefresher(final AccessTokensBuilder configuration) {
         this.configuration = configuration;
         scheduler = Executors.newSingleThreadScheduledExecutor();
+        
+    	requestConfig = RequestConfig.custom()
+    	        .setSocketTimeout(configuration.getSocketTimeout())
+    	        .setConnectTimeout(configuration.getConnectTimeout())
+    	        .setConnectionRequestTimeout(configuration.getConnectionRequestTimeout())
+    	        .setStaleConnectionCheckEnabled(configuration.isStaleConnectionCheckEnabled())
+    	        .build();
+    	
+    	schedulingPeriod = configuration.getSchedulingPeriod();
     }
 
     protected void initializeFixedTokensFromEnvironment() {
@@ -104,8 +117,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         LOG.info("Starting to refresh tokens regularly...");
         run();
 
-        // #10, increase 'period' to 5 to avoid flooding the endpoint
-        scheduler.scheduleAtFixedRate(this, 1, 5, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this, 1, schedulingPeriod, TimeUnit.SECONDS);
     }
 
     static int percentLeft(final AccessToken token) {
@@ -197,6 +209,8 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
                 }
             };
             request.setEntity(new UrlEncodedFormEntity(values));
+            // specifies timeouts
+            request.setConfig(requestConfig);
 
             // enable basic auth for the request
             final AuthCache authCache = new BasicAuthCache();
