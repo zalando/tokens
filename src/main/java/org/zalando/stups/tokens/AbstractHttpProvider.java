@@ -15,11 +15,10 @@
  */
 package org.zalando.stups.tokens;
 
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 
-public abstract class AbstractHttpProvider implements HttpProvider{
-    public String joinScopes(final Collection<Object> scopes) {
+public abstract class AbstractHttpProvider implements HttpProvider {
+    protected String joinScopes(final Collection<Object> scopes) {
         final Iterator<Object> iter = scopes.iterator();
 
         final StringBuilder scope = new StringBuilder(iter.next().toString());
@@ -29,5 +28,22 @@ public abstract class AbstractHttpProvider implements HttpProvider{
         }
 
         return scope.toString();
+    }
+
+    protected Date calculateValidUntil(AccessTokenResponse accessTokenResponse) {
+        return new Date(System.currentTimeMillis()
+                + (accessTokenResponse.getExpiresInSeconds() * 1000));
+    }
+
+    protected Map<String, String> buildParameterMap(final AccessTokenConfiguration tokenConfig, UserCredentials userCredentials) {
+        Map<String, String> nameValuePairs = new HashMap<>();
+        String grantType = tokenConfig.getGrantType();
+        nameValuePairs.put("grant_type", grantType);
+        nameValuePairs.put("scope", joinScopes(tokenConfig.getScopes()));
+        if ("password".equals(grantType)) {
+            nameValuePairs.put("username", userCredentials.getUsername());
+            nameValuePairs.put("password", userCredentials.getPassword());
+        }
+        return nameValuePairs;
     }
 }
