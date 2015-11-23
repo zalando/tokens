@@ -24,7 +24,7 @@ public class AccessTokenConfiguration {
     private static final String DEFAULT_GRANT_TYPE = "password";
     private final Object tokenId;
     private final AccessTokensBuilder accessTokensBuilder;
-    private final String grantType;
+    private String grantType;
 
     private final Set<Object> scopes = new HashSet<>();
 
@@ -63,6 +63,13 @@ public class AccessTokenConfiguration {
         checkLock();
         checkNotNull("scopes", scopes);
         this.scopes.addAll(scopes);
+        return this;
+    }
+    
+    public AccessTokenConfiguration withGrantType(final String grantType) {
+        checkLock();
+        checkNotNull("grantType", grantType);
+        this.grantType=grantType;
         return this;
     }
 
