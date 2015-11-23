@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.http.client.config.RequestConfig;
+
 public class AccessTokensBuilder {
     private final URI accessTokenUri;
 
@@ -28,6 +30,22 @@ public class AccessTokensBuilder {
     private UserCredentialsProvider userCredentialsProvider = null;
     private int refreshPercentLeft = 40;
     private int warnPercentLeft = 20;
+    
+    // default here would -1 (undefined, system default)
+    private int socketTimeout = 2000;
+    
+    // default here would -1 (undefined, system default)
+    private int connectTimeout = 1000;
+    
+    // default here would -1 (undefined, system default)
+    private int connectionRequestTimeout = 500;
+
+    // default here would be 'true'
+    // but javadoc mention ' ... cause up to 30 millisecond overhead per request and should be used only when appropriate'
+    // so set default to false
+    private boolean staleConnectionCheckEnabled = false;
+    
+    private int schedulingPeriod = 5;
 
     private final Set<AccessTokenConfiguration> accessTokenConfigurations = new HashSet<AccessTokenConfiguration>();
 
@@ -75,6 +93,64 @@ public class AccessTokensBuilder {
         this.warnPercentLeft = warnPercentLeft;
         return this;
     }
+    
+    /**
+     * 
+     * @see RequestConfig#getSocketTimeout()
+     * 
+     * @param socketTimeout
+     * @return
+     */
+    public AccessTokensBuilder socketTimeout(final int socketTimeout){
+    	checkLock();
+    	this.socketTimeout = socketTimeout;
+    	return this;
+    }
+    
+    /**
+     * 
+     * @see RequestConfig#getConnectTimeout()
+     * 
+     * @param connectTimeout
+     * @return
+     */
+    public AccessTokensBuilder connectTimeout(final int connectTimeout){
+    	checkLock();
+    	this.connectTimeout = connectTimeout;
+    	return this;
+    }
+
+    /**
+     * 
+     * @see RequestConfig#getConnectionRequestTimeout()
+     * 
+     * @param connectionRequestTimeout
+     * @return
+     */
+    public AccessTokensBuilder connectionRequestTimeout(final int connectionRequestTimeout){
+    	checkLock();
+    	this.connectionRequestTimeout = connectionRequestTimeout;
+    	return this;
+    }
+    
+    /**
+     * 
+     * @see RequestConfig#isStaleConnectionCheckEnabled()
+     * 
+     * @param staleConnectionCheckEnabled
+     * @return
+     */
+    public AccessTokensBuilder staleConnectionCheckEnabled(final boolean staleConnectionCheckEnabled){
+    	checkLock();
+    	this.staleConnectionCheckEnabled = staleConnectionCheckEnabled;
+    	return this;
+    }
+    
+    public AccessTokensBuilder schedulingPeriod(final int schedulingPeriod){
+    	checkLock();
+    	this.schedulingPeriod = schedulingPeriod;
+    	return this;
+    }
 
     public AccessTokenConfiguration manageToken(final Object tokenId) {
         checkLock();
@@ -105,7 +181,27 @@ public class AccessTokensBuilder {
         return warnPercentLeft;
     }
 
-    Set<AccessTokenConfiguration> getAccessTokenConfigurations() {
+    public int getSocketTimeout() {
+		return socketTimeout;
+	}
+
+	public int getConnectTimeout() {
+		return connectTimeout;
+	}
+
+	public int getConnectionRequestTimeout() {
+		return connectionRequestTimeout;
+	}
+
+	public boolean isStaleConnectionCheckEnabled() {
+		return staleConnectionCheckEnabled;
+	}
+	
+	public int getSchedulingPeriod() {
+		return schedulingPeriod;
+	}
+
+	Set<AccessTokenConfiguration> getAccessTokenConfigurations() {
         return Collections.unmodifiableSet(accessTokenConfigurations);
     }
 
