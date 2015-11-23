@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AccessTokensBuilder {
+public class AccessTokensBuilder implements TokenRefresherConfiguration {
     private final URI accessTokenUri;
 
     private ClientCredentialsProvider clientCredentialsProvider = null;
@@ -32,6 +32,7 @@ public class AccessTokensBuilder {
     private final Set<AccessTokenConfiguration> accessTokenConfigurations = new HashSet<AccessTokenConfiguration>();
 
     private boolean locked = false;
+    private HttpProviderFactory httpProviderFactory;
 
     AccessTokensBuilder(final URI accessTokenUri) {
         this.accessTokenUri = accessTokenUri;
@@ -64,6 +65,11 @@ public class AccessTokensBuilder {
         return this;
     }
 
+    public AccessTokensBuilder usingHttpProviderFactory(HttpProviderFactory factory) {
+        this.httpProviderFactory = factory;
+        return this;
+    }
+
     public AccessTokensBuilder refreshPercentLeft(final int refreshPercentLeft) {
         checkLock();
         this.refreshPercentLeft = refreshPercentLeft;
@@ -85,27 +91,32 @@ public class AccessTokensBuilder {
         return config;
     }
 
-    URI getAccessTokenUri() {
+    public URI getAccessTokenUri() {
         return accessTokenUri;
     }
 
-    ClientCredentialsProvider getClientCredentialsProvider() {
+    @Override
+    public HttpProviderFactory getHttpProviderFactory() {
+        return this.httpProviderFactory;
+    }
+
+    public ClientCredentialsProvider getClientCredentialsProvider() {
         return clientCredentialsProvider;
     }
 
-    UserCredentialsProvider getUserCredentialsProvider() {
+    public UserCredentialsProvider getUserCredentialsProvider() {
         return userCredentialsProvider;
     }
 
-    int getRefreshPercentLeft() {
+    public int getRefreshPercentLeft() {
         return refreshPercentLeft;
     }
 
-    int getWarnPercentLeft() {
+    public int getWarnPercentLeft() {
         return warnPercentLeft;
     }
 
-    Set<AccessTokenConfiguration> getAccessTokenConfigurations() {
+    public Set<AccessTokenConfiguration> getAccessTokenConfigurations() {
         return Collections.unmodifiableSet(accessTokenConfigurations);
     }
 
@@ -125,6 +136,9 @@ public class AccessTokensBuilder {
 
             // use default
             userCredentialsProvider = new JsonFileBackedUserCredentialsProvider();
+        }
+        if(httpProviderFactory == null) {
+            this.httpProviderFactory = new ClosableHttpProviderFactory();
         }
 
         final AccessTokenRefresher refresher = getAccessTokenRefresher();
