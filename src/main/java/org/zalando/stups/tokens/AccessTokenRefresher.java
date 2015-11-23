@@ -83,7 +83,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         LOG.info("Starting to refresh tokens regularly...");
         final ClientCredentials clientCredentials = configuration.getClientCredentialsProvider().get();
         UserCredentials userCredentials = null;
-        if(configuration.getUserCredentialsProvider() != null) {
+        if (configuration.getUserCredentialsProvider() != null) {
             userCredentials = configuration.getUserCredentialsProvider().get();
         }
         httpProvider = configuration.getHttpProviderFactory().create(clientCredentials,
