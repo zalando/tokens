@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AccessTokensBuilder {
+public class AccessTokensBuilder implements TokenRefresherConfiguration {
     private final URI accessTokenUri;
 
     private ClientCredentialsProvider clientCredentialsProvider = null;
@@ -29,9 +29,12 @@ public class AccessTokensBuilder {
     private int refreshPercentLeft = 40;
     private int warnPercentLeft = 20;
 
+    private final HttpConfig httpConfig = new HttpConfig();
     private final Set<AccessTokenConfiguration> accessTokenConfigurations = new HashSet<AccessTokenConfiguration>();
 
     private boolean locked = false;
+    private HttpProviderFactory httpProviderFactory;
+    private int schedulingPeriod = 5;
 
     AccessTokensBuilder(final URI accessTokenUri) {
         this.accessTokenUri = accessTokenUri;
@@ -64,6 +67,36 @@ public class AccessTokensBuilder {
         return this;
     }
 
+    public AccessTokensBuilder usingHttpProviderFactory(HttpProviderFactory factory) {
+        checkLock();
+        this.httpProviderFactory = factory;
+        return this;
+    }
+
+    public AccessTokensBuilder socketTimeout(final int socketTimeout){
+        checkLock();
+        this.httpConfig.setSocketTimeout(socketTimeout);
+        return this;
+    }
+
+    public AccessTokensBuilder connectTimeout(final int connectTimeout){
+        checkLock();
+        this.httpConfig.setConnectTimeout(connectTimeout);
+        return this;
+    }
+
+    public AccessTokensBuilder connectionRequestTimeout(final int connectionRequestTimeout){
+        checkLock();
+        this.httpConfig.setConnectionRequestTimeout(connectionRequestTimeout);
+        return this;
+    }
+
+    public AccessTokensBuilder staleConnectionCheckEnabled(final boolean staleConnectionCheckEnabled){
+        checkLock();
+        this.httpConfig.setStaleConnectionCheckEnabled(staleConnectionCheckEnabled);
+        return this;
+    }
+
     public AccessTokensBuilder refreshPercentLeft(final int refreshPercentLeft) {
         checkLock();
         this.refreshPercentLeft = refreshPercentLeft;
@@ -85,27 +118,42 @@ public class AccessTokensBuilder {
         return config;
     }
 
-    URI getAccessTokenUri() {
+    public AccessTokensBuilder schedulingPeriod(final int schedulingPeriod){
+        checkLock();
+        this.schedulingPeriod = schedulingPeriod;
+        return this;
+    }
+
+    public int getSchedulingPeriod() {
+        return schedulingPeriod;
+    }
+
+    public URI getAccessTokenUri() {
         return accessTokenUri;
     }
 
-    ClientCredentialsProvider getClientCredentialsProvider() {
+    @Override
+    public HttpProviderFactory getHttpProviderFactory() {
+        return this.httpProviderFactory;
+    }
+
+    public ClientCredentialsProvider getClientCredentialsProvider() {
         return clientCredentialsProvider;
     }
 
-    UserCredentialsProvider getUserCredentialsProvider() {
+    public UserCredentialsProvider getUserCredentialsProvider() {
         return userCredentialsProvider;
     }
 
-    int getRefreshPercentLeft() {
+    public int getRefreshPercentLeft() {
         return refreshPercentLeft;
     }
 
-    int getWarnPercentLeft() {
+    public int getWarnPercentLeft() {
         return warnPercentLeft;
     }
 
-    Set<AccessTokenConfiguration> getAccessTokenConfigurations() {
+    public Set<AccessTokenConfiguration> getAccessTokenConfigurations() {
         return Collections.unmodifiableSet(accessTokenConfigurations);
     }
 
@@ -126,10 +174,17 @@ public class AccessTokensBuilder {
             // use default
             userCredentialsProvider = new JsonFileBackedUserCredentialsProvider();
         }
+        if(httpProviderFactory == null) {
+            this.httpProviderFactory = new ClosableHttpProviderFactory();
+        }
 
         final AccessTokenRefresher refresher = getAccessTokenRefresher();
         refresher.start();
         return refresher;
+    }
+
+    public HttpConfig getHttpConfig() {
+        return httpConfig;
     }
 
     protected AccessTokenRefresher getAccessTokenRefresher() {
