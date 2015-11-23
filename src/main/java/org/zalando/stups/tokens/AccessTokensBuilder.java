@@ -34,6 +34,7 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
 
     private boolean locked = false;
     private HttpProviderFactory httpProviderFactory;
+    private int schedulingPeriod = 5;
 
     AccessTokensBuilder(final URI accessTokenUri) {
         this.accessTokenUri = accessTokenUri;
@@ -115,6 +116,16 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         final AccessTokenConfiguration config = new AccessTokenConfiguration(tokenId, this);
         accessTokenConfigurations.add(config);
         return config;
+    }
+
+    public AccessTokensBuilder schedulingPeriod(final int schedulingPeriod){
+        checkLock();
+        this.schedulingPeriod = schedulingPeriod;
+        return this;
+    }
+
+    public int getSchedulingPeriod() {
+        return schedulingPeriod;
     }
 
     public URI getAccessTokenUri() {

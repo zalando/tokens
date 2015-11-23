@@ -37,11 +37,13 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     private final TokenRefresherConfiguration configuration;
     private final ScheduledExecutorService scheduler;
     private HttpProvider httpProvider;
+    private final int schedulingPeriod;
 
     private ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<Object, AccessToken>();
 
     public AccessTokenRefresher(final TokenRefresherConfiguration configuration) {
         this.configuration = configuration;
+        this.schedulingPeriod = configuration.getSchedulingPeriod();
         scheduler = Executors.newSingleThreadScheduledExecutor();
 
     }
@@ -86,7 +88,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         run();
 
         // #10, increase 'period' to 5 to avoid flooding the endpoint
-        scheduler.scheduleAtFixedRate(this, 1, 5, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this, 1, schedulingPeriod, TimeUnit.SECONDS);
     }
 
     static int percentLeft(final AccessToken token) {

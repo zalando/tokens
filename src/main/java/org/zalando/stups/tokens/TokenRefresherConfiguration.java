@@ -34,4 +34,6 @@ public interface TokenRefresherConfiguration {
     HttpProviderFactory getHttpProviderFactory();
 
     HttpConfig getHttpConfig();
+
+    int getSchedulingPeriod();
 }
