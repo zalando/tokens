@@ -42,6 +42,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class CloseableHttpProvider extends AbstractHttpProvider {
 
@@ -109,8 +110,7 @@ public class CloseableHttpProvider extends AbstractHttpProvider {
                     AccessTokenResponse.class);
 
             // create new access token object
-            final Date validUntil = new Date(System.currentTimeMillis()
-                    + (accessTokenResponse.getExpiresInSeconds() * 1000));
+            final Date validUntil = calculateValidUntil(accessTokenResponse);
 
             return new AccessToken(accessTokenResponse.getAccessToken(), accessTokenResponse.getTokenType(),
                     accessTokenResponse.getExpiresInSeconds(), validUntil);
@@ -119,12 +119,13 @@ public class CloseableHttpProvider extends AbstractHttpProvider {
         }
     }
 
+
     private List<NameValuePair> buildParameterList(final AccessTokenConfiguration tokenConfig) {
+        Map<String, String> parameterList = buildParameterMap(tokenConfig, userCredentials);
         List<NameValuePair> nameValuePairs = new ArrayList<>();
-        nameValuePairs.add(new BasicNameValuePair("grant_type", "password"));
-        nameValuePairs.add(new BasicNameValuePair("username", userCredentials.getUsername()));
-        nameValuePairs.add(new BasicNameValuePair("password", userCredentials.getPassword()));
-        nameValuePairs.add(new BasicNameValuePair("scope", joinScopes(tokenConfig.getScopes())));
+        for (Map.Entry<String, String> entry : parameterList.entrySet()) {
+            nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+        }
         return nameValuePairs;
     }
 
