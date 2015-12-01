@@ -15,6 +15,9 @@
  */
 package org.zalando.stups.tokens;
 
+import lombok.Data;
+
+@Data
 public class HttpConfig {
     private int socketTimeout = 2000;
 
@@ -25,44 +28,4 @@ public class HttpConfig {
     private boolean staleConnectionCheckEnabled = false;
 
     private int schedulingPeriod = 5;
-
-    public int getSocketTimeout() {
-        return socketTimeout;
-    }
-
-    public void setSocketTimeout(int socketTimeout) {
-        this.socketTimeout = socketTimeout;
-    }
-
-    public int getConnectTimeout() {
-        return connectTimeout;
-    }
-
-    public void setConnectTimeout(int connectTimeout) {
-        this.connectTimeout = connectTimeout;
-    }
-
-    public int getConnectionRequestTimeout() {
-        return connectionRequestTimeout;
-    }
-
-    public void setConnectionRequestTimeout(int connectionRequestTimeout) {
-        this.connectionRequestTimeout = connectionRequestTimeout;
-    }
-
-    public boolean isStaleConnectionCheckEnabled() {
-        return staleConnectionCheckEnabled;
-    }
-
-    public void setStaleConnectionCheckEnabled(boolean staleConnectionCheckEnabled) {
-        this.staleConnectionCheckEnabled = staleConnectionCheckEnabled;
-    }
-
-    public int getSchedulingPeriod() {
-        return schedulingPeriod;
-    }
-
-    public void setSchedulingPeriod(int schedulingPeriod) {
-        this.schedulingPeriod = schedulingPeriod;
-    }
 }

@@ -17,7 +17,9 @@ package org.zalando.stups.tokens;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class AccessTokenResponse {
     @JsonProperty("access_token")
@@ -28,16 +30,4 @@ public final class AccessTokenResponse {
 
     @JsonProperty("expires_in")
     private long expiresInSeconds;
-
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public String getTokenType() {
-        return tokenType;
-    }
-
-    public long getExpiresInSeconds() {
-        return expiresInSeconds;
-    }
 }
