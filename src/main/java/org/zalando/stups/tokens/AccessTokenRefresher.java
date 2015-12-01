@@ -15,18 +15,16 @@
  */
 package org.zalando.stups.tokens;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Collection;
+
 import java.util.Date;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class AccessTokenRefresher implements AccessTokens, Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenRefresher.class);
@@ -44,8 +42,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     public AccessTokenRefresher(final TokenRefresherConfiguration configuration) {
         this.configuration = configuration;
         this.schedulingPeriod = configuration.getSchedulingPeriod();
-        scheduler = Executors.newSingleThreadScheduledExecutor();
-
+        this.scheduler = configuration.getExecutorService();
     }
 
     protected void initializeFixedTokensFromEnvironment() {
@@ -81,10 +78,11 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     void start() {
         initializeFixedTokensFromEnvironment();
         LOG.info("Starting to refresh tokens regularly...");
+
         final ClientCredentials clientCredentials = configuration.getClientCredentialsProvider().get();
         final UserCredentials userCredentials = configuration.getUserCredentialsProvider().get();
-        httpProvider = configuration.getHttpProviderFactory().create(clientCredentials,
-                userCredentials, configuration.getAccessTokenUri(), configuration.getHttpConfig());
+        httpProvider = configuration.getHttpProviderFactory().create(clientCredentials, userCredentials,
+                configuration.getAccessTokenUri(), configuration.getHttpConfig());
         run();
 
         // #10, increase 'period' to 5 to avoid flooding the endpoint
@@ -135,7 +133,6 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
             LOG.error("Unexpected problem during token refresh run!", t);
         }
     }
-
 
     private AccessToken createToken(final AccessTokenConfiguration tokenConfig) {
         try {
