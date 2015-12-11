@@ -2,12 +2,17 @@ language: java
 
 jdk:
     - oraclejdk8
+    - oraclejdk7
+
+before_script:
+    - pip install --user codecov
 
 script:
     - mvn install
 
 after_success:
   - mvn coveralls:report -Ptravis
+  - codecov
 
 notifications:
     email:
