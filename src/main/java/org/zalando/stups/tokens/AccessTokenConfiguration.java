@@ -21,16 +21,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class AccessTokenConfiguration {
+    private static final String DEFAULT_GRANT_TYPE = "password";
     private final Object tokenId;
     private final AccessTokensBuilder accessTokensBuilder;
+    private String grantType;
 
     private final Set<Object> scopes = new HashSet<>();
 
     private boolean locked = false;
 
     AccessTokenConfiguration(final Object tokenId, final AccessTokensBuilder accessTokensBuilder) {
+        this(tokenId, accessTokensBuilder, DEFAULT_GRANT_TYPE);
+    }
+
+    AccessTokenConfiguration(final Object tokenId, final AccessTokensBuilder accessTokensBuilder, final String grantType) {
         this.tokenId = tokenId;
         this.accessTokensBuilder = accessTokensBuilder;
+        this.grantType = grantType;
     }
 
     private void checkLock() {
@@ -58,6 +65,13 @@ public class AccessTokenConfiguration {
         this.scopes.addAll(scopes);
         return this;
     }
+    
+    public AccessTokenConfiguration withGrantType(final String grantType) {
+        checkLock();
+        checkNotNull("grantType", grantType);
+        this.grantType=grantType;
+        return this;
+    }
 
     Object getTokenId() {
         return tokenId;
@@ -70,5 +84,9 @@ public class AccessTokenConfiguration {
     public AccessTokensBuilder done() {
         locked = true;
         return accessTokensBuilder;
+    }
+
+    public String getGrantType() {
+        return grantType;
     }
 }
