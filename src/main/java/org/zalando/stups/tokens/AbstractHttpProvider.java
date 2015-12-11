@@ -22,10 +22,12 @@ public abstract class AbstractHttpProvider implements HttpProvider{
     public String joinScopes(final Collection<Object> scopes) {
         final Iterator<Object> iter = scopes.iterator();
 
-        final StringBuilder scope = new StringBuilder(iter.next().toString());
+        final StringBuilder scope = new StringBuilder();
         while (iter.hasNext()) {
-            scope.append(' ');
             scope.append(iter.next().toString());
+            if(iter.hasNext()) {
+                scope.append(' ');
+            }
         }
 
         return scope.toString();
