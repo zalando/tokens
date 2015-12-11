@@ -20,6 +20,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import lombok.Data;
+
+@Data
 public class AccessTokenConfiguration {
     private final Object tokenId;
     private final AccessTokensBuilder accessTokensBuilder;
@@ -27,11 +30,6 @@ public class AccessTokenConfiguration {
     private final Set<Object> scopes = new HashSet<>();
 
     private boolean locked = false;
-
-    AccessTokenConfiguration(final Object tokenId, final AccessTokensBuilder accessTokensBuilder) {
-        this.tokenId = tokenId;
-        this.accessTokensBuilder = accessTokensBuilder;
-    }
 
     private void checkLock() {
         if (locked) {

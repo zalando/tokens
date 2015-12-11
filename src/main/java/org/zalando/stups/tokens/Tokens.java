@@ -17,9 +17,10 @@ package org.zalando.stups.tokens;
 
 import java.net.URI;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public final class Tokens {
-    private Tokens() {
-    }
 
     public static AccessTokensBuilder createAccessTokensWithUri(final URI accessTokenUri) {
         return new AccessTokensBuilder(accessTokenUri);

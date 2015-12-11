@@ -15,18 +15,16 @@
  */
 package org.zalando.stups.tokens;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class AccessTokenRefresher implements AccessTokens, Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenRefresher.class);
@@ -39,7 +37,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     private HttpProvider httpProvider;
     private final int schedulingPeriod;
 
-    private ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<Object, AccessToken>();
+    private final ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<Object, AccessToken>();
 
     public AccessTokenRefresher(final TokenRefresherConfiguration configuration) {
         this.configuration = configuration;
