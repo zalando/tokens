@@ -20,9 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -31,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 class AccessTokenRefresher implements AccessTokens, Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenRefresher.class);
 
-    private static final long ONE_YEAR_SECONDS = 3600 * 24 * 365;
+    private static final long ONE_YEAR_SECONDS =  TimeUnit.DAYS.toSeconds(365);
     private static final String FIXED_TOKENS_ENV_VAR = "OAUTH2_ACCESS_TOKENS";
 
     private final TokenRefresherConfiguration configuration;
