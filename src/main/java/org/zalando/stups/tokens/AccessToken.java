@@ -47,7 +47,7 @@ public class AccessToken {
     }
 
     public boolean isExpired() {
-        return (System.currentTimeMillis() - validUntil.getTime()) >= 0;
+        return validUntil != null && validUntil.before(new Date());
     }
 
     @Override
