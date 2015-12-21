@@ -74,7 +74,9 @@ public class CloseableHttpProvider extends AbstractHttpProvider {
                         accessTokenUri.getPort()),
                 new UsernamePasswordCredentials(clientCredentials.getId(), clientCredentials.getSecret()));
 
-        client = HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider)
+        client = HttpClients.custom()
+                .useSystemProperties()
+                .setDefaultCredentialsProvider(credentialsProvider)
                 .build();
 
         host = new HttpHost(accessTokenUri.getHost(),
