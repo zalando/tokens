@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -68,7 +69,8 @@ public class AccessTokenConfigurationTest {
 		configuration.addScope(scope);
 		Assertions.assertThat(configuration.getScopes()).containsExactly(scope);
 	}
-	
+
+	@Ignore
 	@Test
 	public void addingScopes() {
 		Object scope = new Object();
