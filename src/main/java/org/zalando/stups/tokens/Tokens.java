@@ -15,13 +15,16 @@
  */
 package org.zalando.stups.tokens;
 
+import static org.zalando.stups.tokens.util.Objects.notNull;
+
 import java.net.URI;
+
 
 public final class Tokens {
     private Tokens() {
     }
 
     public static AccessTokensBuilder createAccessTokensWithUri(final URI accessTokenUri) {
-        return new AccessTokensBuilder(accessTokenUri);
+        return new AccessTokensBuilder(notNull("accessTokenUri", accessTokenUri));
     }
 }
