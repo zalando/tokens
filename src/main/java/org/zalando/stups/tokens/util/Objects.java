@@ -15,6 +15,8 @@
  */
 package org.zalando.stups.tokens.util;
 
+import java.util.Collection;
+
 import org.apache.http.util.Args;
 
 /**
@@ -37,6 +39,19 @@ public class Objects {
 
 	public static <T extends CharSequence> T notBlank(String name, T argument) {
 		return Args.notBlank(argument, name);
+	}
+
+	public static <T extends Object> Collection<T> noNullEntries(String name, Collection<T> collection) {
+		name = notBlank("name", name);
+		collection = notNull(name, collection);
+		try {
+			if (collection.contains(null)) {
+				throw new IllegalArgumentException(name + " should not contain 'null'");
+			}
+		} catch (NullPointerException e) {
+			return collection;
+		}
+		return collection;
 	}
 
 }

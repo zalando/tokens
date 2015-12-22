@@ -15,11 +15,18 @@
  */
 package org.zalando.stups.tokens;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 
-import org.junit.Ignore;
+import org.assertj.core.api.Assertions;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
+import org.mockito.internal.util.io.IOUtil;
 
 /**
  * 
@@ -28,11 +35,30 @@ import org.mockito.Mockito;
  */
 public class AccessTokenBuilderTest {
 
+	private static final String CREDENTIALS_DIR = "CREDENTIALS_DIR";
 	private static final String HTTP_EXAMPLE_ORG = "http://example.org";
-	URI uri = URI.create(HTTP_EXAMPLE_ORG);
+	private URI uri = URI.create(HTTP_EXAMPLE_ORG);
 	private ClientCredentialsProvider ccp = Mockito.mock(ClientCredentialsProvider.class);
 	private UserCredentialsProvider ucp = Mockito.mock(UserCredentialsProvider.class);
 	private HttpProviderFactory hpf = Mockito.mock(HttpProviderFactory.class);
+
+	@Rule
+	public TemporaryFolder tempFolder = new TemporaryFolder();
+
+	@Before
+	public void createCredentials() throws IOException {
+		File tempDir = tempFolder.newFolder();
+		File clientJson = new File(tempDir, "client.json");
+		IOUtil.writeText("{\"client_id\":\"abcdefg \",\"client_secret\":\"geheim\"}", clientJson);
+		File userJson = new File(tempDir, "user.json");
+		IOUtil.writeText("{\"application_username\":\"klaus \",\"application_password\":\"geheim\"}", userJson);
+		System.setProperty(CREDENTIALS_DIR, tempDir.getAbsolutePath());
+	}
+
+	@After
+	public void resetSystemProperty() {
+		System.getProperties().remove(CREDENTIALS_DIR);
+	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void createByBuilderWithNull() {
@@ -55,13 +81,39 @@ public class AccessTokenBuilderTest {
 				.usingHttpProviderFactory(null);
 	}
 
-	@Ignore
+	// GH-28
 	@Test
 	public void shouldItBePossibleToGetTokensWithoutScopesDefined() {
 		// this is possible at the moment
-		Tokens.createAccessTokensWithUri(URI.create(HTTP_EXAMPLE_ORG)).usingClientCredentialsProvider(ccp)
+		AccessTokens accessTokens = Tokens.createAccessTokensWithUri(uri).usingClientCredentialsProvider(ccp)
 				.usingUserCredentialsProvider(ucp).usingHttpProviderFactory(hpf).manageToken(new Object()).done()
 				.start();
+
+		Assertions.assertThat(accessTokens).isNotNull();
+	}
+
+	@Test
+	public void buildAccessTokensWithDefault() throws IOException {
+
+		AccessTokens accessTokens = Tokens.createAccessTokensWithUri(uri).manageToken(new Object()).done().start();
+
+		Assertions.assertThat(accessTokens).isNotNull();
+	}
+
+	@Test
+	public void httpConfigShouldBeNotNull() {
+		// this is possible at the moment
+		HttpConfig httpConfig = Tokens.createAccessTokensWithUri(uri).usingClientCredentialsProvider(ccp)
+				.usingUserCredentialsProvider(ucp).usingHttpProviderFactory(hpf).manageToken(new Object()).done()
+				.getHttpConfig();
+
+		Assertions.assertThat(httpConfig).isNotNull();
+
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void accessTokenConfigurationWithouScopesShouldFail() {
+		Tokens.createAccessTokensWithUri(uri).start();
 	}
 
 }

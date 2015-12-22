@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -70,8 +69,7 @@ public class AccessTokenConfigurationTest {
 		Assertions.assertThat(configuration.getScopes()).containsExactly(scope);
 	}
 
-	@Ignore
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public void addingScopes() {
 		Object scope = new Object();
 		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
@@ -79,7 +77,18 @@ public class AccessTokenConfigurationTest {
 		scopes.add(null);
 		scopes.add(scope);
 		configuration.addScopes(scopes);
-		Assertions.assertThat(configuration.getScopes()).containsExactly(scope);
+		Assertions.fail("This code should not be reached");
+	}
+
+	@Test
+	public void addingValidScopes() {
+		Object scope = new Object();
+		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
+		List<Object> scopes = new ArrayList<>();
+		scopes.add(new Object());
+		scopes.add(scope);
+		configuration.addScopes(scopes);
+		Assertions.assertThat(configuration.getScopes()).contains(scope);
 	}
 
 	@Test
@@ -103,6 +112,26 @@ public class AccessTokenConfigurationTest {
 		AccessTokensBuilder builder = configuration.done();
 		Assertions.assertThat(builder).isNotNull();
 		configuration.addScopes(Collections.singleton(new Object()));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testNullGrantType() {
+		new AccessTokenConfiguration(new Object(), builder).withGrantType(null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testEmptyGrantType() {
+		new AccessTokenConfiguration(new Object(), builder).withGrantType("");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testWhitespaceGrantType() {
+		new AccessTokenConfiguration(new Object(), builder).withGrantType("  ");
+	}
+
+	@Test
+	public void testValidArgumentGrantType() {
+		new AccessTokenConfiguration(new Object(), builder).withGrantType("a_ValidArgument_But_Invalid_Grant_Type");
 	}
 
 }
