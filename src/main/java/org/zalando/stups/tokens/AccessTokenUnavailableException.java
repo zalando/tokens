@@ -15,19 +15,22 @@
  */
 package org.zalando.stups.tokens;
 
+@SuppressWarnings("serial")
 public class AccessTokenUnavailableException extends IllegalStateException {
-    public AccessTokenUnavailableException() {
-    }
 
-    public AccessTokenUnavailableException(final String s) {
-        super(s);
-    }
+	public AccessTokenUnavailableException() {
+		super();
+	}
 
-    public AccessTokenUnavailableException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
+	public AccessTokenUnavailableException(final String s) {
+		super(s);
+	}
 
-    public AccessTokenUnavailableException(final Throwable cause) {
-        super(cause);
-    }
+	public AccessTokenUnavailableException(final String message, final Throwable cause) {
+		super(message, cause);
+	}
+
+	public AccessTokenUnavailableException(final Throwable cause) {
+		super(cause);
+	}
 }

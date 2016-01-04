@@ -21,6 +21,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 
+@SuppressWarnings("serial")
 public class AccessTokenEndpointException extends IllegalStateException {
 
     public static AccessTokenEndpointException from(HttpResponse response) {

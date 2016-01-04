@@ -15,19 +15,21 @@
  */
 package org.zalando.stups.tokens;
 
+@SuppressWarnings("serial")
 public class CredentialsUnavailableException extends IllegalStateException {
-    public CredentialsUnavailableException() {
-    }
+	public CredentialsUnavailableException() {
+		super();
+	}
 
-    public CredentialsUnavailableException(final String message) {
-        super(message);
-    }
+	public CredentialsUnavailableException(final String message) {
+		super(message);
+	}
 
-    public CredentialsUnavailableException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
+	public CredentialsUnavailableException(final String message, final Throwable cause) {
+		super(message, cause);
+	}
 
-    public CredentialsUnavailableException(final Throwable cause) {
-        super(cause);
-    }
+	public CredentialsUnavailableException(final Throwable cause) {
+		super(cause);
+	}
 }

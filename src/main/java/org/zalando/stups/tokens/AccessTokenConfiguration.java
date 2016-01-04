@@ -15,78 +15,85 @@
  */
 package org.zalando.stups.tokens;
 
+import static org.zalando.stups.tokens.util.Objects.noNullEntries;
+import static org.zalando.stups.tokens.util.Objects.notBlank;
+import static org.zalando.stups.tokens.util.Objects.notNull;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.zalando.stups.tokens.util.Objects;
+
 public class AccessTokenConfiguration {
-    private static final String DEFAULT_GRANT_TYPE = "password";
-    private final Object tokenId;
-    private final AccessTokensBuilder accessTokensBuilder;
-    private String grantType;
+	protected static final String DEFAULT_GRANT_TYPE = "password";
+	private final Object tokenId;
+	private final AccessTokensBuilder accessTokensBuilder;
+	private String grantType;
 
-    private final Set<Object> scopes = new HashSet<>();
+	private final Set<Object> scopes = new HashSet<>();
 
-    private boolean locked = false;
+	private boolean locked = false;
 
-    AccessTokenConfiguration(final Object tokenId, final AccessTokensBuilder accessTokensBuilder) {
-        this(tokenId, accessTokensBuilder, DEFAULT_GRANT_TYPE);
-    }
+	AccessTokenConfiguration(final Object tokenId, final AccessTokensBuilder accessTokensBuilder) {
+		this(tokenId, accessTokensBuilder, DEFAULT_GRANT_TYPE);
+	}
 
-    AccessTokenConfiguration(final Object tokenId, final AccessTokensBuilder accessTokensBuilder, final String grantType) {
-        this.tokenId = tokenId;
-        this.accessTokensBuilder = accessTokensBuilder;
-        this.grantType = grantType;
-    }
+	AccessTokenConfiguration(final Object tokenId, final AccessTokensBuilder accessTokensBuilder,
+			final String grantType) {
+		this.tokenId = notNull("tokenId", tokenId);
+		this.accessTokensBuilder = notNull("accessTokenBuilder", accessTokensBuilder);
+		this.grantType = notBlank("grantType", notNull("grantType", grantType));
+	}
 
-    private void checkLock() {
-        if (locked) {
-            throw new IllegalStateException("scope configuration already done");
-        }
-    }
+	private void checkLock() {
+		if (locked) {
+			throw new IllegalStateException("scope configuration already done");
+		}
+	}
 
-    private void checkNotNull(final String name, final Object obj) {
-        if (obj == null) {
-            throw new IllegalArgumentException(name + " must not be null");
-        }
-    }
+	// private void checkNotNull(final String name, final Object obj) {
+	// if (obj == null) {
+	// throw new IllegalArgumentException(name + " must not be null");
+	// }
+	// }
 
-    public AccessTokenConfiguration addScope(final Object scope) {
-        checkLock();
-        checkNotNull("scope", scope);
-        scopes.add(scope);
-        return this;
-    }
+	public AccessTokenConfiguration addScope(final Object scope) {
+		checkLock();
+		// checkNotNull("scope", scope);
+		scopes.add(notNull("scope", scope));
+		return this;
+	}
 
-    public AccessTokenConfiguration addScopes(final Collection<?> scopes) {
-        checkLock();
-        checkNotNull("scopes", scopes);
-        this.scopes.addAll(scopes);
-        return this;
-    }
-    
-    public AccessTokenConfiguration withGrantType(final String grantType) {
-        checkLock();
-        checkNotNull("grantType", grantType);
-        this.grantType=grantType;
-        return this;
-    }
+	public AccessTokenConfiguration addScopes(final Collection<?> scopes) {
+		checkLock();
+		// checkNotNull("scopes", scopes);
+		this.scopes.addAll(noNullEntries("scopes", notNull("scopes", scopes)));
+		return this;
+	}
 
-    Object getTokenId() {
-        return tokenId;
-    }
+	public AccessTokenConfiguration withGrantType(final String grantType) {
+		checkLock();
+		// checkNotNull("grantType", grantType);
+		this.grantType = Objects.notBlank("grantType", notNull("grantType", grantType));
+		return this;
+	}
 
-    Set<Object> getScopes() {
-        return Collections.unmodifiableSet(scopes);
-    }
+	Object getTokenId() {
+		return tokenId;
+	}
 
-    public AccessTokensBuilder done() {
-        locked = true;
-        return accessTokensBuilder;
-    }
+	Set<Object> getScopes() {
+		return Collections.unmodifiableSet(scopes);
+	}
 
-    public String getGrantType() {
-        return grantType;
-    }
+	public AccessTokensBuilder done() {
+		locked = true;
+		return accessTokensBuilder;
+	}
+
+	public String getGrantType() {
+		return grantType;
+	}
 }

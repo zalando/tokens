@@ -15,9 +15,6 @@
  */
 package org.zalando.stups.tokens;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
@@ -25,6 +22,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zalando.stups.tokens.util.Objects;
 
 class AccessTokenRefresher implements AccessTokens, Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenRefresher.class);
@@ -120,11 +121,13 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
                         LOG.trace("Refreshing access token {}...", tokenConfig.getTokenId());
 
                         final AccessToken newToken = createToken(tokenConfig);
+                        //validate
+                        Objects.notNull("newToken", newToken);
                         accessTokens.put(tokenConfig.getTokenId(), newToken);
                         LOG.info("Refreshed access token {}.", tokenConfig.getTokenId());
                     } catch (final Throwable t) {
                         if (oldToken == null || shouldWarn(oldToken, configuration)) {
-                            LOG.warn("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
+                            LOG.warn("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t.getMessage(), t);
                         } else {
                             LOG.info("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
                         }
@@ -176,7 +179,8 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         try {
             httpProvider.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+        	LOG.warn(e.getMessage(), e);
+//            throw new RuntimeException(e);
         }
     }
 }
