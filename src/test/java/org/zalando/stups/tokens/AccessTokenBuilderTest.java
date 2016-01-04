@@ -18,6 +18,7 @@ package org.zalando.stups.tokens;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.assertj.core.api.Assertions;
 import org.junit.After;
@@ -111,9 +112,22 @@ public class AccessTokenBuilderTest {
 
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void accessTokenConfigurationWithouScopesShouldFail() {
 		Tokens.createAccessTokensWithUri(uri).start();
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void providedExecutorServiceShouldNotBeNull() {
+		Tokens.createAccessTokensWithUri(uri).existingExecutorService(null);
+	}
+
+	@Test
+	public void defaultExecutorServiceShouldNotBeNull() {
+		AccessTokensBuilder builder = Tokens.createAccessTokensWithUri(uri);
+		ScheduledExecutorService executor = builder.getExecutorService();
+		Assertions.assertThat(executor).isNotNull();
+		executor.shutdownNow();
 	}
 
 }
