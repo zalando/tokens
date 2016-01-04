@@ -15,14 +15,17 @@
  */
 package org.zalando.stups.tokens;
 
+import static org.zalando.stups.tokens.util.Objects.notBlank;
+import static org.zalando.stups.tokens.util.Objects.notNull;
+
 public class SimpleClientCredentials implements ClientCredentials {
 
     private final String id;
     private final String secret;
 
     public SimpleClientCredentials(String id, String secret) {
-        this.id = id;
-        this.secret = secret;
+        this.id = notBlank("id", id);
+        this.secret = notNull("secret", secret);
     }
 
     @Override
