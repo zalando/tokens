@@ -15,17 +15,29 @@
  */
 package org.zalando.stups.tokens;
 
+import org.apache.http.client.config.RequestConfig;
+
+/**
+ * Configurations for {@link HttpProvider} used by {@link HttpProviderFactory}.
+ * 
+ * @author jbellmann
+ *
+ */
 public class HttpConfig {
+
     private int socketTimeout = 2000;
 
     private int connectTimeout = 1000;
 
     private int connectionRequestTimeout = 500;
 
-    private boolean staleConnectionCheckEnabled = false;
+    private boolean staleConnectionCheckEnabled = true;
 
-    private int schedulingPeriod = 5;
-
+    /**
+     * @see RequestConfig#getSocketTimeout()
+     * 
+     * @return socket_timeout in milliseconds, defaults to 2000
+     */
     public int getSocketTimeout() {
         return socketTimeout;
     }
@@ -34,6 +46,11 @@ public class HttpConfig {
         this.socketTimeout = socketTimeout;
     }
 
+    /**
+     * @see RequestConfig#getConnectTimeout()
+     * 
+     * @return timeout in milliseconds until a connection is established, defaults to 1000
+     */
     public int getConnectTimeout() {
         return connectTimeout;
     }
@@ -42,6 +59,11 @@ public class HttpConfig {
         this.connectTimeout = connectTimeout;
     }
 
+    /**
+     * @see RequestConfig#getConnectionRequestTimeout()
+     * 
+     * @return timeout in milliseconds used when requesting a connection from the connection manager, defaults to 500
+     */
     public int getConnectionRequestTimeout() {
         return connectionRequestTimeout;
     }
@@ -50,6 +72,11 @@ public class HttpConfig {
         this.connectionRequestTimeout = connectionRequestTimeout;
     }
 
+    /**
+     * @see RequestConfig#isStaleConnectionCheckEnabled()
+     * 
+     * @return true if stale connection check is enabled, defaults to true
+     */
     public boolean isStaleConnectionCheckEnabled() {
         return staleConnectionCheckEnabled;
     }
@@ -58,11 +85,4 @@ public class HttpConfig {
         this.staleConnectionCheckEnabled = staleConnectionCheckEnabled;
     }
 
-    public int getSchedulingPeriod() {
-        return schedulingPeriod;
-    }
-
-    public void setSchedulingPeriod(int schedulingPeriod) {
-        this.schedulingPeriod = schedulingPeriod;
-    }
 }

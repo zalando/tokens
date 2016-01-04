@@ -47,23 +47,15 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         }
     }
 
-//    private void checkNotNull(final String name, final Object obj) {
-//        if (obj == null) {
-//            throw new IllegalArgumentException(name + " must not be null");
-//        }
-//    }
-
     public AccessTokensBuilder usingClientCredentialsProvider(
             final ClientCredentialsProvider clientCredentialsProvider) {
         checkLock();
-        //checkNotNull("clientCredentialsProvider", clientCredentialsProvider);
         this.clientCredentialsProvider = notNull("clientCredentialsProvider", clientCredentialsProvider);
         return this;
     }
 
     public AccessTokensBuilder usingUserCredentialsProvider(final UserCredentialsProvider userCredentialsProvider) {
         checkLock();
-//        checkNotNull("userCredentialsProvider", userCredentialsProvider);
         this.userCredentialsProvider = notNull("userCredentialsProvider", userCredentialsProvider);
         return this;
     }

@@ -15,7 +15,14 @@
  */
 package org.zalando.stups.tokens;
 
-import java.util.*;
+import static java.lang.System.currentTimeMillis;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public abstract class AbstractHttpProvider implements HttpProvider {
     protected String joinScopes(final Collection<Object> scopes) {
@@ -33,8 +40,7 @@ public abstract class AbstractHttpProvider implements HttpProvider {
     }
 
     protected Date calculateValidUntil(AccessTokenResponse accessTokenResponse) {
-        return new Date(System.currentTimeMillis()
-                + (accessTokenResponse.getExpiresInSeconds() * 1000));
+        return new Date(currentTimeMillis() + SECONDS.toMillis(accessTokenResponse.getExpiresInSeconds()));
     }
 
     protected Map<String, String> buildParameterMap(final AccessTokenConfiguration tokenConfig, UserCredentials userCredentials) {
