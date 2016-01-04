@@ -21,6 +21,8 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class AccessTokensBuilder implements TokenRefresherConfiguration {
     private final URI accessTokenUri;
@@ -36,6 +38,7 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     private boolean locked = false;
     private HttpProviderFactory httpProviderFactory;
     private int schedulingPeriod = 5;
+    private ScheduledExecutorService executorService;
 
     AccessTokensBuilder(final URI accessTokenUri) {
         this.accessTokenUri = notNull("accessTokenUri", accessTokenUri);
@@ -60,31 +63,37 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         return this;
     }
 
-    public AccessTokensBuilder usingHttpProviderFactory(HttpProviderFactory factory) {
+    public AccessTokensBuilder usingHttpProviderFactory(final HttpProviderFactory factory) {
         checkLock();
         this.httpProviderFactory = notNull("httpProviderFactory", factory);
         return this;
     }
 
-    public AccessTokensBuilder socketTimeout(final int socketTimeout){
+    public AccessTokensBuilder socketTimeout(final int socketTimeout) {
         checkLock();
         this.httpConfig.setSocketTimeout(socketTimeout);
         return this;
     }
 
-    public AccessTokensBuilder connectTimeout(final int connectTimeout){
+    public AccessTokensBuilder existingExecutorService(final ScheduledExecutorService executorService) {
+        checkLock();
+        this.executorService = notNull("executorService",executorService);
+        return this;
+    }
+
+    public AccessTokensBuilder connectTimeout(final int connectTimeout) {
         checkLock();
         this.httpConfig.setConnectTimeout(connectTimeout);
         return this;
     }
 
-    public AccessTokensBuilder connectionRequestTimeout(final int connectionRequestTimeout){
+    public AccessTokensBuilder connectionRequestTimeout(final int connectionRequestTimeout) {
         checkLock();
         this.httpConfig.setConnectionRequestTimeout(connectionRequestTimeout);
         return this;
     }
 
-    public AccessTokensBuilder staleConnectionCheckEnabled(final boolean staleConnectionCheckEnabled){
+    public AccessTokensBuilder staleConnectionCheckEnabled(final boolean staleConnectionCheckEnabled) {
         checkLock();
         this.httpConfig.setStaleConnectionCheckEnabled(staleConnectionCheckEnabled);
         return this;
@@ -111,7 +120,7 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         return config;
     }
 
-    public AccessTokensBuilder schedulingPeriod(final int schedulingPeriod){
+    public AccessTokensBuilder schedulingPeriod(final int schedulingPeriod) {
         checkLock();
         this.schedulingPeriod = schedulingPeriod;
         return this;
@@ -142,6 +151,14 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         return refreshPercentLeft;
     }
 
+    public ScheduledExecutorService getExecutorService() {
+        if (executorService == null) {
+            return Executors.newSingleThreadScheduledExecutor();
+        } else {
+            return executorService;
+        }
+    }
+
     public int getWarnPercentLeft() {
         return warnPercentLeft;
     }
@@ -167,7 +184,8 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
             // use default
             userCredentialsProvider = new JsonFileBackedUserCredentialsProvider();
         }
-        if(httpProviderFactory == null) {
+
+        if (httpProviderFactory == null) {
             this.httpProviderFactory = new ClosableHttpProviderFactory();
         }
 

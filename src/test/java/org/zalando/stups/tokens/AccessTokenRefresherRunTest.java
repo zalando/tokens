@@ -64,14 +64,22 @@ public class AccessTokenRefresherRunTest {
 		System.getProperties().remove(CREDENTIALS_DIR);
 	}
 
+	@After
+	public void shutdownAccessTokens() {
+		if (accessTokens != null) {
+			accessTokens.stop();
+		}
+	}
+
 	@Test
 	public void runAccessTokenRefresher() throws InterruptedException, UnsupportedEncodingException {
 		HttpProvider httpProvider = Mockito.mock(HttpProvider.class);
 
 		Mockito.when(hpf.create(Mockito.any(ClientCredentials.class), Mockito.any(UserCredentials.class),
 				Mockito.any(URI.class), Mockito.any(HttpConfig.class))).thenReturn(httpProvider);
-		
-		Mockito.when(httpProvider.createToken(Mockito.any(AccessTokenConfiguration.class))).thenReturn(new AccessToken("123456789", "BEARER", 100, new Date(System.currentTimeMillis() + 15000)));
+
+		Mockito.when(httpProvider.createToken(Mockito.any(AccessTokenConfiguration.class)))
+				.thenReturn(new AccessToken("123456789", "BEARER", 2, new Date(System.currentTimeMillis() + 15000)));
 		accessTokens = accessTokenBuilder.start();
 		Assertions.assertThat(accessTokens).isNotNull();
 
