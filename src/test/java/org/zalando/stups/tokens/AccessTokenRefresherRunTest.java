@@ -17,14 +17,12 @@ package org.zalando.stups.tokens;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.Assertions;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -36,32 +34,16 @@ public class AccessTokenRefresherRunTest {
 	private static final String CREDENTIALS_DIR = "CREDENTIALS_DIR";
 	private static final String HTTP_EXAMPLE_ORG = "http://example.org";
 	private URI uri = URI.create(HTTP_EXAMPLE_ORG);
-	private ClientCredentialsProvider ccp = Mockito.mock(ClientCredentialsProvider.class);
-	private UserCredentialsProvider ucp = Mockito.mock(UserCredentialsProvider.class);
-	private HttpProviderFactory hpf = Mockito.mock(HttpProviderFactory.class);
 
-	private AccessTokensBuilder accessTokenBuilder;
 	private AccessTokens accessTokens;
 
 	@Rule
 	public TemporaryFolder tempFolder = new TemporaryFolder();
 
-	@Before
-	public void createCredentials() throws IOException {
-		File tempDir = tempFolder.newFolder();
-		File clientJson = new File(tempDir, "client.json");
-		IOUtil.writeText("{\"client_id\":\"abcdefg \",\"client_secret\":\"geheim\"}", clientJson);
-		File userJson = new File(tempDir, "user.json");
-		IOUtil.writeText("{\"application_username\":\"klaus \",\"application_password\":\"geheim\"}", userJson);
-		System.setProperty(CREDENTIALS_DIR, tempDir.getAbsolutePath());
-
-		accessTokenBuilder = Tokens.createAccessTokensWithUri(uri).usingClientCredentialsProvider(ccp)
-				.usingUserCredentialsProvider(ucp).usingHttpProviderFactory(hpf).manageToken("TR_TEST").done();
-	}
-
 	@After
 	public void resetSystemProperty() {
 		System.getProperties().remove(CREDENTIALS_DIR);
+		System.clearProperty("OAUTH2_ACCESS_TOKENS");
 	}
 
 	@After
@@ -72,7 +54,21 @@ public class AccessTokenRefresherRunTest {
 	}
 
 	@Test
-	public void runAccessTokenRefresher() throws InterruptedException, UnsupportedEncodingException {
+	public void runAccessTokenRefresher() throws IOException, InterruptedException {
+		File tempDir = tempFolder.newFolder();
+		File clientJson = new File(tempDir, "client.json");
+		IOUtil.writeText("{\"client_id\":\"abcdefg \",\"client_secret\":\"geheim\"}", clientJson);
+		File userJson = new File(tempDir, "user.json");
+		IOUtil.writeText("{\"application_username\":\"klaus \",\"application_password\":\"geheim\"}", userJson);
+		System.setProperty(CREDENTIALS_DIR, tempDir.getAbsolutePath());
+
+		ClientCredentialsProvider ccp = Mockito.mock(ClientCredentialsProvider.class);
+		UserCredentialsProvider ucp = Mockito.mock(UserCredentialsProvider.class);
+		HttpProviderFactory hpf = Mockito.mock(HttpProviderFactory.class);
+
+		AccessTokensBuilder accessTokenBuilder = Tokens.createAccessTokensWithUri(uri).usingClientCredentialsProvider(ccp)
+				.usingUserCredentialsProvider(ucp).usingHttpProviderFactory(hpf).manageToken("TR_TEST").done();
+
 		HttpProvider httpProvider = Mockito.mock(HttpProvider.class);
 
 		Mockito.when(hpf.create(Mockito.any(ClientCredentials.class), Mockito.any(UserCredentials.class),
@@ -89,4 +85,14 @@ public class AccessTokenRefresherRunTest {
 
 	}
 
+	/**
+	 * Verifies that if a fixed token is set and the default configuration used, no attempt to refresh it using an
+	 * {@link HttpProvider} is done.
+	 */
+	@Test
+	public void runAccessTokenRefresherWithFixedToken() throws InterruptedException {
+		System.setProperty("OAUTH2_ACCESS_TOKENS", "pierone=987654321");
+
+		accessTokens = Tokens.createAccessTokensWithUri(uri).manageToken("pierone").done().start();
+	}
 }
