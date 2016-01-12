@@ -80,14 +80,6 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     void start() {
         initializeFixedTokensFromEnvironment();
         LOG.info("Starting to refresh tokens regularly...");
-
-        final ClientCredentials clientCredentials = configuration.getClientCredentialsProvider().get();
-        UserCredentials userCredentials = null;
-        if (configuration.getUserCredentialsProvider() != null) {
-            userCredentials = configuration.getUserCredentialsProvider().get();
-        }
-        httpProvider = configuration.getHttpProviderFactory().create(clientCredentials,
-                userCredentials, configuration.getAccessTokenUri(), configuration.getHttpConfig());
         run();
 
         // #10, increase 'period' to 5 to avoid flooding the endpoint
@@ -143,6 +135,17 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     private AccessToken createToken(final AccessTokenConfiguration tokenConfig) {
         try {
+            if(httpProvider == null) {
+                final ClientCredentials clientCredentials = configuration.getClientCredentialsProvider().get();
+                UserCredentials userCredentials = null;
+                if (configuration.getUserCredentialsProvider() != null) {
+                    userCredentials = configuration.getUserCredentialsProvider().get();
+                }
+
+                httpProvider = configuration.getHttpProviderFactory().create(clientCredentials,
+                        userCredentials, configuration.getAccessTokenUri(), configuration.getHttpConfig());
+            }
+
             return httpProvider.createToken(tokenConfig);
         } catch (RuntimeException | UnsupportedEncodingException e) {
             throw new AccessTokenEndpointException(e.getMessage(), e);
@@ -177,7 +180,9 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     public void stop() {
         scheduler.shutdown();
         try {
-            httpProvider.close();
+            if(httpProvider != null) {
+                httpProvider.close();
+            }
         } catch (IOException e) {
         	LOG.warn(e.getMessage(), e);
 //            throw new RuntimeException(e);
