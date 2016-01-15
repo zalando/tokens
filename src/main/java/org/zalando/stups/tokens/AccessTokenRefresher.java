@@ -139,12 +139,16 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
             userCredentials = configuration.getUserCredentialsProvider().get();
         }
 
-        try (final HttpProvider httpProvider = configuration.getHttpProviderFactory().create(clientCredentials,
-                    userCredentials, configuration.getAccessTokenUri(), configuration.getHttpConfig())) {
+        try (final HttpProvider httpProvider = buildHttpProvider(clientCredentials, userCredentials)) {
             return httpProvider.createToken(tokenConfig);
         } catch (RuntimeException | IOException e) {
             throw new AccessTokenEndpointException(e.getMessage(), e);
         }
+    }
+
+    private HttpProvider buildHttpProvider(ClientCredentials clientCredentials, UserCredentials userCredentials){
+        return configuration.getHttpProviderFactory().create(clientCredentials,
+                userCredentials, configuration.getAccessTokenUri(), configuration.getHttpConfig());
     }
 
     @Override
