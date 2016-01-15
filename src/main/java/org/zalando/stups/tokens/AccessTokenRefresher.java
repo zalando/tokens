@@ -36,7 +36,6 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     private final TokenRefresherConfiguration configuration;
     private final ScheduledExecutorService scheduler;
-    private HttpProvider httpProvider;
     private final int schedulingPeriod;
 
     private ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<Object, AccessToken>();
@@ -134,20 +133,16 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     }
 
     private AccessToken createToken(final AccessTokenConfiguration tokenConfig) {
-        try {
-            if(httpProvider == null) {
-                final ClientCredentials clientCredentials = configuration.getClientCredentialsProvider().get();
-                UserCredentials userCredentials = null;
-                if (configuration.getUserCredentialsProvider() != null) {
-                    userCredentials = configuration.getUserCredentialsProvider().get();
-                }
+        final ClientCredentials clientCredentials = configuration.getClientCredentialsProvider().get();
+        UserCredentials userCredentials = null;
+        if (configuration.getUserCredentialsProvider() != null) {
+            userCredentials = configuration.getUserCredentialsProvider().get();
+        }
 
-                httpProvider = configuration.getHttpProviderFactory().create(clientCredentials,
-                        userCredentials, configuration.getAccessTokenUri(), configuration.getHttpConfig());
-            }
-
+        try (final HttpProvider httpProvider = configuration.getHttpProviderFactory().create(clientCredentials,
+                    userCredentials, configuration.getAccessTokenUri(), configuration.getHttpConfig())) {
             return httpProvider.createToken(tokenConfig);
-        } catch (RuntimeException | UnsupportedEncodingException e) {
+        } catch (RuntimeException | IOException e) {
             throw new AccessTokenEndpointException(e.getMessage(), e);
         }
     }
@@ -179,13 +174,5 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     @Override
     public void stop() {
         scheduler.shutdown();
-        try {
-            if(httpProvider != null) {
-                httpProvider.close();
-            }
-        } catch (IOException e) {
-        	LOG.warn(e.getMessage(), e);
-//            throw new RuntimeException(e);
-        }
     }
 }

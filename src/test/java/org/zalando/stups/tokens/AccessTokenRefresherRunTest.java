@@ -17,6 +17,7 @@ package org.zalando.stups.tokens;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -94,5 +95,39 @@ public class AccessTokenRefresherRunTest {
 		System.setProperty("OAUTH2_ACCESS_TOKENS", "pierone=987654321");
 
 		accessTokens = Tokens.createAccessTokensWithUri(uri).manageToken("pierone").done().start();
+	}
+
+	/**
+	 * Verifies that for each access token refresh updated credentials are used.
+	 */
+	@Test
+	public void usesFreshCredentialsOnEachRequest() throws UnsupportedEncodingException, InterruptedException {
+		final ClientCredentialsProvider clientCredentialsProvider = Mockito.mock(ClientCredentialsProvider.class);
+		Mockito.when(clientCredentialsProvider.get()).thenReturn(new SimpleClientCredentials("id", "secret"));
+
+		final UserCredentialsProvider userCredentialsProvider = Mockito.mock(UserCredentialsProvider.class);
+		Mockito.when(userCredentialsProvider.get()).thenReturn(new NoopUserCredentials());
+
+		final HttpProvider httpProvider = Mockito.mock(HttpProvider.class);
+		Mockito.when(httpProvider.createToken(Mockito.any(AccessTokenConfiguration.class)))
+				.thenReturn(new AccessToken("123456789", "BEARER", 0, new Date()));
+
+		final HttpProviderFactory httpProviderFactory = Mockito.mock(HttpProviderFactory.class);
+		Mockito.when(httpProviderFactory.create(Mockito.any(ClientCredentials.class),
+				Mockito.any(UserCredentials.class), Mockito.any(URI.class), Mockito.any(HttpConfig.class)))
+				.thenReturn(httpProvider);
+
+		final AccessTokensBuilder builder = Tokens.createAccessTokensWithUri(uri).schedulingPeriod(1)
+				.usingClientCredentialsProvider(clientCredentialsProvider)
+				.usingUserCredentialsProvider(userCredentialsProvider).usingHttpProviderFactory(httpProviderFactory)
+				.manageToken("pierone").done();
+
+		accessTokens = builder.start();
+
+		TimeUnit.MILLISECONDS.sleep(1200);
+
+		accessTokens.stop();
+
+		Mockito.verify(clientCredentialsProvider, Mockito.atLeast(2)).get();
 	}
 }
