@@ -15,7 +15,14 @@
  */
 package org.zalando.stups.tokens;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
@@ -36,13 +43,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CloseableHttpProvider extends AbstractHttpProvider {
 
@@ -55,32 +56,24 @@ public class CloseableHttpProvider extends AbstractHttpProvider {
     private final HttpHost host;
     private final RequestConfig requestConfig;
 
-    public CloseableHttpProvider(ClientCredentials clientCredentials,
-                                 UserCredentials userCredentials,
-                                 URI accessTokenUri,
-                                 HttpConfig httpConfig) {
+    public CloseableHttpProvider(ClientCredentials clientCredentials, UserCredentials userCredentials,
+            URI accessTokenUri, HttpConfig httpConfig) {
         this.userCredentials = userCredentials;
         this.accessTokenUri = accessTokenUri;
-        requestConfig = RequestConfig.custom()
-                    	        .setSocketTimeout(httpConfig.getSocketTimeout())
-                    	        .setConnectTimeout(httpConfig.getConnectTimeout())
-                    	        .setConnectionRequestTimeout(httpConfig.getConnectionRequestTimeout())
-                    	        .setStaleConnectionCheckEnabled(httpConfig.isStaleConnectionCheckEnabled())
-                    	        .build();
+        requestConfig = RequestConfig.custom().setSocketTimeout(httpConfig.getSocketTimeout())
+                .setConnectTimeout(httpConfig.getConnectTimeout())
+                .setConnectionRequestTimeout(httpConfig.getConnectionRequestTimeout())
+                .setStaleConnectionCheckEnabled(httpConfig.isStaleConnectionCheckEnabled()).build();
 
         // prepare basic auth credentials
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(new AuthScope(accessTokenUri.getHost(),
-                        accessTokenUri.getPort()),
+        credentialsProvider.setCredentials(new AuthScope(accessTokenUri.getHost(), accessTokenUri.getPort()),
                 new UsernamePasswordCredentials(clientCredentials.getId(), clientCredentials.getSecret()));
 
-        client = HttpClients.custom()
-                .useSystemProperties()
-                .setDefaultCredentialsProvider(credentialsProvider)
-                .build();
+        client = HttpClients.custom().setUserAgent(USER_AGENT.get()).useSystemProperties()
+                .setDefaultCredentialsProvider(credentialsProvider).build();
 
-        host = new HttpHost(accessTokenUri.getHost(),
-                accessTokenUri.getPort(), accessTokenUri.getScheme());
+        host = new HttpHost(accessTokenUri.getHost(), accessTokenUri.getPort(), accessTokenUri.getScheme());
 
         // enable basic auth for the request
         final AuthCache authCache = new BasicAuthCache();
@@ -91,6 +84,7 @@ public class CloseableHttpProvider extends AbstractHttpProvider {
         localContext.setAuthCache(authCache);
     }
 
+    @Override
     public AccessToken createToken(final AccessTokenConfiguration tokenConfig) throws UnsupportedEncodingException {
         final List<NameValuePair> values = buildParameterList(tokenConfig);
 
@@ -120,7 +114,6 @@ public class CloseableHttpProvider extends AbstractHttpProvider {
             throw new AccessTokenEndpointException(t.getMessage(), t);
         }
     }
-
 
     private List<NameValuePair> buildParameterList(final AccessTokenConfiguration tokenConfig) {
         Map<String, String> parameterList = buildParameterMap(tokenConfig, userCredentials);
