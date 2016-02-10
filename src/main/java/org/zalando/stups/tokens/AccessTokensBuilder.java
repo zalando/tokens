@@ -26,6 +26,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class AccessTokensBuilder implements TokenRefresherConfiguration {
     private final URI accessTokenUri;
+    private URI tokenInfoUri;
 
     private ClientCredentialsProvider clientCredentialsProvider = null;
     private UserCredentialsProvider userCredentialsProvider = null;
@@ -39,6 +40,9 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     private HttpProviderFactory httpProviderFactory;
     private int schedulingPeriod = 5;
     private ScheduledExecutorService executorService;
+
+    private int tokenVerifierSchedulingPeriod = 5 * 60;
+    private TokenVerifierProvider tokenVerifierProvider;
 
     AccessTokensBuilder(final URI accessTokenUri) {
         this.accessTokenUri = notNull("accessTokenUri", accessTokenUri);
@@ -66,6 +70,12 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     public AccessTokensBuilder usingHttpProviderFactory(final HttpProviderFactory factory) {
         checkLock();
         this.httpProviderFactory = notNull("httpProviderFactory", factory);
+        return this;
+    }
+
+    public AccessTokensBuilder usingTokenVerifierProvider(TokenVerifierProvider tokenVerifierProvider) {
+        checkLock();
+        this.tokenVerifierProvider = notNull("tokenVerifierProvider", tokenVerifierProvider);
         return this;
     }
 
@@ -126,12 +136,31 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         return this;
     }
 
+    public AccessTokensBuilder tokenVerifierSchedulingPeriod(int tokenVerifierSchedulingPeriod) {
+        checkLock();
+        this.tokenVerifierSchedulingPeriod = tokenVerifierSchedulingPeriod;
+        return this;
+    }
+
+    public AccessTokensBuilder tokenInfoUri(URI tokenInfoUri) {
+        checkLock();
+        this.tokenInfoUri = notNull("tokenInfoUri", tokenInfoUri);
+        return this;
+    }
+
+    @Override
     public int getSchedulingPeriod() {
         return schedulingPeriod;
     }
 
+    @Override
     public URI getAccessTokenUri() {
         return accessTokenUri;
+    }
+
+    @Override
+    public URI getTokenInfoUri() {
+        return tokenInfoUri;
     }
 
     @Override
@@ -139,18 +168,22 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         return this.httpProviderFactory;
     }
 
+    @Override
     public ClientCredentialsProvider getClientCredentialsProvider() {
         return clientCredentialsProvider;
     }
 
+    @Override
     public UserCredentialsProvider getUserCredentialsProvider() {
         return userCredentialsProvider;
     }
 
+    @Override
     public int getRefreshPercentLeft() {
         return refreshPercentLeft;
     }
 
+    @Override
     public ScheduledExecutorService getExecutorService() {
         if (executorService == null) {
             return Executors.newSingleThreadScheduledExecutor();
@@ -159,10 +192,21 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         }
     }
 
+    @Override
+    public TokenVerifierProvider getTokenVerifierProvider() {
+        if (tokenVerifierProvider == null) {
+            return new CloseableTokenVerifierProvider();
+        } else {
+            return tokenVerifierProvider;
+        }
+    }
+
+    @Override
     public int getWarnPercentLeft() {
         return warnPercentLeft;
     }
 
+    @Override
     public Set<AccessTokenConfiguration> getAccessTokenConfigurations() {
         return Collections.unmodifiableSet(accessTokenConfigurations);
     }
@@ -194,11 +238,17 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         return refresher;
     }
 
+    @Override
     public HttpConfig getHttpConfig() {
         return httpConfig;
     }
 
     protected AccessTokenRefresher getAccessTokenRefresher() {
         return new AccessTokenRefresher(this);
+    }
+
+    @Override
+    public int getTokenVerifierSchedulingPeriod() {
+        return tokenVerifierSchedulingPeriod;
     }
 }

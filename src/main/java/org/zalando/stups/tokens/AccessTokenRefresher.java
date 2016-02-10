@@ -16,8 +16,6 @@
 package org.zalando.stups.tokens;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.zalando.stups.tokens.util.Objects;
 
 class AccessTokenRefresher implements AccessTokens, Runnable {
@@ -40,10 +37,13 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     private ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<Object, AccessToken>();
 
+    private final TokenVerifyRunner verifyRunner;
+
     public AccessTokenRefresher(final TokenRefresherConfiguration configuration) {
         this.configuration = configuration;
         this.schedulingPeriod = configuration.getSchedulingPeriod();
         this.scheduler = configuration.getExecutorService();
+        this.verifyRunner = new TokenVerifyRunner(configuration, accessTokens);
     }
 
     protected void initializeFixedTokensFromEnvironment() {
@@ -83,6 +83,9 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
         // #10, increase 'period' to 5 to avoid flooding the endpoint
         scheduler.scheduleAtFixedRate(this, 1, schedulingPeriod, TimeUnit.SECONDS);
+
+        // #36
+        scheduler.scheduleAtFixedRate(verifyRunner, 5, 5 * 60, TimeUnit.SECONDS);
     }
 
     static int percentLeft(final AccessToken token) {
@@ -90,7 +93,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         final long validUntil = token.getValidUntil().getTime();
         final long hundredPercentSeconds = token.getInitialValidSeconds();
         final long secondsLeft = (validUntil - now) / 1000;
-        return (int) ((double) secondsLeft / (double) hundredPercentSeconds * (double) 100);
+        return (int) ((double) secondsLeft / (double) hundredPercentSeconds * 100);
     }
 
     static boolean shouldRefresh(final AccessToken token, final TokenRefresherConfiguration configuration) {
