@@ -54,6 +54,7 @@ public class AccessTokenRefresherRunTest {
 		}
 	}
 
+    //@formatter:off
 	@Test
 	public void runAccessTokenRefresher() throws IOException, InterruptedException {
 		File tempDir = tempFolder.newFolder();
@@ -67,8 +68,16 @@ public class AccessTokenRefresherRunTest {
 		UserCredentialsProvider ucp = Mockito.mock(UserCredentialsProvider.class);
 		HttpProviderFactory hpf = Mockito.mock(HttpProviderFactory.class);
 
-		AccessTokensBuilder accessTokenBuilder = Tokens.createAccessTokensWithUri(uri).usingClientCredentialsProvider(ccp)
-				.usingUserCredentialsProvider(ucp).usingHttpProviderFactory(hpf).manageToken("TR_TEST").done();
+		AccessTokensBuilder accessTokenBuilder = Tokens.createAccessTokensWithUri(uri)
+		                                               .usingClientCredentialsProvider(ccp)
+		                                               .usingUserCredentialsProvider(ucp)
+		                                               .usingHttpProviderFactory(hpf)
+		                                               .manageToken("TR_TEST")
+		                                               .done()
+		                                               .manageToken("TR_TEST_1")
+		                                               .done()
+		                                               .manageToken("TR_TEST_2")
+                                                       .done();
 
 		HttpProvider httpProvider = Mockito.mock(HttpProvider.class);
 
@@ -76,7 +85,12 @@ public class AccessTokenRefresherRunTest {
 				Mockito.any(URI.class), Mockito.any(HttpConfig.class))).thenReturn(httpProvider);
 
 		Mockito.when(httpProvider.createToken(Mockito.any(AccessTokenConfiguration.class)))
-				.thenReturn(new AccessToken("123456789", "BEARER", 2, new Date(System.currentTimeMillis() + 15000)));
+                .thenReturn(new AccessToken("123456789", "BEARER", 2, new Date(System.currentTimeMillis() + 15000)))
+                .thenThrow(new RuntimeException("DO NOT FAIL ALL CONFIGURATIONS"))
+                .thenReturn(new AccessToken("123456789", "BEARER", 2, new Date(System.currentTimeMillis() + 15000)))
+                .thenReturn(new AccessToken("123456789", "BEARER", 2, new Date(System.currentTimeMillis() + 15000)))
+                .thenThrow(new RuntimeException("DO NOT FAIL ALL CONFIGURATIONS"))
+                .thenReturn(new AccessToken("123456789", "BEARER", 2, new Date(System.currentTimeMillis() + 15000)));
 		accessTokens = accessTokenBuilder.start();
 		Assertions.assertThat(accessTokens).isNotNull();
 
@@ -85,6 +99,7 @@ public class AccessTokenRefresherRunTest {
 		Mockito.verify(httpProvider, Mockito.atLeastOnce()).createToken(Mockito.any(AccessTokenConfiguration.class));
 
 	}
+	//@formatter:on
 
 	/**
 	 * Verifies that if a fixed token is set and the default configuration used, no attempt to refresh it using an
