@@ -20,5 +20,7 @@ import java.io.UnsupportedEncodingException;
 
 public interface HttpProvider extends Closeable {
 
+    static final UserAgent USER_AGENT = new UserAgent();
+
     AccessToken createToken(final AccessTokenConfiguration tokenConfig) throws UnsupportedEncodingException;
 }
