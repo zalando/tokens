@@ -16,8 +16,6 @@
 package org.zalando.stups.tokens;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.zalando.stups.tokens.util.Objects;
 
 class AccessTokenRefresher implements AccessTokens, Runnable {
@@ -90,7 +87,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         final long validUntil = token.getValidUntil().getTime();
         final long hundredPercentSeconds = token.getInitialValidSeconds();
         final long secondsLeft = (validUntil - now) / 1000;
-        return (int) ((double) secondsLeft / (double) hundredPercentSeconds * (double) 100);
+        return (int) ((double) secondsLeft / (double) hundredPercentSeconds * 100);
     }
 
     static boolean shouldRefresh(final AccessToken token, final TokenRefresherConfiguration configuration) {
@@ -103,32 +100,32 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     @Override
     public void run() {
-        try {
-            for (final AccessTokenConfiguration tokenConfig : configuration.getAccessTokenConfigurations()) {
+        for (final AccessTokenConfiguration tokenConfig : configuration.getAccessTokenConfigurations()) {
+            try {
                 final AccessToken oldToken = accessTokens.get(tokenConfig.getTokenId());
 
-                // TODO optionally check with tokeninfo endpoint regularly (every x% of time)
+                // TODO optionally check with tokeninfo endpoint regularly
+                // (every x% of time)
                 if (oldToken == null || shouldRefresh(oldToken, configuration)) {
                     try {
                         LOG.trace("Refreshing access token {}...", tokenConfig.getTokenId());
 
                         final AccessToken newToken = createToken(tokenConfig);
-                        //validate
+                        // validate
                         Objects.notNull("newToken", newToken);
                         accessTokens.put(tokenConfig.getTokenId(), newToken);
                         LOG.info("Refreshed access token {}.", tokenConfig.getTokenId());
                     } catch (final Throwable t) {
                         if (oldToken == null || shouldWarn(oldToken, configuration)) {
-                            LOG.warn("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t.getMessage(), t);
+                            LOG.warn("Cannot refresh access token " + tokenConfig.getTokenId(), t);
                         } else {
                             LOG.info("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
                         }
                     }
                 }
-
+            } catch (Throwable t) {
+                LOG.warn("Unexpected problem during token refresh run! TokenId: " + tokenConfig.getTokenId(), t);
             }
-        } catch (final Throwable t) {
-            LOG.error("Unexpected problem during token refresh run!", t);
         }
     }
 
