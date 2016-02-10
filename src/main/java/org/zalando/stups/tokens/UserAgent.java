@@ -32,7 +32,7 @@ final class UserAgent {
 
     private static final String UNKNOWN_VERSION = "unknown";
 
-    static final String PREFIX = "org.zalando.stups.tokens";
+    static final String PREFIX = "stups-tokens";
 
     private final String agentName;
 
@@ -49,7 +49,7 @@ final class UserAgent {
             LOG.warn("Could not resolve 'VERSION' for user-agent");
         }
 
-        this.agentName = PREFIX + " (" + version + ")";
+        this.agentName = PREFIX + "/" + version;
     }
 
     String get() {
