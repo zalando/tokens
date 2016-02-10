@@ -56,22 +56,30 @@ public class CloseableHttpProvider extends AbstractHttpProvider {
     private final HttpHost host;
     private final RequestConfig requestConfig;
 
+    //@formatter:off
     public CloseableHttpProvider(ClientCredentials clientCredentials, UserCredentials userCredentials,
             URI accessTokenUri, HttpConfig httpConfig) {
+
         this.userCredentials = userCredentials;
         this.accessTokenUri = accessTokenUri;
-        requestConfig = RequestConfig.custom().setSocketTimeout(httpConfig.getSocketTimeout())
-                .setConnectTimeout(httpConfig.getConnectTimeout())
-                .setConnectionRequestTimeout(httpConfig.getConnectionRequestTimeout())
-                .setStaleConnectionCheckEnabled(httpConfig.isStaleConnectionCheckEnabled()).build();
+
+        requestConfig = RequestConfig.custom()
+                                     .setSocketTimeout(httpConfig.getSocketTimeout())
+                                     .setConnectTimeout(httpConfig.getConnectTimeout())
+                                     .setConnectionRequestTimeout(httpConfig.getConnectionRequestTimeout())
+                                     .setStaleConnectionCheckEnabled(httpConfig.isStaleConnectionCheckEnabled())
+                                     .build();
 
         // prepare basic auth credentials
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(new AuthScope(accessTokenUri.getHost(), accessTokenUri.getPort()),
                 new UsernamePasswordCredentials(clientCredentials.getId(), clientCredentials.getSecret()));
 
-        client = HttpClients.custom().setUserAgent(USER_AGENT.get()).useSystemProperties()
-                .setDefaultCredentialsProvider(credentialsProvider).build();
+        client = HttpClients.custom()
+                            .setUserAgent(USER_AGENT.get())
+                            .useSystemProperties()
+                            .setDefaultCredentialsProvider(credentialsProvider)
+                            .build();
 
         host = new HttpHost(accessTokenUri.getHost(), accessTokenUri.getPort(), accessTokenUri.getScheme());
 
@@ -83,6 +91,7 @@ public class CloseableHttpProvider extends AbstractHttpProvider {
         localContext = HttpClientContext.create();
         localContext.setAuthCache(authCache);
     }
+    //@formatter:on
 
     @Override
     public AccessToken createToken(final AccessTokenConfiguration tokenConfig) throws UnsupportedEncodingException {
