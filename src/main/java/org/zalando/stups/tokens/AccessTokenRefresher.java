@@ -117,8 +117,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
                         LOG.info("Refreshed access token {}.", tokenConfig.getTokenId());
                     } catch (final Throwable t) {
                         if (oldToken == null || shouldWarn(oldToken, configuration)) {
-                            LOG.warn("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(),
-                                    t.getMessage(), t);
+                            LOG.warn("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
                         } else {
                             LOG.info("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
                         }
