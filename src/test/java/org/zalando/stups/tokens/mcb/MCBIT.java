@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class MCBTest {
+public class MCBIT {
 
     @Test
     public void scenario() throws InterruptedException {
