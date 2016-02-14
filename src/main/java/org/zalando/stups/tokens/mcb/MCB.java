@@ -1,7 +1,7 @@
 package org.zalando.stups.tokens.mcb;
 
 /**
- * Minimalistic Circuit Breaker.
+ * Minimal Circuit Breaker.
  * 
  * @author jbellmann
  *
