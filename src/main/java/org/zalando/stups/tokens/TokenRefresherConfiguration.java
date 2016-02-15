@@ -16,11 +16,11 @@
 package org.zalando.stups.tokens;
 
 import java.net.URI;
-
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 
 public interface TokenRefresherConfiguration {
+
     ClientCredentialsProvider getClientCredentialsProvider();
 
     UserCredentialsProvider getUserCredentialsProvider();
@@ -40,4 +40,10 @@ public interface TokenRefresherConfiguration {
     int getSchedulingPeriod();
 
     ScheduledExecutorService getExecutorService();
+
+    URI getTokenInfoUri();
+
+    int getTokenVerifierSchedulingPeriod();
+
+    TokenVerifierProvider getTokenVerifierProvider();
 }
