@@ -53,29 +53,20 @@ public class AccessTokenConfiguration {
 		}
 	}
 
-	// private void checkNotNull(final String name, final Object obj) {
-	// if (obj == null) {
-	// throw new IllegalArgumentException(name + " must not be null");
-	// }
-	// }
-
 	public AccessTokenConfiguration addScope(final Object scope) {
 		checkLock();
-		// checkNotNull("scope", scope);
 		scopes.add(notNull("scope", scope));
 		return this;
 	}
 
 	public AccessTokenConfiguration addScopes(final Collection<?> scopes) {
 		checkLock();
-		// checkNotNull("scopes", scopes);
 		this.scopes.addAll(noNullEntries("scopes", notNull("scopes", scopes)));
 		return this;
 	}
 
 	public AccessTokenConfiguration withGrantType(final String grantType) {
 		checkLock();
-		// checkNotNull("grantType", grantType);
 		this.grantType = Objects.notBlank("grantType", notNull("grantType", grantType));
 		return this;
 	}
