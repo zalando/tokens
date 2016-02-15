@@ -54,7 +54,7 @@ class CloseableTokenVerifier implements TokenVerifier {
                 .setConnectionRequestTimeout(httpConfig.getConnectionRequestTimeout())
                 .setStaleConnectionCheckEnabled(httpConfig.isStaleConnectionCheckEnabled()).build();
 
-        client = HttpClients.custom().setUserAgent("put-something here").useSystemProperties().build();
+        client = HttpClients.custom().setUserAgent(new UserAgent().get()).useSystemProperties().build();
 
         host = new HttpHost(tokenInfoUri.getHost(), tokenInfoUri.getPort(), tokenInfoUri.getScheme());
     }
@@ -79,7 +79,7 @@ class CloseableTokenVerifier implements TokenVerifier {
             if (status < 400) {
                 // seems to be ok
                 return true;
-            } else if (status >= 400) {
+            } else if (status >= 400 && status < 500) {
                 // get json response
                 final HttpEntity entity = response.getEntity();
                 final ProblemResponse problemResponse = objectMapper.readValue(EntityUtils.toByteArray(entity),
