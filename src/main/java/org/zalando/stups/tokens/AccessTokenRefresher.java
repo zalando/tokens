@@ -35,7 +35,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     private final ScheduledExecutorService scheduler;
     private final int schedulingPeriod;
 
-    private ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<Object, AccessToken>();
+    private final ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<>();
 
     private final TokenVerifyRunner verifyRunner;
 
@@ -110,7 +110,6 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
             try {
                 final AccessToken oldToken = accessTokens.get(tokenConfig.getTokenId());
 
-                // TODO optionally check with tokeninfo endpoint regularly
                 // (every x% of time)
                 if (oldToken == null || shouldRefresh(oldToken, configuration)) {
                     try {
