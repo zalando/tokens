@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zalando.stups.tokens.mcb.MCB;
 import org.zalando.stups.tokens.util.Objects;
 
 class AccessTokenRefresher implements AccessTokens, Runnable {
@@ -35,6 +36,8 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     private final ScheduledExecutorService scheduler;
     private final int schedulingPeriod;
 
+    private final MCB mcb;
+
     private ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<Object, AccessToken>();
 
     private final TokenVerifyRunner verifyRunner;
@@ -44,6 +47,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         this.schedulingPeriod = configuration.getSchedulingPeriod();
         this.scheduler = configuration.getExecutorService();
         this.verifyRunner = new TokenVerifyRunner(configuration, accessTokens);
+        this.mcb = new MCB();
     }
 
     protected void initializeFixedTokensFromEnvironment() {
@@ -106,31 +110,35 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     @Override
     public void run() {
-        for (final AccessTokenConfiguration tokenConfig : configuration.getAccessTokenConfigurations()) {
-            try {
-                final AccessToken oldToken = accessTokens.get(tokenConfig.getTokenId());
+        if (mcb.isClosed()) {
 
-                // TODO optionally check with tokeninfo endpoint regularly
-                // (every x% of time)
-                if (oldToken == null || shouldRefresh(oldToken, configuration)) {
-                    try {
-                        LOG.trace("Refreshing access token {}...", tokenConfig.getTokenId());
+            for (final AccessTokenConfiguration tokenConfig : configuration.getAccessTokenConfigurations()) {
+                try {
+                    final AccessToken oldToken = accessTokens.get(tokenConfig.getTokenId());
 
-                        final AccessToken newToken = createToken(tokenConfig);
-                        // validate
-                        Objects.notNull("newToken", newToken);
-                        accessTokens.put(tokenConfig.getTokenId(), newToken);
-                        LOG.info("Refreshed access token {}.", tokenConfig.getTokenId());
-                    } catch (final Throwable t) {
-                        if (oldToken == null || shouldWarn(oldToken, configuration)) {
-                            LOG.warn("Cannot refresh access token " + tokenConfig.getTokenId(), t);
-                        } else {
-                            LOG.info("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
+                    if (oldToken == null || shouldRefresh(oldToken, configuration)) {
+                        try {
+                            LOG.trace("Refreshing access token {}...", tokenConfig.getTokenId());
+
+                            final AccessToken newToken = createToken(tokenConfig);
+                            // validate
+                            Objects.notNull("newToken", newToken);
+                            accessTokens.put(tokenConfig.getTokenId(), newToken);
+                            mcb.onSuccess();
+                            LOG.info("Refreshed access token {}.", tokenConfig.getTokenId());
+                        } catch (final Throwable t) {
+                            if (oldToken == null || shouldWarn(oldToken, configuration)) {
+                                LOG.warn("Cannot refresh access token " + tokenConfig.getTokenId(), t);
+                            } else {
+                                LOG.info("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
+                            }
+                            mcb.onError();
                         }
                     }
+                } catch (Throwable t) {
+                    LOG.warn("Unexpected problem during token refresh run! TokenId: " + tokenConfig.getTokenId(), t);
+                    mcb.onError();
                 }
-            } catch (Throwable t) {
-                LOG.warn("Unexpected problem during token refresh run! TokenId: " + tokenConfig.getTokenId(), t);
             }
         }
     }

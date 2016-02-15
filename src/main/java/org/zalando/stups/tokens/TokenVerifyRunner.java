@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zalando.stups.tokens.mcb.MCB;
 
 /**
  * 
@@ -34,12 +35,14 @@ class TokenVerifyRunner implements Runnable, Closeable {
     private final TokenRefresherConfiguration configuration;
     private final Map<Object, AccessToken> accessTokens;
 
+    private final MCB mcb;
+
     private TokenVerifier tokenVerifier;
 
     public TokenVerifyRunner(TokenRefresherConfiguration configuration, Map<Object, AccessToken> accessTokens) {
         this.configuration = configuration;
         this.accessTokens = accessTokens;
-
+        this.mcb = new MCB();
         if (configuration.getTokenInfoUri() != null) {
             this.tokenVerifier = configuration.getTokenVerifierProvider().create(configuration.getTokenInfoUri(),
                     configuration.getHttpConfig());
@@ -51,18 +54,23 @@ class TokenVerifyRunner implements Runnable, Closeable {
     @Override
     public void run() {
         if (tokenVerifier != null) {
-            for (final AccessTokenConfiguration tokenConfig : configuration.getAccessTokenConfigurations()) {
-                try {
-                    final AccessToken accessToken = accessTokens.get(tokenConfig.getTokenId());
+            if (mcb.isClosed()) {
+                for (final AccessTokenConfiguration tokenConfig : configuration.getAccessTokenConfigurations()) {
+                    try {
+                        final AccessToken accessToken = accessTokens.get(tokenConfig.getTokenId());
 
-                    if (accessToken != null) {
-                        String token = accessToken.getToken();
-                        if (!tokenVerifier.isTokenValid(token)) {
-                            accessTokens.remove(tokenConfig.getTokenId());
+                        if (accessToken != null) {
+                            String token = accessToken.getToken();
+                            if (!tokenVerifier.isTokenValid(token)) {
+                                accessTokens.remove(tokenConfig.getTokenId());
+                            }
+                            mcb.onSuccess();
                         }
+                    } catch (final Throwable t) {
+                        LOG.warn("Unexpected problem during token verify run! TokenId : {}", tokenConfig.getTokenId(),
+                                t);
+                        mcb.onError();
                     }
-                } catch (final Throwable t) {
-                    LOG.warn("Unexpected problem during token verify run! TokenId : {}", tokenConfig.getTokenId(), t);
                 }
             }
         }
