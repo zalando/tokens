@@ -90,9 +90,10 @@ class CloseableTokenVerifier implements TokenVerifier {
             }
 
         } catch (Throwable t) {
-            // how to handle this?
+            // how to handle this? For now, do not delete the token
+            return true;
         }
-        return false;
+        return true;
     }
 
 }
