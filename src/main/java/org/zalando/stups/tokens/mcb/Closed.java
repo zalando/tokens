@@ -31,7 +31,12 @@ class Closed implements State {
 
     private static final Logger LOG = LoggerFactory.getLogger(Closed.class);
 
-    final AtomicLong errorCount = new AtomicLong(0);
+    private final AtomicLong errorCount = new AtomicLong(0);
+    private final MCBConfig config;
+
+    public Closed(MCBConfig config) {
+        this.config = config;
+    }
 
     @Override
     public boolean isClosed() {
@@ -52,9 +57,9 @@ class Closed implements State {
 
     @Override
     public State switchState() {
-        if (errorCount.get() >= 5) {
-            LOG.debug("SWITCH TO OPEN");
-            return new Open();
+        if (errorCount.get() >= config.getErrorThreshold()) {
+            LOG.warn("SWITCH TO OPEN");
+            return new Open(config);
         } else {
             return this;
         }

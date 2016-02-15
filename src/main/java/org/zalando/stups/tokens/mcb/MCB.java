@@ -23,7 +23,23 @@ package org.zalando.stups.tokens.mcb;
  */
 public class MCB {
 
-    private State state = new Closed();
+    private State state;
+
+    /**
+     * Uses defaults from {@link MCBConfig}.
+     */
+    public MCB() {
+        this(new MCBConfig.Builder().build());
+    }
+
+    /**
+     * Create one with a custom-config.
+     * 
+     * @param config
+     */
+    public MCB(MCBConfig config) {
+        this.state = new Closed(config);
+    }
 
     public void onError() {
         this.state.onError();

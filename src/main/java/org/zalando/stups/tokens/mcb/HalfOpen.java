@@ -34,9 +34,11 @@ class HalfOpen implements State {
     private final AtomicBoolean error = new AtomicBoolean(false);
 
     private final Open source;
+    private final MCBConfig config;
 
-    HalfOpen(Open source) {
+    HalfOpen(MCBConfig config, Open source) {
         this.source = source;
+        this.config = config;
     }
 
     @Override
@@ -57,11 +59,11 @@ class HalfOpen implements State {
     @Override
     public State switchState() {
         if (error.get()) {
-            LOG.debug("SWITCH STATE TO OPEN");
-            return new Open(source.nextMulti());
+            LOG.warn("SWITCH STATE TO OPEN");
+            return new Open(config, source.nextMulti());
         } else {
             LOG.debug("SWITCH STATE TO CLOSED");
-            return new Closed();
+            return new Closed(config);
         }
     }
 

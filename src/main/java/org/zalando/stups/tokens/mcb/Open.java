@@ -29,24 +29,27 @@ import org.slf4j.LoggerFactory;
 class Open implements State {
 
     private static final Logger LOG = LoggerFactory.getLogger(Open.class);
-    
-    public static final int TIMEOUT = 30000;
-    private static final int MAX_MULTI = 40;
 
     private long timeoutUntil = -1;
     private AtomicInteger multi;
 
-    Open() {
-        this(1);
+    private final MCBConfig config;
+
+    Open(MCBConfig config) {
+        this(config, 1);
     }
 
-    Open(int multi) {
-        if (multi < MAX_MULTI) {
+    Open(MCBConfig config, int multi) {
+        this.config = config;
+        if (multi < this.config.getMaxMulti()) {
             this.multi = new AtomicInteger(multi);
         } else {
-            this.multi = new AtomicInteger(MAX_MULTI);
+            this.multi = new AtomicInteger(config.getMaxMulti());
         }
-        this.timeoutUntil = System.currentTimeMillis() + this.multi.get() * TIMEOUT;
+        long sleepTime = this.multi.get() * this.config.getTimeout();
+        LOG.debug("OPEN for {} {}", sleepTime, this.config.getTimeUnit().toString());
+        this.timeoutUntil = System.currentTimeMillis()
+ + config.getTimeUnit().toMillis(sleepTime);
     }
 
     public int nextMulti() {
@@ -72,7 +75,7 @@ class Open implements State {
     public State switchState() {
         if (timeoutUntil < System.currentTimeMillis()) {
             LOG.debug("SWITCH STATE TO HALF_OPEN");
-            return new HalfOpen(this);
+            return new HalfOpen(config, this);
         } else {
             return this;
         }

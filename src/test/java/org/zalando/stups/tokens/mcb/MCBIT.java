@@ -29,8 +29,9 @@ public class MCBIT {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         AnService anService = Mockito.mock(AnService.class);
         initializeServiceBehaviour(anService);
-        scheduler.scheduleAtFixedRate(new Runner(new MCB(), anService), 2, 3, TimeUnit.SECONDS);
-        TimeUnit.SECONDS.sleep(500);
+        MCBConfig config = new MCBConfig.Builder().withTimeout(14).build();
+        scheduler.scheduleAtFixedRate(new Runner(new MCB(config), anService), 2, 3, TimeUnit.SECONDS);
+        TimeUnit.SECONDS.sleep(300);
     }
 
 
