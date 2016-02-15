@@ -41,7 +41,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     private final MCB mcb;
 
     private final ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<>();
-    private final Set<Object> invalidTokenIds = Collections.newSetFromMap(new ConcurrentHashMap<Object, Boolean>());
+    private final Set<Object> invalidTokens = Collections.newSetFromMap(new ConcurrentHashMap<Object, Boolean>());
 
     private final TokenVerifyRunner verifyRunner;
 
@@ -49,7 +49,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         this.configuration = configuration;
         this.schedulingPeriod = configuration.getSchedulingPeriod();
         this.scheduler = configuration.getExecutorService();
-        this.verifyRunner = new TokenVerifyRunner(configuration, accessTokens, invalidTokenIds);
+        this.verifyRunner = new TokenVerifyRunner(configuration, accessTokens, invalidTokens);
         this.mcb = new MCB();
     }
 
@@ -115,7 +115,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         if (token == null) {
             return false;
         }
-        return invalidTokenIds.contains(token);
+        return invalidTokens.contains(token);
     }
 
     @Override
@@ -134,7 +134,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
                             Objects.notNull("newToken", newToken);
                             accessTokens.put(tokenConfig.getTokenId(), newToken);
                             if (oldToken != null) {
-                                invalidTokenIds.remove(oldToken);
+                                invalidTokens.remove(oldToken);
                             }
                             mcb.onSuccess();
                             LOG.info("Refreshed access token {}.", tokenConfig.getTokenId());
