@@ -17,6 +17,7 @@ package org.zalando.stups.tokens;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
@@ -35,6 +36,7 @@ public class TokenVerifyRunnerTest {
     private final URI tokenInfoUri = URI.create("http://localhost/access_token");
     private TokenVerifierProvider tokenVerifierProvider;
     private Map<Object, AccessToken> accessTokens = new ConcurrentHashMap<>();
+    private Set<Object> invalidTokens = Collections.newSetFromMap(new ConcurrentHashMap<Object, Boolean>());
 
     @Before
     public void setUp() {
@@ -65,7 +67,7 @@ public class TokenVerifyRunnerTest {
         Mockito.when(tokenVerifierProvider.create(Mockito.any(URI.class), Mockito.any(HttpConfig.class)))
                 .thenReturn(verifier);
         Mockito.when(verifier.isTokenValid(Mockito.anyString())).thenReturn(true).thenReturn(false).thenReturn(true);
-        TokenVerifyRunner runner = new TokenVerifyRunner(configuration, accessTokens);
+        TokenVerifyRunner runner = new TokenVerifyRunner(configuration, accessTokens, invalidTokens);
         // execute
         runner.run();
         runner.run();
