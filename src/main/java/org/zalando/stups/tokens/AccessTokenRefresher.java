@@ -38,7 +38,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     private final MCB mcb;
 
-    private ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<Object, AccessToken>();
+    private final ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<>();
 
     private final TokenVerifyRunner verifyRunner;
 
@@ -111,7 +111,6 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     @Override
     public void run() {
         if (mcb.isClosed()) {
-
             for (final AccessTokenConfiguration tokenConfig : configuration.getAccessTokenConfigurations()) {
                 try {
                     final AccessToken oldToken = accessTokens.get(tokenConfig.getTokenId());

@@ -79,7 +79,7 @@ class TokenVerifyRunner implements Runnable, Closeable {
     @Override
     public void close() throws IOException {
         if (tokenVerifier != null) {
-            ((Closeable) tokenVerifier).close();
+            tokenVerifier.close();
         }
     }
 

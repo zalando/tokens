@@ -34,7 +34,7 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     private int warnPercentLeft = 20;
 
     private final HttpConfig httpConfig = new HttpConfig();
-    private final Set<AccessTokenConfiguration> accessTokenConfigurations = new HashSet<AccessTokenConfiguration>();
+    private final Set<AccessTokenConfiguration> accessTokenConfigurations = new HashSet<>();
 
     private boolean locked = false;
     private HttpProviderFactory httpProviderFactory;
