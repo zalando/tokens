@@ -18,6 +18,7 @@ package org.zalando.stups.tokens;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,14 +35,17 @@ class TokenVerifyRunner implements Runnable, Closeable {
 
     private final TokenRefresherConfiguration configuration;
     private final Map<Object, AccessToken> accessTokens;
+    private Set<Object> invalidTokenIds;
 
     private final MCB mcb;
 
     private TokenVerifier tokenVerifier;
 
-    public TokenVerifyRunner(TokenRefresherConfiguration configuration, Map<Object, AccessToken> accessTokens) {
+    public TokenVerifyRunner(TokenRefresherConfiguration configuration, Map<Object, AccessToken> accessTokens,
+            Set<Object> invalidTokenIds) {
         this.configuration = configuration;
         this.accessTokens = accessTokens;
+        this.invalidTokenIds = invalidTokenIds;
         this.mcb = new MCB();
         if (configuration.getTokenInfoUri() != null) {
             this.tokenVerifier = configuration.getTokenVerifierProvider().create(configuration.getTokenInfoUri(),
@@ -62,7 +66,7 @@ class TokenVerifyRunner implements Runnable, Closeable {
                         if (accessToken != null) {
                             String token = accessToken.getToken();
                             if (!tokenVerifier.isTokenValid(token)) {
-                                accessTokens.remove(tokenConfig.getTokenId());
+                                invalidTokenIds.add(accessToken);
                             }
                             mcb.onSuccess();
                         }

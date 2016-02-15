@@ -16,7 +16,9 @@
 package org.zalando.stups.tokens;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -39,6 +41,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     private final MCB mcb;
 
     private final ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<>();
+    private final Set<Object> invalidTokenIds = Collections.newSetFromMap(new ConcurrentHashMap<Object, Boolean>());
 
     private final TokenVerifyRunner verifyRunner;
 
@@ -46,7 +49,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         this.configuration = configuration;
         this.schedulingPeriod = configuration.getSchedulingPeriod();
         this.scheduler = configuration.getExecutorService();
-        this.verifyRunner = new TokenVerifyRunner(configuration, accessTokens);
+        this.verifyRunner = new TokenVerifyRunner(configuration, accessTokens, invalidTokenIds);
         this.mcb = new MCB();
     }
 
@@ -108,6 +111,13 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         return percentLeft(token) <= configuration.getWarnPercentLeft();
     }
 
+    protected boolean isInvalid(final AccessToken token) {
+        if (token == null) {
+            return false;
+        }
+        return invalidTokenIds.contains(token);
+    }
+
     @Override
     public void run() {
         if (mcb.isClosed()) {
@@ -115,7 +125,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
                 try {
                     final AccessToken oldToken = accessTokens.get(tokenConfig.getTokenId());
 
-                    if (oldToken == null || shouldRefresh(oldToken, configuration)) {
+                    if (oldToken == null || shouldRefresh(oldToken, configuration) || isInvalid(oldToken)) {
                         try {
                             LOG.trace("Refreshing access token {}...", tokenConfig.getTokenId());
 
@@ -123,6 +133,9 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
                             // validate
                             Objects.notNull("newToken", newToken);
                             accessTokens.put(tokenConfig.getTokenId(), newToken);
+                            if (oldToken != null) {
+                                invalidTokenIds.remove(oldToken);
+                            }
                             mcb.onSuccess();
                             LOG.info("Refreshed access token {}.", tokenConfig.getTokenId());
                         } catch (final Throwable t) {
