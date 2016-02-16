@@ -15,6 +15,8 @@
  */
 package org.zalando.stups.tokens;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
@@ -46,12 +48,12 @@ class TokenVerifyRunner implements Runnable, Closeable {
         this.configuration = configuration;
         this.accessTokens = accessTokens;
         this.invalidTokenIds = invalidTokenIds;
-        this.mcb = new MCB();
+        this.mcb = new MCB(this.configuration.getTokenVerifierMcbConfig());
         if (configuration.getTokenInfoUri() != null) {
             this.tokenVerifier = configuration.getTokenVerifierProvider().create(configuration.getTokenInfoUri(),
                     configuration.getHttpConfig());
         } else {
-            LOG.warn("No AccessToken-Verification enabled because no tokenInfoUri was configured");
+            LOG.warn("No AccessToken-Verification enabled because no 'tokenInfoUri' was configured");
         }
     }
 
@@ -63,7 +65,7 @@ class TokenVerifyRunner implements Runnable, Closeable {
                     try {
                         final AccessToken accessToken = accessTokens.get(tokenConfig.getTokenId());
 
-                        if (accessToken != null) {
+                        if (accessToken != null && olderThanMinute(accessToken)) {
                             String token = accessToken.getToken();
                             if (!tokenVerifier.isTokenValid(token)) {
                                 invalidTokenIds.add(accessToken);
@@ -78,6 +80,11 @@ class TokenVerifyRunner implements Runnable, Closeable {
                 }
             }
         }
+    }
+
+    protected boolean olderThanMinute(AccessToken accessToken) {
+        long diff = System.currentTimeMillis() - accessToken.getCreationTimestamp();
+        return diff > MINUTES.toMillis(1) ? true : false;
     }
 
     @Override

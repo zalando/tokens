@@ -74,7 +74,7 @@ class Open implements State {
     @Override
     public State switchState() {
         if (timeoutUntil < System.currentTimeMillis()) {
-            LOG.debug("SWITCH STATE TO HALF_OPEN");
+            LOG.info("SWITCH STATE TO HALF_OPEN");
             return new HalfOpen(config, this);
         } else {
             return this;

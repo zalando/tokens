@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
@@ -80,5 +81,19 @@ public class TokenVerifyRunnerTest {
         }
         Mockito.verify(verifier, Mockito.atLeast(3)).isTokenValid(Mockito.anyString());
         Assertions.assertThat(accessTokens.keySet().size()).isEqualTo(2);
+    }
+
+    @Test
+    public void olderThanMinute() {
+        TokenVerifyRunner runner = new TokenVerifyRunner(configuration, accessTokens, invalidTokens);
+        AccessToken accessToken = new AccessToken("token", "Bearer", 13, new Date());
+        boolean result = runner.olderThanMinute(accessToken);
+        Assertions.assertThat(result).isFalse();
+
+        long creatIonTimestamp = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(2);
+        AccessToken accessToken2 = new AccessToken("token2", "Bearer", 13, new Date(), creatIonTimestamp);
+        boolean result2 = runner.olderThanMinute(accessToken2);
+        Assertions.assertThat(result2).isTrue();
+
     }
 }

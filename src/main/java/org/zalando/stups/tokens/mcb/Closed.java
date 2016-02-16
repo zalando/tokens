@@ -58,7 +58,7 @@ class Closed implements State {
     @Override
     public State switchState() {
         if (errorCount.get() >= config.getErrorThreshold()) {
-            LOG.warn("SWITCH TO OPEN");
+            LOG.warn("SWITCH STATE TO OPEN");
             return new Open(config);
         } else {
             return this;

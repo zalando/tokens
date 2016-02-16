@@ -50,7 +50,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         this.schedulingPeriod = configuration.getSchedulingPeriod();
         this.scheduler = configuration.getExecutorService();
         this.verifyRunner = new TokenVerifyRunner(configuration, accessTokens, invalidTokens);
-        this.mcb = new MCB();
+        this.mcb = new MCB(this.configuration.getTokenRefresherMcbConfig());
     }
 
     protected void initializeFixedTokensFromEnvironment() {

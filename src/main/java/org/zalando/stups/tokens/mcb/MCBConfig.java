@@ -58,7 +58,7 @@ public class MCBConfig {
         return timeUnit;
     }
 
-    static class Builder {
+    public static class Builder {
         private int threshold = 5;
         private int timeout = 30;
         private int maxMulti = 40;

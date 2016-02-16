@@ -62,7 +62,7 @@ class HalfOpen implements State {
             LOG.warn("SWITCH STATE TO OPEN");
             return new Open(config, source.nextMulti());
         } else {
-            LOG.debug("SWITCH STATE TO CLOSED");
+            LOG.info("SWITCH STATE TO CLOSED");
             return new Closed(config);
         }
     }

@@ -19,6 +19,8 @@ import java.net.URI;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.zalando.stups.tokens.mcb.MCBConfig;
+
 public interface TokenRefresherConfiguration {
 
     ClientCredentialsProvider getClientCredentialsProvider();
@@ -46,4 +48,8 @@ public interface TokenRefresherConfiguration {
     int getTokenVerifierSchedulingPeriod();
 
     TokenVerifierProvider getTokenVerifierProvider();
+
+    MCBConfig getTokenRefresherMcbConfig();
+
+    MCBConfig getTokenVerifierMcbConfig();
 }

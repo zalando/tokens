@@ -23,6 +23,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.zalando.stups.tokens.mcb.MCBConfig;
 
 public class AccessTokensBuilder implements TokenRefresherConfiguration {
     private final URI accessTokenUri;
@@ -43,6 +46,11 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
 
     private int tokenVerifierSchedulingPeriod = 5 * 60;
     private TokenVerifierProvider tokenVerifierProvider;
+
+    private MCBConfig tokenRefresherMcbConfig = new MCBConfig.Builder().build();
+
+    private MCBConfig tokenVerifierMcbConfig = new MCBConfig.Builder().withErrorThreshold(3).withMaxMulti(4)
+            .withTimeout(10).withTimeUnit(TimeUnit.MINUTES).build();
 
     AccessTokensBuilder(final URI accessTokenUri) {
         this.accessTokenUri = notNull("accessTokenUri", accessTokenUri);
@@ -145,6 +153,18 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     public AccessTokensBuilder tokenInfoUri(URI tokenInfoUri) {
         checkLock();
         this.tokenInfoUri = notNull("tokenInfoUri", tokenInfoUri);
+        return this;
+    }
+
+    public AccessTokensBuilder tokenRefresherMcbConfig(MCBConfig config) {
+        checkLock();
+        this.tokenRefresherMcbConfig = notNull("tokenRefresherMcbConfig", config);
+        return this;
+    }
+
+    public AccessTokensBuilder tokenVerifierMcbConfig(MCBConfig config) {
+        checkLock();
+        this.tokenVerifierMcbConfig = notNull("tokenVerifierMcbConfig", config);
         return this;
     }
 
@@ -251,4 +271,15 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     public int getTokenVerifierSchedulingPeriod() {
         return tokenVerifierSchedulingPeriod;
     }
+
+    @Override
+    public MCBConfig getTokenRefresherMcbConfig() {
+        return tokenRefresherMcbConfig;
+    }
+
+    @Override
+    public MCBConfig getTokenVerifierMcbConfig() {
+        return tokenVerifierMcbConfig;
+    }
+
 }
