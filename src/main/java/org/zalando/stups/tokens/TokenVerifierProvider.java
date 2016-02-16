@@ -19,6 +19,6 @@ import java.net.URI;
 
 public interface TokenVerifierProvider {
 
-    TokenVerifier create(URI tokenInfoUri, HttpConfig httpConfig);
+    TokenVerifier create(URI tokenInfoUri, HttpConfig httpConfig, MetricsListener metricsListener);
 
 }

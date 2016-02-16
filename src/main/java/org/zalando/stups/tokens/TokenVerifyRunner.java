@@ -51,7 +51,7 @@ class TokenVerifyRunner implements Runnable, Closeable {
         this.mcb = new MCB(this.configuration.getTokenVerifierMcbConfig());
         if (configuration.getTokenInfoUri() != null) {
             this.tokenVerifier = configuration.getTokenVerifierProvider().create(configuration.getTokenInfoUri(),
-                    configuration.getHttpConfig());
+                    configuration.getHttpConfig(), configuration.getMetricsListener());
         } else {
             LOG.warn("No AccessToken-Verification enabled because no 'tokenInfoUri' was configured");
         }

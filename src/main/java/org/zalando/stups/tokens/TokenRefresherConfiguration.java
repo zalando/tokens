@@ -52,4 +52,6 @@ public interface TokenRefresherConfiguration {
     MCBConfig getTokenRefresherMcbConfig();
 
     MCBConfig getTokenVerifierMcbConfig();
+
+    MetricsListener getMetricsListener();
 }

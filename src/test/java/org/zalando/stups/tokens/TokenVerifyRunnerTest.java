@@ -67,7 +67,8 @@ public class TokenVerifyRunnerTest {
         TokenVerifier verifier = Mockito.mock(TokenVerifier.class);
         Mockito.when(configuration.getTokenInfoUri()).thenReturn(tokenInfoUri);
         Mockito.when(configuration.getTokenVerifierMcbConfig()).thenReturn(new MCBConfig.Builder().build());
-        Mockito.when(tokenVerifierProvider.create(Mockito.any(URI.class), Mockito.any(HttpConfig.class)))
+        Mockito.when(tokenVerifierProvider.create(Mockito.any(URI.class), Mockito.any(HttpConfig.class),
+                Mockito.any(MetricsListener.class)))
                 .thenReturn(verifier);
         Mockito.when(verifier.isTokenValid(Mockito.anyString())).thenReturn(true).thenReturn(false).thenReturn(true);
         TokenVerifyRunner runner = new TokenVerifyRunner(configuration, accessTokens, invalidTokens);

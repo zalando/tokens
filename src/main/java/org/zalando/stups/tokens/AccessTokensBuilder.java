@@ -52,6 +52,8 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     private MCBConfig tokenVerifierMcbConfig = new MCBConfig.Builder().withErrorThreshold(3).withMaxMulti(4)
             .withTimeout(10).withTimeUnit(TimeUnit.MINUTES).build();
 
+    private MetricsListener metricsListener = new DebugLogMetricsListener();
+
     AccessTokensBuilder(final URI accessTokenUri) {
         this.accessTokenUri = notNull("accessTokenUri", accessTokenUri);
     }
@@ -168,6 +170,12 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         return this;
     }
 
+    public AccessTokensBuilder metricsListener(MetricsListener metricsListener) {
+        checkLock();
+        this.metricsListener = notNull("metricsListener", metricsListener);
+        return this;
+    }
+
     @Override
     public int getSchedulingPeriod() {
         return schedulingPeriod;
@@ -280,6 +288,11 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     @Override
     public MCBConfig getTokenVerifierMcbConfig() {
         return tokenVerifierMcbConfig;
+    }
+
+    @Override
+    public MetricsListener getMetricsListener() {
+        return metricsListener;
     }
 
 }

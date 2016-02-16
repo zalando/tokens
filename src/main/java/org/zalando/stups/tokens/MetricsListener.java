@@ -15,13 +15,8 @@
  */
 package org.zalando.stups.tokens;
 
-import java.net.URI;
+public interface MetricsListener {
 
-class CloseableTokenVerifierProvider implements TokenVerifierProvider {
-
-    @Override
-    public TokenVerifier create(URI tokenInfoUri, HttpConfig httpConfig, MetricsListener metricsListener) {
-        return new CloseableTokenVerifier(tokenInfoUri, httpConfig, metricsListener);
-    }
+    void submitToTimer(String key, long time);
 
 }
