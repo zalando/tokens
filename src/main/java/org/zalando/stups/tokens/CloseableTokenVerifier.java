@@ -48,6 +48,7 @@ class CloseableTokenVerifier implements TokenVerifier {
     private final HttpHost host;
 
     public CloseableTokenVerifier(URI tokenInfoUri, HttpConfig httpConfig) {
+        this.tokenInfoUri = tokenInfoUri;
 
         requestConfig = RequestConfig.custom().setSocketTimeout(httpConfig.getSocketTimeout())
                 .setConnectTimeout(httpConfig.getConnectTimeout())

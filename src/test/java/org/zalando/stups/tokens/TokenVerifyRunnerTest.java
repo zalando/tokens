@@ -17,16 +17,19 @@ package org.zalando.stups.tokens;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.zalando.stups.tokens.mcb.MCBConfig;
 
 public class TokenVerifyRunnerTest {
 
@@ -35,6 +38,7 @@ public class TokenVerifyRunnerTest {
     private final URI tokenInfoUri = URI.create("http://localhost/access_token");
     private TokenVerifierProvider tokenVerifierProvider;
     private Map<Object, AccessToken> accessTokens = new ConcurrentHashMap<>();
+    private Set<Object> invalidTokens = Collections.newSetFromMap(new ConcurrentHashMap<Object, Boolean>());
 
     @Before
     public void setUp() {
@@ -52,8 +56,8 @@ public class TokenVerifyRunnerTest {
             AccessTokenConfiguration configuration = new AccessTokenConfiguration("TOKEN_" + i, accessTokensBuilder);
             configuration = configuration.addScope("read_all");
             configurations.add(configuration);
-
-            accessTokens.put("TOKEN_" + i, new AccessToken("12345678", "Bearer", 1, new Date()));
+            long creatIonTimestamp = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(2);
+            accessTokens.put("TOKEN_" + i, new AccessToken("12345678", "Bearer", 1, new Date(), creatIonTimestamp));
         }
         return configurations;
     }
@@ -62,10 +66,11 @@ public class TokenVerifyRunnerTest {
     public void create() {
         TokenVerifier verifier = Mockito.mock(TokenVerifier.class);
         Mockito.when(configuration.getTokenInfoUri()).thenReturn(tokenInfoUri);
+        Mockito.when(configuration.getTokenVerifierMcbConfig()).thenReturn(new MCBConfig.Builder().build());
         Mockito.when(tokenVerifierProvider.create(Mockito.any(URI.class), Mockito.any(HttpConfig.class)))
                 .thenReturn(verifier);
         Mockito.when(verifier.isTokenValid(Mockito.anyString())).thenReturn(true).thenReturn(false).thenReturn(true);
-        TokenVerifyRunner runner = new TokenVerifyRunner(configuration, accessTokens);
+        TokenVerifyRunner runner = new TokenVerifyRunner(configuration, accessTokens, invalidTokens);
         // execute
         runner.run();
         runner.run();
@@ -77,6 +82,20 @@ public class TokenVerifyRunnerTest {
             // close
         }
         Mockito.verify(verifier, Mockito.atLeast(3)).isTokenValid(Mockito.anyString());
-        Assertions.assertThat(accessTokens.keySet().size()).isEqualTo(2);
+        Assertions.assertThat(invalidTokens.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void olderThanMinute() {
+        TokenVerifyRunner runner = new TokenVerifyRunner(configuration, accessTokens, invalidTokens);
+        AccessToken accessToken = new AccessToken("token", "Bearer", 13, new Date());
+        boolean result = runner.olderThanMinute(accessToken);
+        Assertions.assertThat(result).isFalse();
+
+        long creatIonTimestamp = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(2);
+        AccessToken accessToken2 = new AccessToken("token2", "Bearer", 13, new Date(), creatIonTimestamp);
+        boolean result2 = runner.olderThanMinute(accessToken2);
+        Assertions.assertThat(result2).isTrue();
+
     }
 }

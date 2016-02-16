@@ -15,12 +15,16 @@
  */
 package org.zalando.stups.tokens;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zalando.stups.tokens.mcb.MCB;
 
 /**
  * 
@@ -33,45 +37,60 @@ class TokenVerifyRunner implements Runnable, Closeable {
 
     private final TokenRefresherConfiguration configuration;
     private final Map<Object, AccessToken> accessTokens;
+    private Set<Object> invalidTokenIds;
+
+    private final MCB mcb;
 
     private TokenVerifier tokenVerifier;
 
-    public TokenVerifyRunner(TokenRefresherConfiguration configuration, Map<Object, AccessToken> accessTokens) {
+    public TokenVerifyRunner(TokenRefresherConfiguration configuration, Map<Object, AccessToken> accessTokens,
+            Set<Object> invalidTokenIds) {
         this.configuration = configuration;
         this.accessTokens = accessTokens;
-
+        this.invalidTokenIds = invalidTokenIds;
+        this.mcb = new MCB(this.configuration.getTokenVerifierMcbConfig());
         if (configuration.getTokenInfoUri() != null) {
             this.tokenVerifier = configuration.getTokenVerifierProvider().create(configuration.getTokenInfoUri(),
                     configuration.getHttpConfig());
         } else {
-            LOG.warn("No AccessToken-Verification enabled because no tokenInfoUri was configured");
+            LOG.warn("No AccessToken-Verification enabled because no 'tokenInfoUri' was configured");
         }
     }
 
     @Override
     public void run() {
         if (tokenVerifier != null) {
-            for (final AccessTokenConfiguration tokenConfig : configuration.getAccessTokenConfigurations()) {
-                try {
-                    final AccessToken accessToken = accessTokens.get(tokenConfig.getTokenId());
+            if (mcb.isClosed()) {
+                for (final AccessTokenConfiguration tokenConfig : configuration.getAccessTokenConfigurations()) {
+                    try {
+                        final AccessToken accessToken = accessTokens.get(tokenConfig.getTokenId());
 
-                    if (accessToken != null) {
-                        String token = accessToken.getToken();
-                        if (!tokenVerifier.isTokenValid(token)) {
-                            accessTokens.remove(tokenConfig.getTokenId());
+                        if (accessToken != null && olderThanMinute(accessToken)) {
+                            String token = accessToken.getToken();
+                            if (!tokenVerifier.isTokenValid(token)) {
+                                invalidTokenIds.add(accessToken);
+                            }
+                            mcb.onSuccess();
                         }
+                    } catch (final Throwable t) {
+                        LOG.warn("Unexpected problem during token verify run! TokenId : {}", tokenConfig.getTokenId(),
+                                t);
+                        mcb.onError();
                     }
-                } catch (final Throwable t) {
-                    LOG.warn("Unexpected problem during token verify run! TokenId : {}", tokenConfig.getTokenId(), t);
                 }
             }
         }
     }
 
+    protected boolean olderThanMinute(AccessToken accessToken) {
+        long diff = System.currentTimeMillis() - accessToken.getCreationTimestamp();
+        return diff > MINUTES.toMillis(1) ? true : false;
+    }
+
     @Override
     public void close() throws IOException {
         if (tokenVerifier != null) {
-            ((Closeable) tokenVerifier).close();
+            tokenVerifier.close();
         }
     }
 

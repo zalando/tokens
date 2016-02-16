@@ -22,12 +22,19 @@ public class AccessToken {
     private final String type;
     private final long initialValidSeconds;
     private final Date validUntil;
+    private final long creationTimestamp;
 
     public AccessToken(final String token, final String type, final long initialValidSeconds, final Date validUntil) {
+        this(token, type, initialValidSeconds, validUntil, System.currentTimeMillis());
+    }
+
+    protected AccessToken(final String token, final String type, final long initialValidSeconds, final Date validUntil,
+            long creationTimestamp) {
         this.token = token;
         this.type = type;
         this.initialValidSeconds = initialValidSeconds;
         this.validUntil = validUntil;
+        this.creationTimestamp = creationTimestamp;
     }
 
     public String getToken() {
@@ -48,6 +55,10 @@ public class AccessToken {
 
     public boolean isExpired() {
         return validUntil != null && validUntil.before(new Date());
+    }
+
+    public long getCreationTimestamp() {
+        return creationTimestamp;
     }
 
     @Override

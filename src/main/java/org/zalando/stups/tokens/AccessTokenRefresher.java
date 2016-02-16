@@ -16,13 +16,16 @@
 package org.zalando.stups.tokens;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zalando.stups.tokens.mcb.MCB;
 import org.zalando.stups.tokens.util.Objects;
 
 class AccessTokenRefresher implements AccessTokens, Runnable {
@@ -35,7 +38,10 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     private final ScheduledExecutorService scheduler;
     private final int schedulingPeriod;
 
-    private ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<Object, AccessToken>();
+    private final MCB mcb;
+
+    private final ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<>();
+    private final Set<Object> invalidTokens = Collections.newSetFromMap(new ConcurrentHashMap<Object, Boolean>());
 
     private final TokenVerifyRunner verifyRunner;
 
@@ -43,7 +49,8 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         this.configuration = configuration;
         this.schedulingPeriod = configuration.getSchedulingPeriod();
         this.scheduler = configuration.getExecutorService();
-        this.verifyRunner = new TokenVerifyRunner(configuration, accessTokens);
+        this.verifyRunner = new TokenVerifyRunner(configuration, accessTokens, invalidTokens);
+        this.mcb = new MCB(this.configuration.getTokenRefresherMcbConfig());
     }
 
     protected void initializeFixedTokensFromEnvironment() {
@@ -104,33 +111,46 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         return percentLeft(token) <= configuration.getWarnPercentLeft();
     }
 
+    protected boolean isInvalid(final AccessToken token) {
+        if (token == null) {
+            return false;
+        }
+        return invalidTokens.contains(token);
+    }
+
     @Override
     public void run() {
-        for (final AccessTokenConfiguration tokenConfig : configuration.getAccessTokenConfigurations()) {
-            try {
-                final AccessToken oldToken = accessTokens.get(tokenConfig.getTokenId());
+        if (mcb.isClosed()) {
+            for (final AccessTokenConfiguration tokenConfig : configuration.getAccessTokenConfigurations()) {
+                try {
+                    final AccessToken oldToken = accessTokens.get(tokenConfig.getTokenId());
 
-                // TODO optionally check with tokeninfo endpoint regularly
-                // (every x% of time)
-                if (oldToken == null || shouldRefresh(oldToken, configuration)) {
-                    try {
-                        LOG.trace("Refreshing access token {}...", tokenConfig.getTokenId());
+                    if (oldToken == null || shouldRefresh(oldToken, configuration) || isInvalid(oldToken)) {
+                        try {
+                            LOG.trace("Refreshing access token {}...", tokenConfig.getTokenId());
 
-                        final AccessToken newToken = createToken(tokenConfig);
-                        // validate
-                        Objects.notNull("newToken", newToken);
-                        accessTokens.put(tokenConfig.getTokenId(), newToken);
-                        LOG.info("Refreshed access token {}.", tokenConfig.getTokenId());
-                    } catch (final Throwable t) {
-                        if (oldToken == null || shouldWarn(oldToken, configuration)) {
-                            LOG.warn("Cannot refresh access token " + tokenConfig.getTokenId(), t);
-                        } else {
-                            LOG.info("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
+                            final AccessToken newToken = createToken(tokenConfig);
+                            // validate
+                            Objects.notNull("newToken", newToken);
+                            accessTokens.put(tokenConfig.getTokenId(), newToken);
+                            if (oldToken != null) {
+                                invalidTokens.remove(oldToken);
+                            }
+                            mcb.onSuccess();
+                            LOG.info("Refreshed access token {}.", tokenConfig.getTokenId());
+                        } catch (final Throwable t) {
+                            if (oldToken == null || shouldWarn(oldToken, configuration)) {
+                                LOG.warn("Cannot refresh access token " + tokenConfig.getTokenId(), t);
+                            } else {
+                                LOG.info("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
+                            }
+                            mcb.onError();
                         }
                     }
+                } catch (Throwable t) {
+                    LOG.warn("Unexpected problem during token refresh run! TokenId: " + tokenConfig.getTokenId(), t);
+                    mcb.onError();
                 }
-            } catch (Throwable t) {
-                LOG.warn("Unexpected problem during token refresh run! TokenId: " + tokenConfig.getTokenId(), t);
             }
         }
     }
