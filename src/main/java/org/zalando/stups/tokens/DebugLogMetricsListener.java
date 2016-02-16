@@ -15,13 +15,24 @@
  */
 package org.zalando.stups.tokens;
 
-import java.net.URI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-class CloseableTokenVerifierProvider implements TokenVerifierProvider {
+/**
+ * Passed values will be printed if {@link Logger#isDebugEnabled()}.
+ * 
+ * @author jbellmann
+ *
+ */
+class DebugLogMetricsListener implements MetricsListener {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DebugLogMetricsListener.class);
 
     @Override
-    public TokenVerifier create(URI tokenInfoUri, HttpConfig httpConfig, MetricsListener metricsListener) {
-        return new CloseableTokenVerifier(tokenInfoUri, httpConfig, metricsListener);
+    public void submitToTimer(String key, long time) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("{} needs {} ms", key, time);
+        }
     }
 
 }

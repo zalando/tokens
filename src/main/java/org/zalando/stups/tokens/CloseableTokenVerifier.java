@@ -40,15 +40,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 class CloseableTokenVerifier implements TokenVerifier {
 
+    private static final String METRICS_KEY = "tokens.verifier";
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final RequestConfig requestConfig;
     private final CloseableHttpClient client;
     private URI tokenInfoUri;
     private final HttpHost host;
+    private final MetricsListener metricsListener;
 
-    public CloseableTokenVerifier(URI tokenInfoUri, HttpConfig httpConfig) {
+    public CloseableTokenVerifier(URI tokenInfoUri, HttpConfig httpConfig, MetricsListener metricsListener) {
         this.tokenInfoUri = tokenInfoUri;
+        this.metricsListener = metricsListener;
 
         requestConfig = RequestConfig.custom().setSocketTimeout(httpConfig.getSocketTimeout())
                 .setConnectTimeout(httpConfig.getConnectTimeout())
@@ -73,6 +77,7 @@ class CloseableTokenVerifier implements TokenVerifier {
         request.setHeader(AUTHORIZATION, "Bearer " + token);
         request.setConfig(requestConfig);
 
+        long start = System.currentTimeMillis();
         try (final CloseableHttpResponse response = client.execute(host, request)) {
 
             // success status code?
@@ -93,6 +98,9 @@ class CloseableTokenVerifier implements TokenVerifier {
         } catch (Throwable t) {
             // how to handle this? For now, do not delete the token
             return true;
+        } finally {
+            long time = System.currentTimeMillis() - start;
+            metricsListener.submitToTimer(METRICS_KEY, time);
         }
         return true;
     }

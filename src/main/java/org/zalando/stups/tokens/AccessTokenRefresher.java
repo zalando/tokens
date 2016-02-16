@@ -33,6 +33,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     private static final long ONE_YEAR_SECONDS =  TimeUnit.DAYS.toSeconds(365);
     private static final String FIXED_TOKENS_ENV_VAR = "OAUTH2_ACCESS_TOKENS";
+    private static final String METRICS_KEY = "tokens.refresher";
 
     private final TokenRefresherConfiguration configuration;
     private final ScheduledExecutorService scheduler;
@@ -45,10 +46,13 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     private final TokenVerifyRunner verifyRunner;
 
+    private final MetricsListener metricsListener;
+
     public AccessTokenRefresher(final TokenRefresherConfiguration configuration) {
         this.configuration = configuration;
         this.schedulingPeriod = configuration.getSchedulingPeriod();
         this.scheduler = configuration.getExecutorService();
+        this.metricsListener = configuration.getMetricsListener();
         this.verifyRunner = new TokenVerifyRunner(configuration, accessTokens, invalidTokens);
         this.mcb = new MCB(this.configuration.getTokenRefresherMcbConfig());
     }
@@ -162,10 +166,14 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
             userCredentials = configuration.getUserCredentialsProvider().get();
         }
 
+        long start = System.currentTimeMillis();
         try (final HttpProvider httpProvider = buildHttpProvider(clientCredentials, userCredentials)) {
             return httpProvider.createToken(tokenConfig);
         } catch (RuntimeException | IOException e) {
             throw new AccessTokenEndpointException(e.getMessage(), e);
+        } finally {
+            long diff = System.currentTimeMillis() - start;
+            metricsListener.submitToTimer(METRICS_KEY, diff);
         }
     }
 
