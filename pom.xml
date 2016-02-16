@@ -30,6 +30,16 @@
             <email>tobias.sarnowski@zalando.de</email>
             <organization>Zalando SE</organization>
         </developer>
+        <developer>
+            <name>Joerg Bellmann</name>
+            <email>joerg.bellmann@zalando.de</email>
+            <organization>Zalando SE</organization>
+        </developer>
+        <developer>
+            <name>Andre Hartmann</name>
+            <email>andre.hartmann@zalando.de</email>
+            <organization>Zalando SE</organization>
+        </developer>
     </developers>
 
     <properties>
