@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zalando.stups.tokens.mcb.MCB;
+import org.zalando.stups.tokens.util.Metrics;
 import org.zalando.stups.tokens.util.Objects;
 
 class AccessTokenRefresher implements AccessTokens, Runnable {
@@ -33,7 +34,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     private static final long ONE_YEAR_SECONDS =  TimeUnit.DAYS.toSeconds(365);
     private static final String FIXED_TOKENS_ENV_VAR = "OAUTH2_ACCESS_TOKENS";
-    private static final String METRICS_KEY = "tokens.refresher";
+    private static final String METRICS_KEY_PREFIX = "tokens.refresher";
 
     private final TokenRefresherConfiguration configuration;
     private final ScheduledExecutorService scheduler;
@@ -167,13 +168,15 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         }
 
         long start = System.currentTimeMillis();
+        boolean success = true;
         try (final HttpProvider httpProvider = buildHttpProvider(clientCredentials, userCredentials)) {
             return httpProvider.createToken(tokenConfig);
         } catch (RuntimeException | IOException e) {
+            success = false;
             throw new AccessTokenEndpointException(e.getMessage(), e);
         } finally {
             long diff = System.currentTimeMillis() - start;
-            metricsListener.submitToTimer(METRICS_KEY, diff);
+            metricsListener.submitToTimer(Metrics.buildMetricsKey(METRICS_KEY_PREFIX, success), diff);
         }
     }
 

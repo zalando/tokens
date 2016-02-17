@@ -30,6 +30,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.zalando.stups.tokens.util.Metrics;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -40,7 +41,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 class CloseableTokenVerifier implements TokenVerifier {
 
-    private static final String METRICS_KEY = "tokens.verifier";
+    private static final String METRICS_KEY_PREFIX = "tokens.verifier";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -78,6 +79,7 @@ class CloseableTokenVerifier implements TokenVerifier {
         request.setConfig(requestConfig);
 
         long start = System.currentTimeMillis();
+        boolean success = true;
         try (final CloseableHttpResponse response = client.execute(host, request)) {
 
             // success status code?
@@ -97,10 +99,11 @@ class CloseableTokenVerifier implements TokenVerifier {
 
         } catch (Throwable t) {
             // how to handle this? For now, do not delete the token
+            success = false;
             return true;
         } finally {
             long time = System.currentTimeMillis() - start;
-            metricsListener.submitToTimer(METRICS_KEY, time);
+            metricsListener.submitToTimer(Metrics.buildMetricsKey(METRICS_KEY_PREFIX, success), time);
         }
         return true;
     }
