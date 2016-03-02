@@ -69,6 +69,9 @@ class TokenVerifyRunner implements Runnable, Closeable {
                             String token = accessToken.getToken();
                             if (!tokenVerifier.isTokenValid(token)) {
                                 invalidTokenIds.add(accessToken);
+                                LOG.warn("Invalid Token scheduled for refresh : " + tokenConfig.getTokenId());
+                            } else {
+                                LOG.debug("Token for " + tokenConfig.getTokenId() + " still valid.");
                             }
                             mcb.onSuccess();
                         }
@@ -78,7 +81,11 @@ class TokenVerifyRunner implements Runnable, Closeable {
                         mcb.onError();
                     }
                 }
+            } else {
+                LOG.debug("MCB is open, skip check.");
             }
+        } else {
+            LOG.debug("No TokenVerifier configured, skipp check.");
         }
     }
 
