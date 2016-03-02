@@ -18,6 +18,7 @@ package org.zalando.stups.tokens;
 import java.net.URI;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.zalando.stups.tokens.mcb.MCBConfig;
 
@@ -54,4 +55,8 @@ public interface TokenRefresherConfiguration {
     MCBConfig getTokenVerifierMcbConfig();
 
     MetricsListener getMetricsListener();
+
+    TimeUnit getSchedulingTimeUnit();
+
+    TimeUnit getTokenVerifierSchedulingTimeUnit();
 }

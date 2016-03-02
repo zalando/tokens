@@ -42,9 +42,11 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     private boolean locked = false;
     private HttpProviderFactory httpProviderFactory;
     private int schedulingPeriod = 5;
+    private TimeUnit schedulingTimeUnit = TimeUnit.SECONDS;
     private ScheduledExecutorService executorService;
 
-    private int tokenVerifierSchedulingPeriod = 5 * 60;
+    private int tokenVerifierSchedulingPeriod = 5;
+    private TimeUnit tokenVerifierSchedulingTimeUnit = TimeUnit.MINUTES;
     private TokenVerifierProvider tokenVerifierProvider;
 
     private MCBConfig tokenRefresherMcbConfig = new MCBConfig.Builder().build();
@@ -146,9 +148,21 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         return this;
     }
 
+    public AccessTokensBuilder schedulingTimeUnit(TimeUnit timeUnit) {
+        checkLock();
+        this.schedulingTimeUnit = notNull("schedulingTimeUnit", timeUnit);
+        return this;
+    }
+
     public AccessTokensBuilder tokenVerifierSchedulingPeriod(int tokenVerifierSchedulingPeriod) {
         checkLock();
         this.tokenVerifierSchedulingPeriod = tokenVerifierSchedulingPeriod;
+        return this;
+    }
+
+    public AccessTokensBuilder tokenVerifierSchedulingTimeUnit(TimeUnit timeUnit) {
+        checkLock();
+        this.tokenVerifierSchedulingTimeUnit = notNull("tokenVerifierSchedulingTimeUnit", timeUnit);
         return this;
     }
 
@@ -293,6 +307,16 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     @Override
     public MetricsListener getMetricsListener() {
         return metricsListener;
+    }
+
+    @Override
+    public TimeUnit getSchedulingTimeUnit() {
+        return schedulingTimeUnit;
+    }
+
+    @Override
+    public TimeUnit getTokenVerifierSchedulingTimeUnit() {
+        return tokenVerifierSchedulingTimeUnit;
     }
 
 }

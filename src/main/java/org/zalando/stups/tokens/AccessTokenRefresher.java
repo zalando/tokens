@@ -38,7 +38,6 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     private final TokenRefresherConfiguration configuration;
     private final ScheduledExecutorService scheduler;
-    private final int schedulingPeriod;
 
     private final MCB mcb;
 
@@ -51,7 +50,6 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
 
     public AccessTokenRefresher(final TokenRefresherConfiguration configuration) {
         this.configuration = configuration;
-        this.schedulingPeriod = configuration.getSchedulingPeriod();
         this.scheduler = configuration.getExecutorService();
         this.metricsListener = configuration.getMetricsListener();
         this.verifyRunner = new TokenVerifyRunner(configuration, accessTokens, invalidTokens);
@@ -94,10 +92,12 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         run();
 
         // #10, increase 'period' to 5 to avoid flooding the endpoint
-        scheduler.scheduleAtFixedRate(this, 1, schedulingPeriod, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this, 1, configuration.getSchedulingPeriod(),
+                configuration.getSchedulingTimeUnit());
 
         // #36
-        scheduler.scheduleAtFixedRate(verifyRunner, 5, 5 * 60, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(verifyRunner, 5, configuration.getTokenVerifierSchedulingPeriod(),
+                configuration.getTokenVerifierSchedulingTimeUnit());
     }
 
     static int percentLeft(final AccessToken token) {
@@ -147,16 +147,18 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
                             if (oldToken == null || shouldWarn(oldToken, configuration)) {
                                 LOG.warn("Cannot refresh access token " + tokenConfig.getTokenId(), t);
                             } else {
-                                LOG.info("Cannot refresh access token {} because {}.", tokenConfig.getTokenId(), t);
+                                LOG.info("Cannot refresh access token {}", tokenConfig.getTokenId(), t);
                             }
                             mcb.onError();
                         }
                     }
                 } catch (Throwable t) {
-                    LOG.warn("Unexpected problem during token refresh run! TokenId: " + tokenConfig.getTokenId(), t);
                     mcb.onError();
+                    LOG.warn("Unexpected problem during token refresh run! TokenId: " + tokenConfig.getTokenId(), t);
                 }
             }
+        } else {
+            LOG.debug("MCB is open, skip refresh");
         }
     }
 
