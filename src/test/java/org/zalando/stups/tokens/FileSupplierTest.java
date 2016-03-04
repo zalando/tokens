@@ -17,13 +17,18 @@ package org.zalando.stups.tokens;
 
 import java.io.File;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author  jbellmann
  */
 public class FileSupplierTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FileSupplier.class);
 
     @Test(expected = IllegalArgumentException.class)
     public void testFileConstructorParam() {
@@ -65,11 +70,19 @@ public class FileSupplierTest {
         supplier.get();
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testNoCredentialsDirSet() {
-        FileSupplier supplier = new FileSupplier("notExistent");
-        Assert.assertNotNull(supplier);
-        supplier.get();
+        if (System.getenv("CREDENTIALS_DIR") != null) {
+            LOG.warn("ENV 'CREDENTIALS_DIR' was set so we skip");
+            return;
+        }
+        try {
+            FileSupplier supplier = new FileSupplier("notExistent");
+            Assert.assertNotNull(supplier);
+            supplier.get();
+            Assertions.fail("expect an exception, when 'CREDENTIALS_DIR' not set in environment");
+        } catch (IllegalStateException t) {
+        }
     }
 
 }
