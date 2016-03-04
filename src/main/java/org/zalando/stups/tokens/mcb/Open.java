@@ -52,7 +52,7 @@ class Open implements State {
     }
 
     private void logSwitch(long sleepTime) {
-        LOG.debug("{} SWITCHED TO OPEN for {} {}", this.config.getName(), sleepTime,
+        LOG.warn("{} SWITCHED TO OPEN for {} {}", this.config.getName(), sleepTime,
                 this.config.getTimeUnit().toString());
     }
 
@@ -72,7 +72,7 @@ class Open implements State {
 
     @Override
     public void onSuccess() {
-        // same here, no errors expected
+        // same here, no success expected
     }
 
     @Override

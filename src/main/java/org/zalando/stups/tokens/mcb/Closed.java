@@ -17,9 +17,6 @@ package org.zalando.stups.tokens.mcb;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * If 'closed' the service is available for usage.<br/>
  * Switches to 'open' if a threshold is greater or equal 5.
@@ -28,8 +25,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 class Closed implements State {
-
-    private static final Logger LOG = LoggerFactory.getLogger(Closed.class);
 
     private final AtomicLong errorCount = new AtomicLong(0);
     private final MCBConfig config;
@@ -50,6 +45,8 @@ class Closed implements State {
 
     @Override
     public void onSuccess() {
+        // TODO, we can also reset the counter here
+        // what to prefer
         if (errorCount.get() > 0) {
             errorCount.decrementAndGet();
         }
