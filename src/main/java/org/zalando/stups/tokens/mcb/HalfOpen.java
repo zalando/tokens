@@ -57,12 +57,16 @@ class HalfOpen implements State {
     }
 
     @Override
+    public String getName() {
+        return this.config.getName();
+    }
+
+    @Override
     public State switchState() {
         if (error.get()) {
-            LOG.warn("SWITCH STATE TO OPEN");
             return new Open(config, source.nextMulti());
         } else {
-            LOG.info("SWITCH STATE TO CLOSED");
+            LOG.info("{} SWITCH TO CLOSED", this.config.getName());
             return new Closed(config);
         }
     }

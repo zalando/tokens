@@ -16,6 +16,7 @@
 package org.zalando.stups.tokens.mcb;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Configuration for MCB.
@@ -29,12 +30,14 @@ public class MCBConfig {
     private final int timeout;
     private final int maxMulti;
     private final TimeUnit timeUnit;
+    private final String name;
 
-    private MCBConfig(int errorThreshold, int timeout, int maxMulti, TimeUnit timeUnit) {
+    private MCBConfig(int errorThreshold, int timeout, int maxMulti, TimeUnit timeUnit, String name) {
         this.errorThreshold = errorThreshold;
         this.timeout = timeout;
         this.maxMulti = maxMulti;
         this.timeUnit = timeUnit;
+        this.name = name;
     }
 
     /**
@@ -73,11 +76,22 @@ public class MCBConfig {
         return timeUnit;
     }
 
+    /**
+     * Name for the breaker.
+     * 
+     * @return
+     */
+    public String getName() {
+        return name;
+    }
+
     public static class Builder {
+        private static final AtomicLong nameCounter = new AtomicLong(0);
         private int threshold = 5;
         private int timeout = 30;
         private int maxMulti = 40;
         private TimeUnit timeUnit = TimeUnit.SECONDS;
+        private String name = "MCB-" + nameCounter.getAndIncrement();
 
         public Builder withErrorThreshold(int errorThreshold){
             this.threshold = errorThreshold;
@@ -99,8 +113,13 @@ public class MCBConfig {
             return this;
         }
 
+        public Builder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
         public MCBConfig build() {
-            return new MCBConfig(threshold, timeout, maxMulti, timeUnit);
+            return new MCBConfig(threshold, timeout, maxMulti, timeUnit, name);
         }
 
     }

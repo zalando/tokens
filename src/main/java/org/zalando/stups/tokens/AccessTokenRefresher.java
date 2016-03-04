@@ -158,7 +158,7 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
                 }
             }
         } else {
-            LOG.debug("MCB is open, skip refresh");
+            LOG.debug("{} is open, skip refresh", mcb.getName());
         }
     }
 

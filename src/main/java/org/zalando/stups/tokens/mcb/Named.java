@@ -15,14 +15,8 @@
  */
 package org.zalando.stups.tokens.mcb;
 
-public interface State extends Named {
+public interface Named {
 
-    void onError();
-
-    void onSuccess();
-
-    boolean isClosed();
-
-    State switchState();
+    String getName();
 
 }

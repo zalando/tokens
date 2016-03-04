@@ -47,9 +47,13 @@ class Open implements State {
             this.multi = new AtomicInteger(config.getMaxMulti());
         }
         long sleepTime = this.multi.get() * this.config.getTimeout();
-        LOG.debug("OPEN for {} {}", sleepTime, this.config.getTimeUnit().toString());
-        this.timeoutUntil = System.currentTimeMillis()
- + config.getTimeUnit().toMillis(sleepTime);
+        logSwitch(sleepTime);
+        this.timeoutUntil = System.currentTimeMillis() + config.getTimeUnit().toMillis(sleepTime);
+    }
+
+    private void logSwitch(long sleepTime) {
+        LOG.debug("{} SWITCHED TO OPEN for {} {}", this.config.getName(), sleepTime,
+                this.config.getTimeUnit().toString());
     }
 
     public int nextMulti() {
@@ -72,9 +76,14 @@ class Open implements State {
     }
 
     @Override
+    public String getName() {
+        return this.config.getName();
+    }
+
+    @Override
     public State switchState() {
         if (timeoutUntil < System.currentTimeMillis()) {
-            LOG.info("SWITCH STATE TO HALF_OPEN");
+            LOG.info("{} SWITCH TO HALF_OPEN", this.config.getName());
             return new HalfOpen(config, this);
         } else {
             return this;
