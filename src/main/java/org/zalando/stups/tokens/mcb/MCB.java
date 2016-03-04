@@ -55,4 +55,8 @@ public class MCB {
         return this.state.isClosed();
     }
 
+    public String getName() {
+        return this.state.getName();
+    }
+
 }

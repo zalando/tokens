@@ -82,7 +82,7 @@ class TokenVerifyRunner implements Runnable, Closeable {
                     }
                 }
             } else {
-                LOG.debug("MCB is open, skip check.");
+                LOG.debug("{} is open, skip check.", mcb.getName());
             }
         } else {
             LOG.debug("No TokenVerifier configured, skipp check.");
