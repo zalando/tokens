@@ -19,7 +19,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * If 'closed' the service is available for usage.<br/>
- * Switches to 'open' if a threshold is greater or equal 5.
+ * Switches to 'open' if a threshold is greater or equal the configured value
+ * {@link MCBConfig#getErrorThreshold()}.
+ * 
  * 
  * @author jbellmann
  *
