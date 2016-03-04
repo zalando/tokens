@@ -2,18 +2,30 @@
 
 A Java library that keeps OAuth 2.0 service access tokens in memory for your usage.
 
-## Maven dependency
-
 [![Build Status](https://travis-ci.org/zalando-stups/tokens.svg?branch=master)](https://travis-ci.org/zalando-stups/tokens)
 ![Maven Central](https://img.shields.io/maven-central/v/org.zalando.stups/tokens.svg)
 [![Coverage Status](https://coveralls.io/repos/zalando-stups/tokens/badge.svg?branch=master)](https://coveralls.io/r/zalando-stups/tokens?branch=master)
 [![codecov.io](https://codecov.io/github/zalando-stups/tokens/coverage.svg?branch=master)](https://codecov.io/github/zalando-stups/tokens?branch=master)
+
+## Maven dependency
 
 ```xml
 <dependency>
     <groupId>org.zalando.stups</groupId>
     <artifactId>tokens</artifactId>
     <version>see above</version>
+</dependency>
+```
+
+### Apache-Httpclient is also needed because we depend it currently
+
+So, you also have to add it with:
+
+```xml
+<dependency>
+    <groupId>org.apache.httpcomponents</groupId>
+    <artifactId>httpclient</artifactId>
+    <version>your version</version>
 </dependency>
 ```
 
