@@ -8,8 +8,6 @@ A Java library that keeps OAuth 2.0 service access tokens in memory for your usa
 [![Coverage Status](https://coveralls.io/repos/zalando-stups/tokens/badge.svg?branch=master)](https://coveralls.io/r/zalando-stups/tokens?branch=master)
 [![codecov.io](https://codecov.io/github/zalando-stups/tokens/coverage.svg?branch=master)](https://codecov.io/github/zalando-stups/tokens?branch=master)
 
-[Javadoc](http://www.javadoc.io/doc/org.zalando.stups/tokens/)
-
 ## Maven dependency
 
 ```xml
