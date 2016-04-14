@@ -18,7 +18,7 @@ A Java library that keeps OAuth 2.0 service access tokens in memory for your usa
 </dependency>
 ```
 
-### Apache-Httpclient is also needed because we depend on it currently
+### Apache-Httpclient is also needed.
 
 So, you also have to add it with:
 
