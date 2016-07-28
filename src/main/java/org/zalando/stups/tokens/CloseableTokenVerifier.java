@@ -21,6 +21,8 @@ import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -50,6 +52,7 @@ class CloseableTokenVerifier implements TokenVerifier {
     private URI tokenInfoUri;
     private final HttpHost host;
     private final MetricsListener metricsListener;
+    private final long abortTimeout;
 
     public CloseableTokenVerifier(URI tokenInfoUri, HttpConfig httpConfig, MetricsListener metricsListener) {
         this.tokenInfoUri = tokenInfoUri;
@@ -63,6 +66,8 @@ class CloseableTokenVerifier implements TokenVerifier {
         client = HttpClients.custom().setUserAgent(new UserAgent().get()).useSystemProperties().build();
 
         host = new HttpHost(tokenInfoUri.getHost(), tokenInfoUri.getPort(), tokenInfoUri.getScheme());
+
+        abortTimeout = httpConfig.getAbortTimeoutTimeunit().toMillis(httpConfig.getAbortTimeoutValue());
     }
 
     @Override
@@ -80,6 +85,7 @@ class CloseableTokenVerifier implements TokenVerifier {
 
         long start = System.currentTimeMillis();
         boolean success = true;
+        scheduleRequestAbort(request, abortTimeout);
         try (final CloseableHttpResponse response = client.execute(host, request)) {
 
             // success status code?
@@ -108,4 +114,24 @@ class CloseableTokenVerifier implements TokenVerifier {
         return true;
     }
 
+    protected void scheduleRequestAbort(HttpGet request, long millis) {
+        new Timer(true).schedule(new AbortRequestTask(request), millis);
+    }
+
+    private static final class AbortRequestTask extends TimerTask {
+
+        private final HttpGet httpGet;
+
+        AbortRequestTask(HttpGet httpPost) {
+            this.httpGet = httpPost;
+        }
+
+        @Override
+        public void run() {
+            if (httpGet != null) {
+                httpGet.abort();
+            }
+        }
+
+    }
 }

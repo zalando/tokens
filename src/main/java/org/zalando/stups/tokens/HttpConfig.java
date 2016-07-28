@@ -15,6 +15,8 @@
  */
 package org.zalando.stups.tokens;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.http.client.config.RequestConfig;
 
 /**
@@ -25,6 +27,9 @@ import org.apache.http.client.config.RequestConfig;
  */
 public class HttpConfig {
 
+    public static final int DEFAULT_ABORT_TIMEOUT_VALUE = 10;
+    public static final TimeUnit DEFAULT_ABORT_TIMEOUT_TIMEUNIT = TimeUnit.SECONDS;
+
     private int socketTimeout = 2000;
 
     private int connectTimeout = 1000;
@@ -32,6 +37,10 @@ public class HttpConfig {
     private int connectionRequestTimeout = 500;
 
     private boolean staleConnectionCheckEnabled = true;
+
+    private int abortTimeoutValue = DEFAULT_ABORT_TIMEOUT_VALUE;
+
+    private TimeUnit abortTimeoutTimeunit = DEFAULT_ABORT_TIMEOUT_TIMEUNIT;
 
     /**
      * @see RequestConfig#getSocketTimeout()
@@ -49,7 +58,8 @@ public class HttpConfig {
     /**
      * @see RequestConfig#getConnectTimeout()
      * 
-     * @return timeout in milliseconds until a connection is established, defaults to 1000
+     * @return timeout in milliseconds until a connection is established,
+     *         defaults to 1000
      */
     public int getConnectTimeout() {
         return connectTimeout;
@@ -62,7 +72,8 @@ public class HttpConfig {
     /**
      * @see RequestConfig#getConnectionRequestTimeout()
      * 
-     * @return timeout in milliseconds used when requesting a connection from the connection manager, defaults to 500
+     * @return timeout in milliseconds used when requesting a connection from
+     *         the connection manager, defaults to 500
      */
     public int getConnectionRequestTimeout() {
         return connectionRequestTimeout;
@@ -83,6 +94,22 @@ public class HttpConfig {
 
     public void setStaleConnectionCheckEnabled(boolean staleConnectionCheckEnabled) {
         this.staleConnectionCheckEnabled = staleConnectionCheckEnabled;
+    }
+
+    public int getAbortTimeoutValue() {
+        return abortTimeoutValue;
+    }
+
+    public void setAbortTimeoutValue(int abortTimeoutValue) {
+        this.abortTimeoutValue = abortTimeoutValue;
+    }
+
+    public TimeUnit getAbortTimeoutTimeunit() {
+        return abortTimeoutTimeunit;
+    }
+
+    public void setAbortTimeoutTimeunit(TimeUnit abortTimeoutTimeunit) {
+        this.abortTimeoutTimeunit = abortTimeoutTimeunit;
     }
 
 }

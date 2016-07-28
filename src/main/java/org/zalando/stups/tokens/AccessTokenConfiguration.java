@@ -23,68 +23,87 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.zalando.stups.tokens.util.Objects;
 
 public class AccessTokenConfiguration {
-	protected static final String DEFAULT_GRANT_TYPE = "password";
-	private final Object tokenId;
-	private final AccessTokensBuilder accessTokensBuilder;
-	private String grantType;
+    public static final int DEFAULT_ABORT_TIMEOUT_VALUE = 10;
+    public static final TimeUnit DEFAULT_ABORT_TIMEOUT_TIMEUNIT = TimeUnit.SECONDS;
+    protected static final String DEFAULT_GRANT_TYPE = "password";
+    private final Object tokenId;
+    private final AccessTokensBuilder accessTokensBuilder;
+    private String grantType;
+    private int abortTimeoutValue = DEFAULT_ABORT_TIMEOUT_VALUE;
+    private TimeUnit abortTimeoutTimeunit = DEFAULT_ABORT_TIMEOUT_TIMEUNIT;
 
-	private final Set<Object> scopes = new HashSet<>();
+    private final Set<Object> scopes = new HashSet<>();
 
-	private boolean locked = false;
+    private boolean locked = false;
 
-	AccessTokenConfiguration(final Object tokenId, final AccessTokensBuilder accessTokensBuilder) {
-		this(tokenId, accessTokensBuilder, DEFAULT_GRANT_TYPE);
-	}
+    AccessTokenConfiguration(final Object tokenId, final AccessTokensBuilder accessTokensBuilder) {
+        this(tokenId, accessTokensBuilder, DEFAULT_GRANT_TYPE);
+    }
 
-	AccessTokenConfiguration(final Object tokenId, final AccessTokensBuilder accessTokensBuilder,
-			final String grantType) {
-		this.tokenId = notNull("tokenId", tokenId);
-		this.accessTokensBuilder = notNull("accessTokenBuilder", accessTokensBuilder);
-		this.grantType = notBlank("grantType", notNull("grantType", grantType));
-	}
+    AccessTokenConfiguration(final Object tokenId, final AccessTokensBuilder accessTokensBuilder,
+            final String grantType) {
+        this.tokenId = notNull("tokenId", tokenId);
+        this.accessTokensBuilder = notNull("accessTokenBuilder", accessTokensBuilder);
+        this.grantType = notBlank("grantType", notNull("grantType", grantType));
+    }
 
-	private void checkLock() {
-		if (locked) {
-			throw new IllegalStateException("scope configuration already done");
-		}
-	}
+    private void checkLock() {
+        if (locked) {
+            throw new IllegalStateException("scope configuration already done");
+        }
+    }
 
-	public AccessTokenConfiguration addScope(final Object scope) {
-		checkLock();
-		scopes.add(notNull("scope", scope));
-		return this;
-	}
+    public AccessTokenConfiguration addScope(final Object scope) {
+        checkLock();
+        scopes.add(notNull("scope", scope));
+        return this;
+    }
 
-	public AccessTokenConfiguration addScopes(final Collection<?> scopes) {
-		checkLock();
-		this.scopes.addAll(noNullEntries("scopes", notNull("scopes", scopes)));
-		return this;
-	}
+    public AccessTokenConfiguration addScopes(final Collection<?> scopes) {
+        checkLock();
+        this.scopes.addAll(noNullEntries("scopes", notNull("scopes", scopes)));
+        return this;
+    }
 
-	public AccessTokenConfiguration withGrantType(final String grantType) {
-		checkLock();
-		this.grantType = Objects.notBlank("grantType", notNull("grantType", grantType));
-		return this;
-	}
+    public AccessTokenConfiguration withGrantType(final String grantType) {
+        checkLock();
+        this.grantType = Objects.notBlank("grantType", notNull("grantType", grantType));
+        return this;
+    }
 
-	Object getTokenId() {
-		return tokenId;
-	}
+    public AccessTokenConfiguration withAbortTimeoutValue(int value) {
+        checkLock();
+        this.abortTimeoutValue = value;
+        return this;
+    }
 
-	Set<Object> getScopes() {
-		return Collections.unmodifiableSet(scopes);
-	}
+    Object getTokenId() {
+        return tokenId;
+    }
 
-	public AccessTokensBuilder done() {
-		locked = true;
-		return accessTokensBuilder;
-	}
+    Set<Object> getScopes() {
+        return Collections.unmodifiableSet(scopes);
+    }
 
-	public String getGrantType() {
-		return grantType;
-	}
+    public AccessTokensBuilder done() {
+        locked = true;
+        return accessTokensBuilder;
+    }
+
+    public String getGrantType() {
+        return grantType;
+    }
+
+    public int getAbortTimeoutValue() {
+        return abortTimeoutValue;
+    }
+
+    public TimeUnit getAbortTimeoutTimeunit() {
+        return abortTimeoutTimeunit;
+    }
 }

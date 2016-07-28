@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.assertj.core.api.Assertions;
@@ -29,7 +28,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.base.Stopwatch;
 
 @Ignore
-public class MonitorThreadTest {
+public class AbortRequestTest {
 
     private HttpConfig httpConfig;
     private CloseableHttpClient client;
@@ -63,8 +62,9 @@ public class MonitorThreadTest {
 
         for (int i = 0; i < 5; i++) {
             executorService.submit(new RequestRunner(client, requestConfig));
+            TimeUnit.SECONDS.sleep(2);
         }
-//        MonitorThread mon = new MonitorThread(client.getConnectionManager());
+
         TimeUnit.MINUTES.sleep(1);
     }
 
@@ -95,7 +95,7 @@ public class MonitorThreadTest {
                             getRequest.abort();
                         }
                     }
-                }, 20000);
+                }, 8000);
                 client.execute(getRequest);
                 Assertions.fail("Expect an SocketTimeoutException, here");
             } catch (ClientProtocolException e) {
@@ -109,39 +109,6 @@ public class MonitorThreadTest {
             long timeUsed = sw.elapsed(TimeUnit.MILLISECONDS);
             System.out.println("TIMEUSED: " + timeUsed + " ms");
             return true;
-        }
-
-    }
-
-    static class MonitorThread extends Thread {
-        private final HttpClientConnectionManager connMgr;
-        private volatile boolean shutdown;
-
-        public MonitorThread(HttpClientConnectionManager connMgr) {
-            super();
-            this.connMgr = connMgr;
-        }
-
-        @Override
-        public void run() {
-            try {
-                while (!shutdown) {
-                    synchronized (this) {
-                        wait(1000);
-                        connMgr.closeExpiredConnections();
-                        connMgr.closeIdleConnections(8, TimeUnit.SECONDS);
-                    }
-                }
-            } catch (InterruptedException ex) {
-                shutdown();
-            }
-        }
-
-        public void shutdown() {
-            shutdown = true;
-            synchronized (this) {
-                notifyAll();
-            }
         }
     }
 }

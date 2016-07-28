@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -101,6 +103,8 @@ public class CloseableHttpProvider extends AbstractHttpProvider {
         request.setEntity(new UrlEncodedFormEntity(values));
         request.setConfig(requestConfig);
 
+        scheduleRequestAbort(request,
+                tokenConfig.getAbortTimeoutTimeunit().toMillis(tokenConfig.getAbortTimeoutValue()));
         try (final CloseableHttpResponse response = client.execute(host, request, localContext)) {
 
             // success status code?
@@ -133,8 +137,29 @@ public class CloseableHttpProvider extends AbstractHttpProvider {
         return nameValuePairs;
     }
 
+    protected void scheduleRequestAbort(HttpPost request, long millis) {
+        new Timer(true).schedule(new AbortRequestTask(request), millis);
+    }
+
     @Override
     public void close() throws IOException {
         client.close();
+    }
+
+    private static final class AbortRequestTask extends TimerTask {
+
+        private final HttpPost httpPost;
+
+        AbortRequestTask(HttpPost httpPost) {
+            this.httpPost = httpPost;
+        }
+
+        @Override
+        public void run() {
+            if (httpPost != null) {
+                httpPost.abort();
+            }
+        }
+
     }
 }
