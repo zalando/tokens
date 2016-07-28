@@ -12,6 +12,9 @@
     <logger name="org.zalando.stups">
         <level value="TRACE" />
     </logger>
+    <logger name="org.apache.http.impl.conn">
+        <level value="TRACE"/>
+    </logger>
 
     <root>
         <priority value="INFO" />
