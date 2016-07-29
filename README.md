@@ -76,7 +76,7 @@ while (true) {
 
 ### Local Testing
 
-With Tokens, you can inject fixed OAuth2 access tokens via the `OAUTH2_ACCESS_TOKENS` environment variable and test applications locally with personal OAuth2 tokens:
+With Tokens, you can inject fixed OAuth2 access tokens via the `OAUTH2_ACCESS_TOKENS` environment variable and test applications locally with personal OAuth2 tokens. As an example:
 
 ```bash
 $ MY_TOKEN_1=$(zign token -n mytok1)
@@ -84,6 +84,8 @@ $ MY_TOKEN_2=$(zign token -n mytok2)
 $ export OAUTH2_ACCESS_TOKENS=mytok1=$MY_TOKEN_1,mytok2=$MY_TOKEN_2
 $ lein repl # start my local Clojure app using the tokens library
 ```
+
+In production on EC2 instances, Tokens fetches access tokens by requesting an authorization server with credentials, found in `client.json` and `user.json`. It's also possible to provide `client.json` and `user.json` with valid content and point this library to that directory.
 
 ### Contributing
 
