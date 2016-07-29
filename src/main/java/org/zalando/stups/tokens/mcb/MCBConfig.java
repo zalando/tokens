@@ -79,7 +79,7 @@ public class MCBConfig {
     /**
      * Name for the breaker.
      * 
-     * @return
+     * @return name the brokers name
      */
     public String getName() {
         return name;

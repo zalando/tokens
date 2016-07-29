@@ -20,7 +20,7 @@ import java.util.Collection;
 import org.apache.http.util.Args;
 
 /**
- * Basic Utilities. We know there are a lot of libs out there. <br />
+ * Basic Utilities. We know there are a lot of libs out there.
  * We just delegate to one in classpath here not to spread around the
  * dependency.
  * 
