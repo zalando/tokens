@@ -79,8 +79,9 @@ while (true) {
 With Tokens, you can inject fixed OAuth2 access tokens via the `OAUTH2_ACCESS_TOKENS` environment variable and test applications locally with personal OAuth2 tokens:
 
 ```bash
-$ MY_TOKEN=$(zign token -n mytok)
-$ export OAUTH2_ACCESS_TOKENS=mytok=$MY_TOKEN
+$ MY_TOKEN_1=$(zign token -n mytok1)
+$ MY_TOKEN_2=$(zign token -n mytok2)
+$ export OAUTH2_ACCESS_TOKENS=mytok1=$MY_TOKEN_1,mytok2=$MY_TOKEN_2
 $ lein repl # start my local Clojure app using the tokens library
 ```
 
