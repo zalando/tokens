@@ -23,10 +23,6 @@ import java.net.URI;
  * Use e.g. {@link Tokens#createAccessTokensWithUri(URI)} to create an {@link AccessTokensBuilder}
  * which can be used to define multiple access tokens via {@link AccessTokensBuilder#manageToken(Object)}
  * that are managed and refreshed.
- *
- * @author jbellmann
- * @author sarnowski
- * @author duergner
  */
 public final class Tokens {
     private Tokens() {

@@ -31,11 +31,6 @@ package org.zalando.stups.tokens;
  * The <i>tokenId</i> object used for all three methods must be an object that is equal to the
  * object used when defining the token via {@link AccessTokensBuilder#manageToken(Object)}. If you
  * are referring to tokens by {@link String} simply use a {@link String} with equals characters here.
- *
- * @author sarnowski
- * @author jbellmann
- * @author duergner
- *
  */
 public interface AccessTokens {
 
