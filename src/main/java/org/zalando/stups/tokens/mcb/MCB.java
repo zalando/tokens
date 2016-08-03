@@ -35,7 +35,7 @@ public class MCB {
     /**
      * Create one with a custom-config.
      * 
-     * @param config
+     * @param config configuration for the {@link MCB}
      */
     public MCB(MCBConfig config) {
         this.state = new Closed(config);
