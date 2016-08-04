@@ -27,7 +27,7 @@ import java.util.Set;
 import org.zalando.stups.tokens.util.Objects;
 
 /**
- * Configuration for one single access token that is manages by the {@link AccessTokens} service.
+ * Configuration for one single access token that is managed by the {@link AccessTokens} service.
  * It is used at configuration time and is retrieved via
  * {@link AccessTokensBuilder#manageToken(Object)}. It is possible to configure the desired
  * <i>scopes</i> (see https://tools.ietf.org/html/rfc6749#section-3.3 for details) as well as the
