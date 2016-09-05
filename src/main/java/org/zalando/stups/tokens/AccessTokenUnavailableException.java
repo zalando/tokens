@@ -15,21 +15,49 @@
  */
 package org.zalando.stups.tokens;
 
+/**
+ * Exception class indicating that {@link AccessTokens} implementation is not able to provide an
+ * access token for the specified <i>tokenId</i>
+ */
 @SuppressWarnings("serial")
 public class AccessTokenUnavailableException extends IllegalStateException {
 
+	/**
+	 * Create a simple instance without any additional information.
+	 *
+	 * You should not use this constructor if possible but use one of the more descriptive ones
+	 * instead
+	 */
 	public AccessTokenUnavailableException() {
 		super();
 	}
 
+	/**
+	 * Create a simple instance with the specified message
+	 *
+	 * @param s  The exception message to use
+   */
 	public AccessTokenUnavailableException(final String s) {
 		super(s);
 	}
 
+	/**
+	 * Create a complex instance with a cause included as well as the specified message
+	 *
+	 * @param message  The exception message to use
+	 * @param cause    The cause {@link Throwable} for this exception
+   */
 	public AccessTokenUnavailableException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 
+	/**
+	 * Create a complex instance with a cause included.
+	 *
+	 * You should use the constructor that includes a message instead!
+	 *
+	 * @param cause  The case {@link Throwable} for this exception
+   */
 	public AccessTokenUnavailableException(final Throwable cause) {
 		super(cause);
 	}
