@@ -80,7 +80,7 @@ public class AccessToken {
     }
 
     /**
-     * The point in time until when this {@link AccessToken} is valud
+     * The point in time until when this {@link AccessToken} is valid
      *
      * @return  A {@link Date} that will describe a point in time in the future in case this
      * {@link AccessToken} is not yet expired (see {@link AccessToken#isExpired()}).
@@ -92,9 +92,9 @@ public class AccessToken {
     /**
      * Tell whether this {@link AccessToken} is expired.
      *
-     * @return  Will return {@link Boolean#TRUE} if this {@link AccessToken} is still valid, i.e.
+     * @return  Will return {@link Boolean#FALSE} if this {@link AccessToken} is still valid, i.e.
      * the {@link Date} as returned by {@link AccessToken#getValidUntil()} describes a point of time
-     * in the future; {@link Boolean#FALSE} otherwise
+     * in the future; {@link Boolean#TRUE} otherwise
      */
     public boolean isExpired() {
         return validUntil != null && validUntil.before(new Date());
