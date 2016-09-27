@@ -26,6 +26,19 @@ import java.util.Set;
 
 import org.zalando.stups.tokens.util.Objects;
 
+/**
+ * Configuration for one single access token that is managed by the {@link AccessTokens} service.
+ * It is used at configuration time and is retrieved via
+ * {@link AccessTokensBuilder#manageToken(Object)}. It is possible to configure the desired
+ * <i>scopes</i> (see https://tools.ietf.org/html/rfc6749#section-3.3 for details) as well as the
+ * <i>grant type</i> (see https://tools.ietf.org/html/rfc6749#section-1.3 for details) for this
+ * access token. It follows a fluent interface design pattern.
+ *
+ * Invoke {@link AccessTokenConfiguration#done()} after you finished configuring this access token
+ * to return to the fluent interface of the {@link AccessTokensBuilder} to either add another
+ * managed access token or add additional configuration.
+ *
+ */
 public class AccessTokenConfiguration {
 	protected static final String DEFAULT_GRANT_TYPE = "password";
 	private final Object tokenId;
@@ -53,18 +66,50 @@ public class AccessTokenConfiguration {
 		}
 	}
 
+	/**
+	 * Add a single scope to this access token. Scopes will most of the time being expressed as
+	 * plain strings. If the scope is not a {@link String} it {@link Object#toString()} method will
+	 * be invoked when requesting the access token from the authorization server.
+	 *
+	 * @param scope  The scope to add for this access token. An {@link IllegalArgumentException}
+	 *               will be thrown in case of <i>scope</i> being <i>null</i>.
+	 * @return The same {@link AccessTokenConfiguration} instance this method has been called upon
+	 * with the supplied <i>scope</i> added to the set of existing scopes.
+     */
 	public AccessTokenConfiguration addScope(final Object scope) {
 		checkLock();
 		scopes.add(notNull("scope", scope));
 		return this;
 	}
 
+	/**
+	 * Add multiple scopes to this access token. Refer to
+	 * {@link AccessTokenConfiguration#addScope(Object)} for more detailed description of a scope.
+	 *
+	 * @param scopes  A {@link Collection} of scopes that should be added to this access token. An
+	 *                {@link IllegalArgumentException} will be throws if either <i>scopes</i> being
+	 *                <i>null</i> or {@link Collection#contains(Object)} is <i>true</i> for the
+	 *                <i>null</i> arguments.
+	 *                Please note that scopes are stored as {@link Set} internally, i.e. duplicates
+	 *                with respect to {@link Object#hashCode()} and {@link Object#equals(Object)}
+	 *                will be removed.
+	 * @return The same {@link AccessTokenConfiguration} instance this method has been called upon
+	 * with the supplied <i>scopes</i> added to the set of existing scopes.
+     */
 	public AccessTokenConfiguration addScopes(final Collection<?> scopes) {
 		checkLock();
 		this.scopes.addAll(noNullEntries("scopes", notNull("scopes", scopes)));
 		return this;
 	}
 
+	/**
+	 * Set the grant type to be used for this access token. For possible valid grant types see
+	 * https://tools.ietf.org/html/rfc6749#section-1.3. Defaults to <i>password</i>.
+	 *
+	 * @param grantType  The <i>grant type</i> to be used when requesting an access token.
+	 * @return The same {@link AccessTokenConfiguration} instance this method has been called upon
+	 * with the supplied <i>grant type</i> set.
+     */
 	public AccessTokenConfiguration withGrantType(final String grantType) {
 		checkLock();
 		this.grantType = Objects.notBlank("grantType", notNull("grantType", grantType));
@@ -79,11 +124,24 @@ public class AccessTokenConfiguration {
 		return Collections.unmodifiableSet(scopes);
 	}
 
+	/**
+	 * Finish configuring this access token, lock the configuration and return to the
+	 * {@link AccessTokensBuilder} for further configuration of additional access tokens or other
+	 * aspects.
+	 *
+	 * @return The {@link AccessTokensBuilder} that was used to create this
+	 * {@link AccessTokenConfiguration} with an access token configured according to this instance.
+	 */
 	public AccessTokensBuilder done() {
 		locked = true;
 		return accessTokensBuilder;
 	}
 
+	/**
+	 * Get the <i>grant type</i> for this access token.
+	 *
+	 * @return The grant type for this access token
+	 */
 	public String getGrantType() {
 		return grantType;
 	}
