@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.zalando.stups.tokens.mcb.MCB;
 
 /**
- * 
+ *
  * @author jbellmann
  *
  */
@@ -82,10 +82,10 @@ class TokenVerifyRunner implements Runnable, Closeable {
                     }
                 }
             } else {
-                LOG.debug("{} is open, skip check.", mcb.getName());
+                LOG.debug("{} is open, skipping check.", mcb.getName());
             }
         } else {
-            LOG.debug("No TokenVerifier configured, skipp check.");
+            LOG.debug("No TokenVerifier configured, skipping check.");
         }
     }
 
