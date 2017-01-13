@@ -53,6 +53,9 @@ Add it with:
 ### Usage
 
 ```java
+import org.zalando.stups.tokens.Tokens;
+import org.zalando.stups.tokens.AccessTokens;
+
 AccessTokens tokens = Tokens.createAccessTokensWithUri(new URI("https://example.com/access_tokens"))
                             .manageToken("exampleRW")
                                 .addScope("read")
