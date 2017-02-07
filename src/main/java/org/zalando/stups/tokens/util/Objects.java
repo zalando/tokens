@@ -54,4 +54,25 @@ public class Objects {
 		return collection;
 	}
 
+	public static <T extends CharSequence> Collection<T> noBlankEntries(String name, Collection<T> collection) {
+		name = notBlank("name", name);
+		collection = notNull(name, collection);
+		try {
+			if (collection.contains(null)) {
+				throw new IllegalArgumentException(name + " should not contain 'null'");
+			}
+			try {
+				for (T element : collection) {
+					Args.notBlank(element, name);
+				}
+			} catch (IllegalArgumentException ignore) {
+				throw new IllegalArgumentException(name + " should not contain blank elements");
+			}
+		} catch (NullPointerException e) {
+			return collection;
+		}
+
+		return collection;
+	}
+
 }

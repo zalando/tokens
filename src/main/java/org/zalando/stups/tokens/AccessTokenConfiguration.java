@@ -16,6 +16,7 @@
 package org.zalando.stups.tokens;
 
 import static org.zalando.stups.tokens.util.Objects.noNullEntries;
+import static org.zalando.stups.tokens.util.Objects.noBlankEntries;
 import static org.zalando.stups.tokens.util.Objects.notBlank;
 import static org.zalando.stups.tokens.util.Objects.notNull;
 
@@ -75,10 +76,29 @@ public class AccessTokenConfiguration {
 	 *               will be thrown in case of <i>scope</i> being <i>null</i>.
 	 * @return The same {@link AccessTokenConfiguration} instance this method has been called upon
 	 * with the supplied <i>scope</i> added to the set of existing scopes.
-     */
+	 *
+	 * @deprecated Use {@link AccessTokenConfiguration#addScope(String)} instead and invoke
+	 * {@link Object#toString()} before if necessary.
+   */
+	@Deprecated
 	public AccessTokenConfiguration addScope(final Object scope) {
 		checkLock();
 		scopes.add(notNull("scope", scope));
+		return this;
+	}
+
+	/**
+	 * Add a single scope to this access token.
+	 *
+	 * @param scope  The scope to add for this access token. An {@link IllegalArgumentException}
+	 *               will be thrown in case of <i>scope</i> being <i>null</i> or <i>empty</i>.
+	 * @return The same {@link AccessTokenConfiguration} instance this method has been called upon
+	 * with the supplied <i>scope</i> added to the set of existing scopes.
+	 *
+   */
+	public AccessTokenConfiguration addScope(final String scope) {
+		checkLock();
+		scopes.add(notBlank("scope", scope));
 		return this;
 	}
 
@@ -95,10 +115,34 @@ public class AccessTokenConfiguration {
 	 *                will be removed.
 	 * @return The same {@link AccessTokenConfiguration} instance this method has been called upon
 	 * with the supplied <i>scopes</i> added to the set of existing scopes.
-     */
+	 *
+	 * @deprecated Use {@link AccessTokenConfiguration#addScopesTypeSafe(Collection)} instead and
+	 * invoke {@link Object#toString()} on each element before if necessary
+   */
+	@Deprecated
 	public AccessTokenConfiguration addScopes(final Collection<?> scopes) {
 		checkLock();
-		this.scopes.addAll(noNullEntries("scopes", notNull("scopes", scopes)));
+		this.scopes.addAll(noNullEntries("scopes", scopes));
+		return this;
+	}
+
+	/**
+	 * Add multiple scopes to this access token. Refer to
+	 * {@link AccessTokenConfiguration#addScope(Object)} for more detailed description of a scope.
+	 *
+	 * @param scopes  A {@link Collection} of scopes that should be added to this access token. An
+	 *                {@link IllegalArgumentException} will be throws if either <i>scopes</i> being
+	 *                <i>null</i> or {@link Collection#contains(Object)} is <i>true</i> for the
+	 *                <i>null</i> arguments.
+	 *                Please note that scopes are stored as {@link Set} internally, i.e. duplicates
+	 *                with respect to {@link Object#hashCode()} and {@link Object#equals(Object)}
+	 *                will be removed.
+	 * @return The same {@link AccessTokenConfiguration} instance this method has been called upon
+	 * with the supplied <i>scopes</i> added to the set of existing scopes.
+	 */
+	public AccessTokenConfiguration addScopesTypeSafe(final Collection<String> scopes) {
+		checkLock();
+		this.scopes.addAll(noBlankEntries("scopes", scopes));
 		return this;
 	}
 
@@ -109,7 +153,7 @@ public class AccessTokenConfiguration {
 	 * @param grantType  The <i>grant type</i> to be used when requesting an access token.
 	 * @return The same {@link AccessTokenConfiguration} instance this method has been called upon
 	 * with the supplied <i>grant type</i> set.
-     */
+   */
 	public AccessTokenConfiguration withGrantType(final String grantType) {
 		checkLock();
 		this.grantType = Objects.notBlank("grantType", notNull("grantType", grantType));
