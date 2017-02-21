@@ -69,6 +69,38 @@ public class AccessTokenConfigurationTest {
 		Assertions.assertThat(configuration.getScopes()).containsExactly(scope);
 	}
 
+	@Test
+	public void addStringScope() {
+		String scope = "scope";
+		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
+		configuration.addScope(scope);
+		Assertions.assertThat(configuration.getScopes()).containsExactly(scope);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void addingNullScope() {
+		String scope = null;
+		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
+		configuration.addScope(scope);
+		Assertions.fail("This code should not be reached");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void addingEmptyScope() {
+		String scope = "";
+		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
+		configuration.addScope(scope);
+		Assertions.fail("This code should not be reached");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void addingBlankScope() {
+		String scope = " ";
+		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
+		configuration.addScope(scope);
+		Assertions.fail("This code should not be reached");
+	}
+
 	@Test(expected = IllegalArgumentException.class)
 	public void addingScopes() {
 		Object scope = new Object();
@@ -77,6 +109,28 @@ public class AccessTokenConfigurationTest {
 		scopes.add(null);
 		scopes.add(scope);
 		configuration.addScopes(scopes);
+		Assertions.fail("This code should not be reached");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void addingNullScopesTypeSafe() {
+		String scope = "scope";
+		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
+		List<String> scopes = new ArrayList<>();
+		scopes.add(null);
+		scopes.add(scope);
+		configuration.addScopesTypeSafe(scopes);
+		Assertions.fail("This code should not be reached");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void addingBlankScopesTypeSafe() {
+		String scope = "scope";
+		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
+		List<String> scopes = new ArrayList<>();
+		scopes.add(" ");
+		scopes.add(scope);
+		configuration.addScopesTypeSafe(scopes);
 		Assertions.fail("This code should not be reached");
 	}
 
