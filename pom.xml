@@ -9,7 +9,7 @@
     </parent>
     <groupId>org.zalando.stups</groupId>
     <artifactId>tokens</artifactId>
-    <version>0.9.10-SNAPSHOT</version>
+    <version>0.10.0-SNAPSHOT</version>
 
     <name>Tokens</name>
     <description>
@@ -120,7 +120,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.7.5.201505241946</version>
+                    <version>0.7.8</version>
                     <executions>
                         <execution>
                             <id>default-prepare-agent</id>
