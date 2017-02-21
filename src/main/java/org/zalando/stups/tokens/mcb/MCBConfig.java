@@ -79,7 +79,7 @@ public class MCBConfig {
     /**
      * Name for the breaker.
      * 
-     * @return
+     * @return name name for the breaker
      */
     public String getName() {
         return name;
