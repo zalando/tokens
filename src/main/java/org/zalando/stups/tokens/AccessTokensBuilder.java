@@ -187,7 +187,7 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
      * implementation instead of creating a new one.
      *
      * If none is supplied a new one will be created using
-     * {@link Executors#newSingleThreadScheduledExecutor()} upon start.
+     * {@link Executors#newSingleThreadScheduledExecutor(new TokenRefresherThreadFactory())} upon start.
      *
      * @param executorService
      *            Your version of the {@link ScheduledExecutorService} to be
@@ -195,6 +195,9 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
      * @return The same {@link AccessTokensBuilder} instance this method has
      *         been called upon with the supplied
      *         {@link ScheduledExecutorService} set.
+     *
+     * @see TokenRefresherThreadFactory
+     * @see Executors#newSingleThreadExecutor(java.util.concurrent.ThreadFactory)
      */
     public AccessTokensBuilder existingExecutorService(final ScheduledExecutorService executorService) {
         checkLock();
