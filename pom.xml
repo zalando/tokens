@@ -45,8 +45,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <java.source>1.7</java.source>
-        <java.target>1.7</java.target>
+        <java.source>1.8</java.source>
+        <java.target>1.8</java.target>
 
         <coveralls.dryRun>true</coveralls.dryRun>
         <main.basedir>${basedir}</main.basedir>

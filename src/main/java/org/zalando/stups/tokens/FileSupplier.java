@@ -24,7 +24,7 @@ import org.apache.http.util.Args;
  *
  * @author  jbellmann
  */
-class FileSupplier {
+public class FileSupplier {
 
     private File file;
     private final String filename;
@@ -47,7 +47,7 @@ class FileSupplier {
         }
     }
 
-    private static File getCredentialsDir() {
+    public static File getCredentialsDir() {
         String dir = System.getenv("CREDENTIALS_DIR");
         if (dir == null) {
 

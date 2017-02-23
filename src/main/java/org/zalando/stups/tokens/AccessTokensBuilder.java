@@ -15,6 +15,8 @@
  */
 package org.zalando.stups.tokens;
 
+import static org.zalando.stups.tokens.EndsWithFilenameFilter.forSuffix;
+import static org.zalando.stups.tokens.FileSupplier.getCredentialsDir;
 import static org.zalando.stups.tokens.util.Objects.notNull;
 
 import java.net.URI;
@@ -25,6 +27,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.zalando.stups.tokens.k8s.KubernetesAccessTokenRefresher;
+import org.zalando.stups.tokens.k8s.KubernetesConfiguration;
 import org.zalando.stups.tokens.mcb.MCBConfig;
 
 /**
@@ -69,9 +73,12 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
             .withTimeout(10).withTimeUnit(TimeUnit.MINUTES).build();
 
     private MetricsListener metricsListener = new DebugLogMetricsListener();
+    
+    private final KubernetesConfiguration kubernetesConfiguration;
 
     AccessTokensBuilder(final URI accessTokenUri) {
         this.accessTokenUri = notNull("accessTokenUri", accessTokenUri);
+        this.kubernetesConfiguration = new KubernetesConfiguration(this);
     }
 
     private void checkLock() {
@@ -457,6 +464,10 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         return this;
     }
 
+    public KubernetesConfiguration onKube(){
+        return this.kubernetesConfiguration;
+    }
+
     @Override
     public int getSchedulingPeriod() {
         return schedulingPeriod;
@@ -567,7 +578,7 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
             this.httpProviderFactory = new ClosableHttpProviderFactory();
         }
 
-        final AccessTokenRefresher refresher = getAccessTokenRefresher();
+        final AbstractAccessTokenRefresher refresher = getAccessTokenRefresher();
         refresher.start();
         return refresher;
     }
@@ -577,8 +588,19 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         return httpConfig;
     }
 
-    protected AccessTokenRefresher getAccessTokenRefresher() {
+    protected AbstractAccessTokenRefresher getAccessTokenRefresher() {
+        if(isKubernetesFileLayout()){
+            return new KubernetesAccessTokenRefresher(this);
+        }
         return new AccessTokenRefresher(this);
+    }
+
+    private boolean isKubernetesFileLayout() {
+        try {
+            return getCredentialsDir().list(forSuffix("-token-secret")).length > 0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
@@ -610,4 +632,10 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     public TimeUnit getTokenVerifierSchedulingTimeUnit() {
         return tokenVerifierSchedulingTimeUnit;
     }
+
+    @Override
+    public KubernetesConfiguration getKubernetesConfiguration() {
+        return kubernetesConfiguration;
+    }
+
 }
