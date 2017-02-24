@@ -27,8 +27,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.zalando.stups.tokens.k8s.FilesystemSecretRefresher;
-import org.zalando.stups.tokens.k8s.FilesystemSecretsRefresherConfiguration;
+import org.zalando.stups.tokens.fs.FilesystemSecretRefresher;
+import org.zalando.stups.tokens.fs.FilesystemSecretsRefresherConfiguration;
 import org.zalando.stups.tokens.mcb.MCBConfig;
 
 /**

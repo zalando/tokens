@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.zalando.stups.tokens.k8s;
+package org.zalando.stups.tokens.fs;
 
 import static java.util.stream.Collectors.toList;
 

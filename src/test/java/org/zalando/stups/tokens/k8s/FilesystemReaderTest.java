@@ -23,6 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.zalando.stups.tokens.AccessToken;
+import org.zalando.stups.tokens.fs.FilesystemReader;
 
 public class FilesystemReaderTest {
 

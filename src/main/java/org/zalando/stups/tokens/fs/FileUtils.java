@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.zalando.stups.tokens.k8s;
+package org.zalando.stups.tokens.fs;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.zalando.stups.tokens.AccessTokens;
 import org.zalando.stups.tokens.Tokens;
+import org.zalando.stups.tokens.fs.TokensMissingException;
 
 public class FilesystemSecretRefresherTest {
 

@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.zalando.stups.tokens.k8s.FilesystemSecretsRefresherConfiguration;
+import org.zalando.stups.tokens.fs.FilesystemSecretsRefresherConfiguration;
 import org.zalando.stups.tokens.mcb.MCBConfig;
 
 public interface TokenRefresherConfiguration {
