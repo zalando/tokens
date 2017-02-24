@@ -15,8 +15,7 @@
  */
 package org.zalando.stups.tokens.k8s;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.of;
 import static org.zalando.stups.tokens.FileSupplier.getCredentialsDir;
 
 import java.io.File;
@@ -57,11 +56,9 @@ public class FilesystemReader implements Runnable {
     protected void readFromFilesystem() {
         LOG.debug("read from filesystem ...");
         final File[] tokenSecretFiles = getCredentialsDir().listFiles(endsWithSuffixFilenameFilter);
-        asList(tokenSecretFiles)
-                .stream()
-                .map(f -> buildAccessTokenDto(f))
+        of(tokenSecretFiles)
+                .map(this::buildAccessTokenDto)
                 .filter(Objects::nonNull)
-                .collect(toList())
                 .forEach(it -> {
                     accessTokens.put(it.getName(),it);
                 });
@@ -73,16 +70,12 @@ public class FilesystemReader implements Runnable {
 
         try {
             String secret = FileUtils.readContent(tokenSecretFile.getAbsolutePath());
-            String type = FileUtils.readContent(tokenTypeFilePath(tokenSecretFile.getParentFile(), name));
+            String type = FileUtils.readContent(tokenSecretFile.toPath().resolveSibling(name + TOKEN_TYPE_SUFFIX).toString());
             return new AccessTokenDto(secret, type, name);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
             return null;
         }
-    }
-
-    protected String tokenTypeFilePath(File parentDirectory, String name) {
-        return new File(parentDirectory, name + TOKEN_TYPE_SUFFIX).getAbsolutePath();
     }
 
 }

@@ -32,28 +32,33 @@ public class KubernetesAccessTokenRefresher extends AbstractAccessTokenRefresher
         super(configuration);
     }
 
-    //@formatter:off
+
     @Override
     public void start() {
         initializeFixedTokensFromEnvironment();
-        LOG.info("Starting to refresh tokens regularly...");
+        LOG.info("Starting to refresh tokens regularly from filesystem ...");
 
         FilesystemReader reader = new FilesystemReader(accessTokens);
 
-        if(configuration.getKubernetesConfiguration().isValidateTokensOnStartup()){
+        if (configuration.getKubernetesConfiguration().isValidateTokensOnStartup()) {
             reader.readFromFilesystem();
-            List<?> missing = configuration.getAccessTokenConfigurations()
-                         .stream()
-                         .map(atc -> atc.getTokenId())
-                         .filter(tokenId -> !accessTokens.containsKey(tokenId))
-                         .collect(toList());
-            if(missing.size() > 0){
+            List<?> missing = findMissingTokens();
+            if (missing.size() > 0) {
                 throw new TokensMissingException(missing);
             }
         }
 
         scheduler.scheduleAtFixedRate(reader, 1, configuration.getSchedulingPeriod(),
                 configuration.getSchedulingTimeUnit());
+    }
+    
+    //@formatter:off
+    protected List<?> findMissingTokens() {
+        return configuration.getAccessTokenConfigurations()
+                            .stream()
+                            .map(atc -> atc.getTokenId())
+                            .filter(tokenId -> !accessTokens.containsKey(tokenId))
+                            .collect(toList());
     }
     //@formatter:on
 }
