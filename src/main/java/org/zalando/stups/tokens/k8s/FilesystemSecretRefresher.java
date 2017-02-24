@@ -24,11 +24,11 @@ import org.slf4j.LoggerFactory;
 import org.zalando.stups.tokens.AbstractAccessTokenRefresher;
 import org.zalando.stups.tokens.TokenRefresherConfiguration;
 
-public class KubernetesAccessTokenRefresher extends AbstractAccessTokenRefresher {
+public class FilesystemSecretRefresher extends AbstractAccessTokenRefresher {
 
-    private static final Logger LOG = LoggerFactory.getLogger(KubernetesAccessTokenRefresher.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FilesystemSecretRefresher.class);
 
-    public KubernetesAccessTokenRefresher(TokenRefresherConfiguration configuration) {
+    public FilesystemSecretRefresher(TokenRefresherConfiguration configuration) {
         super(configuration);
     }
 

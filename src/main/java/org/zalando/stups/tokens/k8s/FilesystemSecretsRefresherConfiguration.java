@@ -19,17 +19,17 @@ import static java.util.Objects.requireNonNull;
 
 import org.zalando.stups.tokens.AccessTokensBuilder;
 
-public class KubernetesConfiguration {
+public class FilesystemSecretsRefresherConfiguration {
 
     private final AccessTokensBuilder parent;
 
     private boolean validateTokensOnStartup = false;
 
-    public KubernetesConfiguration(AccessTokensBuilder parent) {
+    public FilesystemSecretsRefresherConfiguration(AccessTokensBuilder parent) {
         this.parent = requireNonNull(parent, "'accessTokensBuilder' should never be null");
     }
 
-    public KubernetesConfiguration validateTokensOnStartup() {
+    public FilesystemSecretsRefresherConfiguration validateTokensOnStartup() {
         this.validateTokensOnStartup = true;
         return this;
     }

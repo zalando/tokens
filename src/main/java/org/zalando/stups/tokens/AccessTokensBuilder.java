@@ -27,8 +27,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.zalando.stups.tokens.k8s.KubernetesAccessTokenRefresher;
-import org.zalando.stups.tokens.k8s.KubernetesConfiguration;
+import org.zalando.stups.tokens.k8s.FilesystemSecretRefresher;
+import org.zalando.stups.tokens.k8s.FilesystemSecretsRefresherConfiguration;
 import org.zalando.stups.tokens.mcb.MCBConfig;
 
 /**
@@ -74,11 +74,11 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
 
     private MetricsListener metricsListener = new DebugLogMetricsListener();
     
-    private final KubernetesConfiguration kubernetesConfiguration;
+    private final FilesystemSecretsRefresherConfiguration kubernetesConfiguration;
 
     AccessTokensBuilder(final URI accessTokenUri) {
         this.accessTokenUri = notNull("accessTokenUri", accessTokenUri);
-        this.kubernetesConfiguration = new KubernetesConfiguration(this);
+        this.kubernetesConfiguration = new FilesystemSecretsRefresherConfiguration(this);
     }
 
     private void checkLock() {
@@ -464,7 +464,7 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         return this;
     }
 
-    public KubernetesConfiguration onKube(){
+    public FilesystemSecretsRefresherConfiguration onKube(){
         return this.kubernetesConfiguration;
     }
 
@@ -590,7 +590,7 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
 
     protected AbstractAccessTokenRefresher getAccessTokenRefresher() {
         if(isKubernetesFileLayout()){
-            return new KubernetesAccessTokenRefresher(this);
+            return new FilesystemSecretRefresher(this);
         }
         return new AccessTokenRefresher(this);
     }
@@ -634,7 +634,7 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     }
 
     @Override
-    public KubernetesConfiguration getKubernetesConfiguration() {
+    public FilesystemSecretsRefresherConfiguration getKubernetesConfiguration() {
         return kubernetesConfiguration;
     }
 

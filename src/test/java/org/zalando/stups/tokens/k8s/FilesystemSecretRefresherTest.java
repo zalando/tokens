@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.zalando.stups.tokens.AccessTokens;
 import org.zalando.stups.tokens.Tokens;
 
-public class KubernetesAccessTokenRefresherTest {
+public class FilesystemSecretRefresherTest {
 
     @Before
     public void setup() {
