@@ -15,19 +15,14 @@
  */
 package org.zalando.stups.tokens.fs;
 
-import org.zalando.stups.tokens.AccessToken;
+import java.util.Optional;
 
-class AccessTokenDto extends AccessToken {
+import org.zalando.stups.tokens.ClientCredentials;
 
-    private final String name;
+public interface Clients {
 
-    AccessTokenDto(String secret, String type, String name) {
-        super(secret, type, -1, null);
-        this.name = name;
-    }
+    ClientCredentials getClientCredentials(String client);
 
-    public String getName() {
-        return name;
-    }
+    Optional<ClientCredentials> getClientCredentialsAsOptional(String client);
 
 }

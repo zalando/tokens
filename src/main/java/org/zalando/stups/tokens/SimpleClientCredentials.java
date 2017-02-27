@@ -22,8 +22,10 @@ public class SimpleClientCredentials implements ClientCredentials {
 
     private final String id;
     private final String secret;
+    private final String name;
 
-    public SimpleClientCredentials(String id, String secret) {
+    public SimpleClientCredentials(String name, String id, String secret) {
+        this.name = notBlank("name", name);
         this.id = notBlank("id", id);
         this.secret = notNull("secret", secret);
     }
@@ -37,4 +39,9 @@ public class SimpleClientCredentials implements ClientCredentials {
     public String getSecret() {
         return secret;
     }
+
+    public String getName() {
+        return name;
+    }
+
 }
