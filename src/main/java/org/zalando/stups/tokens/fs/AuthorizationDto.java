@@ -15,19 +15,38 @@
  */
 package org.zalando.stups.tokens.fs;
 
-import org.zalando.stups.tokens.AccessToken;
+import java.util.StringJoiner;
 
-class AccessTokenDto extends AccessToken {
+class AuthorizationDto implements Authorization {
 
+    private static final String DELIMITER = " ";
     private final String name;
+    private final String type;
+    private final String secret;
 
-    AccessTokenDto(String secret, String type, String name) {
-        super(secret, type, -1, null);
+    AuthorizationDto(String name, String type, String secret) {
         this.name = name;
+        this.type = type;
+        this.secret = secret;
     }
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String type() {
+        return type;
+    }
+
+    @Override
+    public String secret() {
+        return secret;
+    }
+
+    @Override
+    public String headerValue() {
+        return new StringJoiner(DELIMITER).add(type).add(secret).toString();
     }
 
 }

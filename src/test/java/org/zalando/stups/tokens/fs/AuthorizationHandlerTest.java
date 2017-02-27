@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.zalando.stups.tokens.k8s;
+package org.zalando.stups.tokens.fs;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
-import org.assertj.core.util.Maps;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.zalando.stups.tokens.AccessToken;
-import org.zalando.stups.tokens.fs.FilesystemReader;
 
-public class FilesystemReaderTest {
+public class AuthorizationHandlerTest {
+
+    private Map<String, Authorization> authorizations = new HashMap<>();
 
     @Before
     public void setup() {
@@ -38,11 +38,12 @@ public class FilesystemReaderTest {
     }
 
     @Test
-    public void testReadTokens() {
-        Map<Object, AccessToken> accessTokens = Maps.newHashMap();
-        FilesystemReader reader = new FilesystemReader(accessTokens);
+    public void testAuthorizationHandler() {
+        FilesystemReader<?> reader = new AuthorizationHandler(authorizations).getFilesystemReader();
         reader.run();
-        Assertions.assertThat(accessTokens).containsKeys("myfirst");
+        Assertions.assertThat(authorizations).isNotEmpty();
+        Assertions.assertThat(authorizations).containsKeys("mybasic","myfirst");
+
     }
 
 }

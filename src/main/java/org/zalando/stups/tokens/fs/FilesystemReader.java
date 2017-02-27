@@ -20,27 +20,26 @@ import static org.zalando.stups.tokens.FileSupplier.getCredentialsDir;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zalando.stups.tokens.AccessToken;
-import org.zalando.stups.tokens.EndsWithFilenameFilter;
 
-public class FilesystemReader implements Runnable {
+class FilesystemReader<T> implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(FilesystemReader.class);
 
-    private static final String TOKEN_SECRET_SUFFIX = "-token-secret";
-    private static final String TOKEN_TYPE_SUFFIX = "-token-type";
+    private final Function<File,T> mapper;
+    private final Consumer<T> consumer;
+    private final FilenameFilter filter;
+    private final Predicate<T> predicate;
 
-    private final FilenameFilter endsWithSuffixFilenameFilter = EndsWithFilenameFilter.forSuffix(TOKEN_SECRET_SUFFIX);
-
-    private final Map<Object, AccessToken> accessTokens;
-
-    public FilesystemReader(Map<Object, AccessToken> accessTokens) {
-        this.accessTokens = accessTokens;
+    FilesystemReader(Function<File, T> mapper, Consumer<T> consumer, Predicate<T> predicate, FilenameFilter filter) {
+        this.mapper = mapper;
+        this.consumer = consumer;
+        this.filter = filter;
+        this.predicate = predicate;
     }
 
     @Override
@@ -55,27 +54,12 @@ public class FilesystemReader implements Runnable {
     //@formatter:off
     protected void readFromFilesystem() {
         LOG.debug("read from filesystem ...");
-        final File[] tokenSecretFiles = getCredentialsDir().listFiles(endsWithSuffixFilenameFilter);
+        final File[] tokenSecretFiles = getCredentialsDir().listFiles(filter);
         of(tokenSecretFiles)
-                .map(this::buildAccessTokenDto)
-                .filter(Objects::nonNull)
-                .forEach(it -> {
-                    accessTokens.put(it.getName(),it);
-                });
+                .map(mapper)
+                .filter(predicate)
+                .forEach(consumer);
     }
     //@formatter:on
-
-    protected AccessTokenDto buildAccessTokenDto(File tokenSecretFile) {
-        final String name = tokenSecretFile.getName().replace(TOKEN_SECRET_SUFFIX, "");
-
-        try {
-            String secret = FileUtils.readContent(tokenSecretFile.getAbsolutePath());
-            String type = FileUtils.readContent(tokenSecretFile.toPath().resolveSibling(name + TOKEN_TYPE_SUFFIX).toString());
-            return new AccessTokenDto(secret, type, name);
-        } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
-            return null;
-        }
-    }
 
 }

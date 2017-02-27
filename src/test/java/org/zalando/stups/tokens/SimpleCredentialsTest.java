@@ -16,31 +16,32 @@
 package org.zalando.stups.tokens;
 
 import org.junit.Test;
+import org.zalando.stups.tokens.SimpleClientCredentials;
 
 public class SimpleCredentialsTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void noBlankId() {
-		new SimpleClientCredentials(" ", null);
+		new SimpleClientCredentials("name"," ", null);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void noEmptyId() {
-		new SimpleClientCredentials("", null);
+		new SimpleClientCredentials("name", "", null);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void noNullSecret() {
-		new SimpleClientCredentials("klaus", null);
+		new SimpleClientCredentials("name", "klaus", null);
 	}
 
 	@Test
 	public void emptySecret() {
-		new SimpleClientCredentials("klaus", "");
+		new SimpleClientCredentials("name", "klaus", "");
 	}
 
 	@Test
 	public void blankSecret() {
-		new SimpleClientCredentials("klaus", "  ");
+		new SimpleClientCredentials("name", "klaus", "  ");
 	}
 }

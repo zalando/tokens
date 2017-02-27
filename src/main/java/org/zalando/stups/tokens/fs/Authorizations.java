@@ -15,19 +15,12 @@
  */
 package org.zalando.stups.tokens.fs;
 
-import org.zalando.stups.tokens.AccessToken;
+import java.util.Optional;
 
-class AccessTokenDto extends AccessToken {
+public interface Authorizations {
 
-    private final String name;
+    Authorization get(String name);
 
-    AccessTokenDto(String secret, String type, String name) {
-        super(secret, type, -1, null);
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+    Optional<Authorization> getAsOptional(String name);
 
 }
