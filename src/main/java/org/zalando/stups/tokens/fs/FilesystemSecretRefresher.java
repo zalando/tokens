@@ -19,20 +19,21 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zalando.stups.tokens.AbstractAccessTokenRefresher;
 import org.zalando.stups.tokens.ClientCredentials;
+import org.zalando.stups.tokens.Secret;
+import org.zalando.stups.tokens.Secrets;
 import org.zalando.stups.tokens.TokenRefresherConfiguration;
 
-public class FilesystemSecretRefresher extends AbstractAccessTokenRefresher implements Clients, Authorizations {
+public class FilesystemSecretRefresher extends AbstractAccessTokenRefresher implements Secrets {
 
     private static final Logger LOG = LoggerFactory.getLogger(FilesystemSecretRefresher.class);
 
-    private final Map<String, Authorization> authorizations = new ConcurrentHashMap<>();
+    private final Map<String, Secret> secrets = new ConcurrentHashMap<>();
     private final Map<String, ClientCredentials> clientCredentials = new ConcurrentHashMap<>();
 
     public FilesystemSecretRefresher(TokenRefresherConfiguration configuration) {
@@ -59,7 +60,7 @@ public class FilesystemSecretRefresher extends AbstractAccessTokenRefresher impl
                 configuration.getSchedulingTimeUnit());
 
         // authorizations
-        scheduler.scheduleAtFixedRate(new AuthorizationHandler(authorizations).getFilesystemReader(), 0,
+        scheduler.scheduleAtFixedRate(new SecretsHandler(secrets).getFilesystemReader(), 0,
                 configuration.getSchedulingPeriod(), configuration.getSchedulingTimeUnit());
 
         // clients
@@ -79,23 +80,13 @@ public class FilesystemSecretRefresher extends AbstractAccessTokenRefresher impl
     //@formatter:on
 
     @Override
-    public ClientCredentials getClientCredentials(String client) {
-        return this.clientCredentials.get(client);
+    public Secret getSecret(String identifier) {
+        return secrets.get(identifier);
     }
 
     @Override
-    public Optional<ClientCredentials> getClientCredentialsAsOptional(String client) {
-        return Optional.ofNullable(getClientCredentials(client));
-    }
-
-    @Override
-    public Authorization get(String name) {
-        return authorizations.get(name);
-    }
-
-    @Override
-    public Optional<Authorization> getAsOptional(String name) {
-        return Optional.ofNullable(get(name));
+    public ClientCredentials getClient(String identifier) {
+        return clientCredentials.get(identifier);
     }
 
 }

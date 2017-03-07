@@ -15,10 +15,10 @@
  */
 package org.zalando.stups.tokens.fs;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
-import org.assertj.core.util.Maps;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +26,7 @@ import org.zalando.stups.tokens.AccessToken;
 
 public class AccessTokenHandlerTest {
 
-    private final Map<Object, AccessToken> accessTokens = Maps.newHashMap();
+    private final Map<Object, AccessToken> accessTokens = new HashMap<>();
 
     @Before
     public void setup() {

@@ -21,11 +21,13 @@ import static java.util.Objects.requireNonNull;
 import java.util.HashMap;
 import java.util.Map;
 
-class AuthorizationHandler extends AccessTokenHandler {
+import org.zalando.stups.tokens.Secret;
 
-    private final Map<String, Authorization> target;
+class SecretsHandler extends AccessTokenHandler {
 
-    AuthorizationHandler(Map<String, Authorization> target) {
+    private final Map<String, Secret> target;
+
+    SecretsHandler(Map<String, Secret> target) {
         // make parent happy
         super(new HashMap<>());
         this.target =requireNonNull(target, "'target' should not be null");
@@ -33,7 +35,7 @@ class AuthorizationHandler extends AccessTokenHandler {
 
     @Override
     public void accept(AccessTokenDto t) {
-        this.target.put(t.getName(), new AuthorizationDto(t.getName(), t.getType(), t.getToken()));
+        this.target.put(t.getName(), new SecretDto(t.getName(), t.getType(), t.getToken()));
     }
 
     @Override

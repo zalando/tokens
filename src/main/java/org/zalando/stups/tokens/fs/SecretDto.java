@@ -17,14 +17,16 @@ package org.zalando.stups.tokens.fs;
 
 import java.util.StringJoiner;
 
-class AuthorizationDto implements Authorization {
+import org.zalando.stups.tokens.Secret;
+
+class SecretDto implements Secret {
 
     private static final String DELIMITER = " ";
     private final String name;
     private final String type;
     private final String secret;
 
-    AuthorizationDto(String name, String type, String secret) {
+    SecretDto(String name, String type, String secret) {
         this.name = name;
         this.type = type;
         this.secret = secret;
@@ -35,16 +37,15 @@ class AuthorizationDto implements Authorization {
     }
 
     @Override
-    public String type() {
+    public String getType() {
         return type;
     }
 
     @Override
-    public String secret() {
+    public String getValue() {
         return secret;
     }
 
-    @Override
     public String headerValue() {
         return new StringJoiner(DELIMITER).add(type).add(secret).toString();
     }

@@ -13,14 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.zalando.stups.tokens.fs;
+package org.zalando.stups.tokens;
 
-public interface Authorization {
+/**
+ * A secret can be used to authorize against a authority.
+ * 
+ * @author jbellmann
+ *
+ */
+public interface Secret {
 
-    String type();
+    /**
+     * The 'type' of this secret ('Basic', 'Bearer').
+     */
+    String getType();
 
-    String secret();
-
-    String headerValue();
+    /**
+     * The value of this secret. Regarding the 'type' this could be a JWT or an
+     * encode username-password pair.
+     */
+    String getValue();
 
 }

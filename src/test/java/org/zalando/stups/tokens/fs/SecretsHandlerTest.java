@@ -22,10 +22,11 @@ import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.zalando.stups.tokens.Secret;
 
-public class AuthorizationHandlerTest {
+public class SecretsHandlerTest {
 
-    private Map<String, Authorization> authorizations = new HashMap<>();
+    private Map<String, Secret> secrets = new HashMap<>();
 
     @Before
     public void setup() {
@@ -39,10 +40,10 @@ public class AuthorizationHandlerTest {
 
     @Test
     public void testAuthorizationHandler() {
-        FilesystemReader<?> reader = new AuthorizationHandler(authorizations).getFilesystemReader();
+        FilesystemReader<?> reader = new SecretsHandler(secrets).getFilesystemReader();
         reader.run();
-        Assertions.assertThat(authorizations).isNotEmpty();
-        Assertions.assertThat(authorizations).containsKeys("mybasic","myfirst");
+        Assertions.assertThat(secrets).isNotEmpty();
+        Assertions.assertThat(secrets).containsKeys("mybasic","myfirst");
 
     }
 

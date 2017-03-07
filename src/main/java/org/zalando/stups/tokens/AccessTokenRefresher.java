@@ -143,8 +143,11 @@ class AccessTokenRefresher extends AbstractAccessTokenRefresher implements Acces
         }
     }
 
-    private HttpProvider buildHttpProvider(ClientCredentials clientCredentials, UserCredentials userCredentials){
-        return configuration.getHttpProviderFactory().create(clientCredentials,
-                userCredentials, configuration.getAccessTokenUri(), configuration.getHttpConfig());
+    private HttpProvider buildHttpProvider(ClientCredentials clientCredentials, UserCredentials userCredentials) {
+        HttpProviderFactory providerFactory = configuration.getHttpProviderFactory();
+        HttpProvider httpProvider = providerFactory.create(clientCredentials, userCredentials,
+                configuration.getAccessTokenUri(), configuration.getHttpConfig());
+
+        return httpProvider;
     }
 }

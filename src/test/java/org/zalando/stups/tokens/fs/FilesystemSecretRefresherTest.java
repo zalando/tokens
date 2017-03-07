@@ -23,6 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.zalando.stups.tokens.AccessTokens;
+import org.zalando.stups.tokens.Secrets;
 import org.zalando.stups.tokens.Tokens;
 
 public class FilesystemSecretRefresherTest {
@@ -84,11 +85,10 @@ public class FilesystemSecretRefresherTest {
                 .addScope("read::all")
                 .done()
             .start();
-        Assertions.assertThat(at).isInstanceOfAny(AccessTokens.class, Clients.class, Authorizations.class);
+        Assertions.assertThat(at).isInstanceOfAny(AccessTokens.class, Secrets.class);
 
         TimeUnit.SECONDS.sleep(2);
-        Assertions.assertThat(((Clients)at).getClientCredentials("kio")).isNotNull();
-        Assertions.assertThat(((Authorizations)at).get("mybasic")).isNotNull();
+        Assertions.assertThat(((Secrets)at).getClient("kio")).isNotNull();
         at.stop();
     }
     //@formatter:on

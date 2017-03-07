@@ -16,7 +16,6 @@
 package org.zalando.stups.tokens;
 
 import org.junit.Test;
-import org.zalando.stups.tokens.SimpleClientCredentials;
 
 public class SimpleCredentialsTest {
 

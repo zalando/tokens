@@ -64,8 +64,8 @@ public class AccessTokenRefresherRunTest {
 		IOUtil.writeText("{\"application_username\":\"klaus \",\"application_password\":\"geheim\"}", userJson);
 		System.setProperty(CREDENTIALS_DIR, tempDir.getAbsolutePath());
 
-		ClientCredentialsProvider ccp = Mockito.mock(ClientCredentialsProvider.class);
-		UserCredentialsProvider ucp = Mockito.mock(UserCredentialsProvider.class);
+		ClientCredentialsProvider ccp = new JsonFileBackedClientCredentialsProvider(clientJson);
+		UserCredentialsProvider ucp = new JsonFileBackedUserCredentialsProvider(userJson);
 		HttpProviderFactory hpf = Mockito.mock(HttpProviderFactory.class);
 
 		AccessTokensBuilder accessTokenBuilder = Tokens.createAccessTokensWithUri(uri)

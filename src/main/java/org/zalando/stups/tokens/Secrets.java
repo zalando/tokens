@@ -13,14 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.zalando.stups.tokens.fs;
+package org.zalando.stups.tokens;
 
-import java.util.Optional;
+/**
+ * Can be used to obtain {@link Secret}s and {@link ClientCredentials} for a
+ * given identifier (name).
+ *
+ */
+public interface Secrets {
 
-public interface Authorizations {
+    /**
+     * Return the {@link Secret} for the given identifier.
+     * 
+     * @param identifier
+     */
+    Secret getSecret(String identifier);
 
-    Authorization get(String name);
-
-    Optional<Authorization> getAsOptional(String name);
+    /**
+     * Return the {@link ClientCredentials} for the given identifier.
+     * 
+     * @param identifier
+     */
+    ClientCredentials getClient(String identifier);
 
 }
