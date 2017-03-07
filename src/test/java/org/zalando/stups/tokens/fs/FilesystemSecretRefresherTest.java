@@ -30,7 +30,7 @@ public class FilesystemSecretRefresherTest {
 
     @Before
     public void setup() {
-        System.getProperties().put("CREDENTIALS_DIR", "k8s");
+        System.getProperties().put("CREDENTIALS_DIR", "fs");
     }
 
     @After
@@ -41,7 +41,7 @@ public class FilesystemSecretRefresherTest {
     //@formatter:off
     @Test
     public void test() throws InterruptedException {
-        AccessTokens at = Tokens.createAccessTokensWithUri(URI.create("http://we.run.on.kubernetes.and.do.not.care.about.this"))
+        AccessTokens at = Tokens.createAccessTokensWithUri(URI.create("http://we.use.filesystemsecrets.and.do.not.care.about.this"))
             .manageToken("noexistent")
                 .addScope("read::all")
                 .done()
@@ -55,7 +55,7 @@ public class FilesystemSecretRefresherTest {
     @Test
     public void testShouldThrowTokenMissingException() throws InterruptedException {
         try{
-            Tokens.createAccessTokensWithUri(URI.create("http://we.run.on.kubernetes.and.do.not.care.about.this"))
+            Tokens.createAccessTokensWithUri(URI.create("http://we.use.filesystemsecrets.and.do.not.care.about.this"))
                   .manageToken("noexistent")
                       .addScope("read::all")
                       .done()
@@ -65,7 +65,7 @@ public class FilesystemSecretRefresherTest {
                   .manageToken("nonexistent-2")
                       .addScope("read::all")
                       .done()
-                  .onKube()
+                  .whenUsingFilesystemSecrets()
                       .validateTokensOnStartup()
                       .done()
                   .start();
@@ -80,7 +80,7 @@ public class FilesystemSecretRefresherTest {
     //@formatter:off
     @Test
     public void testPolymorph() throws InterruptedException {
-        AccessTokens at = Tokens.createAccessTokensWithUri(URI.create("http://we.run.on.kubernetes.and.do.not.care.about.this"))
+        AccessTokens at = Tokens.createAccessTokensWithUri(URI.create("http://we.use.filesystemsecrets.and.do.not.care.about.this"))
             .manageToken("noexistent")
                 .addScope("read::all")
                 .done()

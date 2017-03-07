@@ -48,7 +48,7 @@ public class FilesystemSecretRefresher extends AbstractAccessTokenRefresher impl
         // access-tokens
         FilesystemReader<?> reader = new AccessTokenHandler(accessTokens).getFilesystemReader();
 
-        if (configuration.getKubernetesConfiguration().isValidateTokensOnStartup()) {
+        if (configuration.getFilesystemSecretsRefresherConfiguration().isValidateTokensOnStartup()) {
             reader.readFromFilesystem();
             List<?> missing = findMissingTokens();
             if (missing.size() > 0) {

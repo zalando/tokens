@@ -61,5 +61,5 @@ public interface TokenRefresherConfiguration {
 
     TimeUnit getTokenVerifierSchedulingTimeUnit();
 
-    FilesystemSecretsRefresherConfiguration getKubernetesConfiguration();
+    FilesystemSecretsRefresherConfiguration getFilesystemSecretsRefresherConfiguration();
 }

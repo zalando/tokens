@@ -30,7 +30,7 @@ public class SecretsHandlerTest {
 
     @Before
     public void setup() {
-        System.getProperties().put("CREDENTIALS_DIR", "k8s");
+        System.getProperties().put("CREDENTIALS_DIR", "fs");
     }
 
     @After

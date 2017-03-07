@@ -74,11 +74,11 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
 
     private MetricsListener metricsListener = new DebugLogMetricsListener();
     
-    private final FilesystemSecretsRefresherConfiguration kubernetesConfiguration;
+    private final FilesystemSecretsRefresherConfiguration filesystemSecretsRefresherConfiguration;
 
     AccessTokensBuilder(final URI accessTokenUri) {
         this.accessTokenUri = notNull("accessTokenUri", accessTokenUri);
-        this.kubernetesConfiguration = new FilesystemSecretsRefresherConfiguration(this);
+        this.filesystemSecretsRefresherConfiguration = new FilesystemSecretsRefresherConfiguration(this);
     }
 
     private void checkLock() {
@@ -464,8 +464,8 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         return this;
     }
 
-    public FilesystemSecretsRefresherConfiguration onKube(){
-        return this.kubernetesConfiguration;
+    public FilesystemSecretsRefresherConfiguration whenUsingFilesystemSecrets(){
+        return this.filesystemSecretsRefresherConfiguration;
     }
 
     @Override
@@ -589,13 +589,13 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     }
 
     protected AbstractAccessTokenRefresher getAccessTokenRefresher() {
-        if(isKubernetesFileLayout()){
+        if(isFilesystemSecretsLayout()){
             return new FilesystemSecretRefresher(this);
         }
         return new AccessTokenRefresher(this);
     }
 
-    private boolean isKubernetesFileLayout() {
+    private boolean isFilesystemSecretsLayout() {
         try {
             return getCredentialsDir().list(forSuffix("-token-secret")).length > 0;
         } catch (Exception e) {
@@ -634,8 +634,8 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
     }
 
     @Override
-    public FilesystemSecretsRefresherConfiguration getKubernetesConfiguration() {
-        return kubernetesConfiguration;
+    public FilesystemSecretsRefresherConfiguration getFilesystemSecretsRefresherConfiguration() {
+        return filesystemSecretsRefresherConfiguration;
     }
 
 }
