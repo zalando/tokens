@@ -15,32 +15,25 @@
  */
 package org.zalando.stups.tokens;
 
-import org.junit.Test;
+/**
+ * Can be used to obtain {@link Secret}s and {@link ClientCredentials} for a
+ * given identifier (name).
+ *
+ */
+public interface Secrets {
 
-public class SimpleCredentialsTest {
+    /**
+     * Return the {@link Secret} for the given identifier.
+     * 
+     * @param identifier
+     */
+    Secret getSecret(String identifier);
 
-	@Test(expected = IllegalArgumentException.class)
-	public void noBlankId() {
-		new SimpleClientCredentials("name"," ", null);
-	}
+    /**
+     * Return the {@link ClientCredentials} for the given identifier.
+     * 
+     * @param identifier
+     */
+    ClientCredentials getClient(String identifier);
 
-	@Test(expected = IllegalArgumentException.class)
-	public void noEmptyId() {
-		new SimpleClientCredentials("name", "", null);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void noNullSecret() {
-		new SimpleClientCredentials("name", "klaus", null);
-	}
-
-	@Test
-	public void emptySecret() {
-		new SimpleClientCredentials("name", "klaus", "");
-	}
-
-	@Test
-	public void blankSecret() {
-		new SimpleClientCredentials("name", "klaus", "  ");
-	}
 }

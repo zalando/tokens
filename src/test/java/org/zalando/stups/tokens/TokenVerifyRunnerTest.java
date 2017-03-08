@@ -37,11 +37,13 @@ public class TokenVerifyRunnerTest {
 
     private final URI tokenInfoUri = URI.create("http://localhost/access_token");
     private TokenVerifierProvider tokenVerifierProvider;
-    private Map<Object, AccessToken> accessTokens = new ConcurrentHashMap<>();
-    private Set<Object> invalidTokens = Collections.newSetFromMap(new ConcurrentHashMap<Object, Boolean>());
+    private Map<Object, AccessToken> accessTokens;
+    private Set<Object> invalidTokens;
 
     @Before
     public void setUp() {
+        accessTokens = new ConcurrentHashMap<>();
+        invalidTokens = Collections.newSetFromMap(new ConcurrentHashMap<Object, Boolean>());
         configuration = Mockito.mock(TokenRefresherConfiguration.class);
         tokenVerifierProvider = Mockito.mock(TokenVerifierProvider.class);
         Mockito.when(configuration.getHttpConfig()).thenReturn(new HttpConfig());
@@ -67,10 +69,11 @@ public class TokenVerifyRunnerTest {
         TokenVerifier verifier = Mockito.mock(TokenVerifier.class);
         Mockito.when(configuration.getTokenInfoUri()).thenReturn(tokenInfoUri);
         Mockito.when(configuration.getTokenVerifierMcbConfig()).thenReturn(new MCBConfig.Builder().build());
-        Mockito.when(tokenVerifierProvider.create(Mockito.any(URI.class), Mockito.any(HttpConfig.class),
-                Mockito.any(MetricsListener.class)))
+        Mockito.when(tokenVerifierProvider.create(Mockito.any(URI.class), Mockito.any(),
+                Mockito.any()))
                 .thenReturn(verifier);
         Mockito.when(verifier.isTokenValid(Mockito.anyString())).thenReturn(true).thenReturn(false).thenReturn(true);
+
         TokenVerifyRunner runner = new TokenVerifyRunner(configuration, accessTokens, invalidTokens);
         // execute
         runner.run();
@@ -87,16 +90,17 @@ public class TokenVerifyRunnerTest {
     }
 
     @Test
-    public void olderThanMinute() {
-        TokenVerifyRunner runner = new TokenVerifyRunner(configuration, accessTokens, invalidTokens);
-        AccessToken accessToken = new AccessToken("token", "Bearer", 13, new Date());
-        boolean result = runner.olderThanMinute(accessToken);
-        Assertions.assertThat(result).isFalse();
+    public void olderThanMinute() throws IOException {
+        try (TokenVerifyRunner runner = new TokenVerifyRunner(configuration, accessTokens, invalidTokens)) {
+            AccessToken accessToken = new AccessToken("token", "Bearer", 13, new Date());
+            boolean result = runner.olderThanMinute(accessToken);
+            Assertions.assertThat(result).isFalse();
 
-        long creatIonTimestamp = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(2);
-        AccessToken accessToken2 = new AccessToken("token2", "Bearer", 13, new Date(), creatIonTimestamp);
-        boolean result2 = runner.olderThanMinute(accessToken2);
-        Assertions.assertThat(result2).isTrue();
-
+            long creatIonTimestamp = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(2);
+            AccessToken accessToken2 = new AccessToken("token2", "Bearer", 13, new Date(), creatIonTimestamp);
+            boolean result2 = runner.olderThanMinute(accessToken2);
+            Assertions.assertThat(result2).isTrue();
+        }
+        ;
     }
 }

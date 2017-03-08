@@ -13,31 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.zalando.stups.tokens;
+package org.zalando.stups.tokens.fs;
 
-import static org.zalando.stups.tokens.util.Objects.notBlank;
-import static org.zalando.stups.tokens.util.Objects.notNull;
+import org.zalando.stups.tokens.AccessToken;
 
-public class SimpleClientCredentials implements ClientCredentials {
+class AccessTokenDto extends AccessToken {
 
-    private final String id;
-    private final String secret;
     private final String name;
 
-    public SimpleClientCredentials(String name, String id, String secret) {
-        this.name = notBlank("name", name);
-        this.id = notBlank("id", id);
-        this.secret = notNull("secret", secret);
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getSecret() {
-        return secret;
+    AccessTokenDto(String secret, String type, String name) {
+        super(secret, type, -1, null);
+        this.name = name;
     }
 
     public String getName() {

@@ -13,35 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.zalando.stups.tokens;
+package org.zalando.stups.tokens.fs;
 
-import static org.zalando.stups.tokens.util.Objects.notBlank;
-import static org.zalando.stups.tokens.util.Objects.notNull;
+import java.util.StringJoiner;
 
-public class SimpleClientCredentials implements ClientCredentials {
+import org.zalando.stups.tokens.Secret;
 
-    private final String id;
-    private final String secret;
+class SecretDto implements Secret {
+
+    private static final String DELIMITER = " ";
     private final String name;
+    private final String type;
+    private final String secret;
 
-    public SimpleClientCredentials(String name, String id, String secret) {
-        this.name = notBlank("name", name);
-        this.id = notBlank("id", id);
-        this.secret = notNull("secret", secret);
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getSecret() {
-        return secret;
+    SecretDto(String name, String type, String secret) {
+        this.name = name;
+        this.type = type;
+        this.secret = secret;
     }
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public String getValue() {
+        return secret;
+    }
+
+    public String headerValue() {
+        return new StringJoiner(DELIMITER).add(type).add(secret).toString();
     }
 
 }

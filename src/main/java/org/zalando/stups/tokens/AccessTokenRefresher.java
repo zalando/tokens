@@ -17,11 +17,8 @@ package org.zalando.stups.tokens;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,19 +26,13 @@ import org.zalando.stups.tokens.mcb.MCB;
 import org.zalando.stups.tokens.util.Metrics;
 import org.zalando.stups.tokens.util.Objects;
 
-class AccessTokenRefresher implements AccessTokens, Runnable {
+class AccessTokenRefresher extends AbstractAccessTokenRefresher implements AccessTokens, Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenRefresher.class);
 
-    private static final long ONE_YEAR_SECONDS =  TimeUnit.DAYS.toSeconds(365);
-    private static final String FIXED_TOKENS_ENV_VAR = "OAUTH2_ACCESS_TOKENS";
     private static final String METRICS_KEY_PREFIX = "tokens.refresher";
-
-    private final TokenRefresherConfiguration configuration;
-    private final ScheduledExecutorService scheduler;
 
     private final MCB mcb;
 
-    private final ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<>();
     private final Set<Object> invalidTokens = Collections.newSetFromMap(new ConcurrentHashMap<Object, Boolean>());
 
     private final TokenVerifyRunner verifyRunner;
@@ -49,44 +40,14 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
     private final MetricsListener metricsListener;
 
     public AccessTokenRefresher(final TokenRefresherConfiguration configuration) {
-        this.configuration = configuration;
-        this.scheduler = configuration.getExecutorService();
+        super(configuration);
         this.metricsListener = configuration.getMetricsListener();
         this.verifyRunner = new TokenVerifyRunner(configuration, accessTokens, invalidTokens);
-        this.mcb = new MCB(this.configuration.getTokenRefresherMcbConfig());
+        this.mcb = new MCB(configuration.getTokenRefresherMcbConfig());
     }
 
-    protected void initializeFixedTokensFromEnvironment() {
-        final String csv = getFixedToken();
-        if (csv != null) {
-            LOG.info("Initializing fixed access tokens from {} environment variable..", FIXED_TOKENS_ENV_VAR);
-
-            final String[] tokens = csv.split(",");
-            final long expiresInSeconds = ONE_YEAR_SECONDS;
-            final Date validUntil = new Date(System.currentTimeMillis() + (expiresInSeconds * 1000));
-            for (String token : tokens) {
-                final String[] keyValue = token.split("=");
-                if (keyValue.length == 2) {
-                    LOG.info("Using fixed access token {}..", keyValue[0]);
-                    accessTokens.put(keyValue[0], new AccessToken(keyValue[1], "fixed", expiresInSeconds, validUntil));
-                } else {
-                    LOG.error("Could not create access token from {}", token);
-                }
-            }
-        }
-    }
-
-    // visible for testing
-    protected String getFixedToken() {
-        final String tokens = System.getProperty(FIXED_TOKENS_ENV_VAR);
-        if (tokens == null) {
-            return System.getenv(FIXED_TOKENS_ENV_VAR);
-        }
-
-        return tokens;
-    }
-
-    void start() {
+    @Override
+    public void start() {
         initializeFixedTokensFromEnvironment();
         LOG.info("Starting to refresh tokens regularly...");
         run();
@@ -182,37 +143,11 @@ class AccessTokenRefresher implements AccessTokens, Runnable {
         }
     }
 
-    private HttpProvider buildHttpProvider(ClientCredentials clientCredentials, UserCredentials userCredentials){
-        return configuration.getHttpProviderFactory().create(clientCredentials,
-                userCredentials, configuration.getAccessTokenUri(), configuration.getHttpConfig());
-    }
+    private HttpProvider buildHttpProvider(ClientCredentials clientCredentials, UserCredentials userCredentials) {
+        HttpProviderFactory providerFactory = configuration.getHttpProviderFactory();
+        HttpProvider httpProvider = providerFactory.create(clientCredentials, userCredentials,
+                configuration.getAccessTokenUri(), configuration.getHttpConfig());
 
-    @Override
-    public String get(final Object tokenId) throws AccessTokenUnavailableException {
-        return getAccessToken(tokenId).getToken();
-    }
-
-    @Override
-    public AccessToken getAccessToken(final Object tokenId) throws AccessTokenUnavailableException {
-        final AccessToken token = accessTokens.get(tokenId);
-        if (token == null) {
-            throw new AccessTokenUnavailableException("no token available");
-        }
-
-        if (token.isExpired()) {
-            throw new AccessTokenUnavailableException("token expired");
-        }
-
-        return token;
-    }
-
-    @Override
-    public void invalidate(final Object tokenId) {
-        accessTokens.remove(tokenId);
-    }
-
-    @Override
-    public void stop() {
-        scheduler.shutdown();
+        return httpProvider;
     }
 }

@@ -15,32 +15,23 @@
  */
 package org.zalando.stups.tokens;
 
-import org.junit.Test;
+/**
+ * A secret can be used to authorize against a authority.
+ * 
+ * @author jbellmann
+ *
+ */
+public interface Secret {
 
-public class SimpleCredentialsTest {
+    /**
+     * The 'type' of this secret ('Basic', 'Bearer').
+     */
+    String getType();
 
-	@Test(expected = IllegalArgumentException.class)
-	public void noBlankId() {
-		new SimpleClientCredentials("name"," ", null);
-	}
+    /**
+     * The value of this secret. Regarding the 'type' this could be a JWT or an
+     * encode username-password pair.
+     */
+    String getValue();
 
-	@Test(expected = IllegalArgumentException.class)
-	public void noEmptyId() {
-		new SimpleClientCredentials("name", "", null);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void noNullSecret() {
-		new SimpleClientCredentials("name", "klaus", null);
-	}
-
-	@Test
-	public void emptySecret() {
-		new SimpleClientCredentials("name", "klaus", "");
-	}
-
-	@Test
-	public void blankSecret() {
-		new SimpleClientCredentials("name", "klaus", "  ");
-	}
 }

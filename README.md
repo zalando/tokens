@@ -23,8 +23,9 @@ When creating tokens, it's easy to make a lot of mistakes. Tokens aims to save y
 
 ### Prerequisites
 
+- Java 8
 - Maven
-- [Apache-HttpClient](https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient)
+- Gradle
 
 #### Maven Dependency
 
@@ -38,17 +39,9 @@ Add it with:
 </dependency>
 ```
 
-####Apache-HttpClient
+#### Gradle Dependency
 
-Add it with:
-
-```xml
-<dependency>
-    <groupId>org.apache.httpcomponents</groupId>
-    <artifactId>httpclient</artifactId>
-    <version>your version</version>
-</dependency>
-```
+``compile('org.zalando.stups:tokens:${version}') ``
 
 ### Usage
 

@@ -63,7 +63,7 @@ public class AccessTokenConfigurationTest {
 
 	@Test
 	public void addScope() {
-		Object scope = new Object();
+		String scope = "somescope";
 		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
 		configuration.addScope(scope);
 		Assertions.assertThat(configuration.getScopes()).containsExactly(scope);
@@ -103,12 +103,12 @@ public class AccessTokenConfigurationTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void addingScopes() {
-		Object scope = new Object();
+		String scope = "scope";
 		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
-		List<Object> scopes = new ArrayList<>();
+		List<String> scopes = new ArrayList<>();
 		scopes.add(null);
 		scopes.add(scope);
-		configuration.addScopes(scopes);
+		configuration.addScopesTypeSafe(scopes);
 		Assertions.fail("This code should not be reached");
 	}
 
@@ -136,12 +136,12 @@ public class AccessTokenConfigurationTest {
 
 	@Test
 	public void addingValidScopes() {
-		Object scope = new Object();
+		String scope = "anotherScope";
 		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
-		List<Object> scopes = new ArrayList<>();
-		scopes.add(new Object());
+		List<String> scopes = new ArrayList<>();
+		scopes.add("scope");
 		scopes.add(scope);
-		configuration.addScopes(scopes);
+		configuration.addScopesTypeSafe(scopes);
 		Assertions.assertThat(configuration.getScopes()).contains(scope);
 	}
 
@@ -157,7 +157,7 @@ public class AccessTokenConfigurationTest {
 		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
 		AccessTokensBuilder builder = configuration.done();
 		Assertions.assertThat(builder).isNotNull();
-		configuration.addScope(new Object());
+		configuration.addScope("scope");
 	}
 
 	@Test(expected = IllegalStateException.class)
@@ -165,7 +165,7 @@ public class AccessTokenConfigurationTest {
 		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
 		AccessTokensBuilder builder = configuration.done();
 		Assertions.assertThat(builder).isNotNull();
-		configuration.addScopes(Collections.singleton(new Object()));
+		configuration.addScopesTypeSafe(Collections.singleton(""));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

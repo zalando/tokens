@@ -15,33 +15,24 @@
  */
 package org.zalando.stups.tokens;
 
-import static org.zalando.stups.tokens.util.Objects.notBlank;
-import static org.zalando.stups.tokens.util.Objects.notNull;
+import java.io.File;
+import java.io.FilenameFilter;
 
-public class SimpleClientCredentials implements ClientCredentials {
+public class EndsWithFilenameFilter implements FilenameFilter {
 
-    private final String id;
-    private final String secret;
-    private final String name;
+    private final String suffix;
 
-    public SimpleClientCredentials(String name, String id, String secret) {
-        this.name = notBlank("name", name);
-        this.id = notBlank("id", id);
-        this.secret = notNull("secret", secret);
+    EndsWithFilenameFilter(String suffix) {
+        this.suffix = suffix;
     }
 
     @Override
-    public String getId() {
-        return id;
+    public boolean accept(File dir, String name) {
+        return name.endsWith(suffix);
     }
 
-    @Override
-    public String getSecret() {
-        return secret;
-    }
-
-    public String getName() {
-        return name;
+    public static FilenameFilter forSuffix(String suffix) {
+        return new EndsWithFilenameFilter(suffix);
     }
 
 }

@@ -15,8 +15,8 @@
  */
 package org.zalando.stups.tokens;
 
-import static org.zalando.stups.tokens.util.Objects.noNullEntries;
 import static org.zalando.stups.tokens.util.Objects.noBlankEntries;
+import static org.zalando.stups.tokens.util.Objects.noNullEntries;
 import static org.zalando.stups.tokens.util.Objects.notBlank;
 import static org.zalando.stups.tokens.util.Objects.notNull;
 
@@ -160,7 +160,7 @@ public class AccessTokenConfiguration {
 		return this;
 	}
 
-	Object getTokenId() {
+	public Object getTokenId() {
 		return tokenId;
 	}
 
