@@ -67,6 +67,8 @@ public final class Tokens {
             accessTokenUri = new URI(accessTokenUriString);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("environment variable OAUTH2_ACCESS_TOKEN_URL cannot be converted to an URI");
+        } catch (IllegalArgumentException e){
+            throw new IllegalArgumentException("environment variable OAUTH2_ACCESS_TOKEN_URL cannot be converted to an URI");
         }
         return createAccessTokensWithUri(accessTokenUri);
     }

@@ -15,6 +15,8 @@
  */
 package org.zalando.stups.tokens;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -25,6 +27,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.mockito.internal.util.io.IOUtil;
@@ -43,8 +46,11 @@ public class AccessTokenBuilderTest {
 	private UserCredentialsProvider ucp = Mockito.mock(UserCredentialsProvider.class);
 	private HttpProviderFactory hpf = Mockito.mock(HttpProviderFactory.class);
 
-	@Rule
-	public TemporaryFolder tempFolder = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @Rule
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
 	@Before
 	public void createCredentials() throws IOException {
@@ -129,5 +135,36 @@ public class AccessTokenBuilderTest {
 		Assertions.assertThat(executor).isNotNull();
 		executor.shutdownNow();
 	}
+
+    @Test
+    public void noEnvironmentSet() {
+        try {
+            Tokens.createAccessTokens();
+            Assertions.fail("Not expected to reach this point");
+        } catch (Exception e) {
+            assertThat(e.getMessage()).contains("environment variable OAUTH2_ACCESS_TOKEN_URL not set");
+        } finally {
+            System.getProperties().remove("OAUTH2_ACCESS_TOKEN_URL");
+        }
+    }
+
+    @Test
+    public void notAnUri_OAUTH2_ACCESS_TOKEN_URL() {
+        environmentVariables.set("OAUTH2_ACCESS_TOKEN_URL", "::::");
+        try {
+            Tokens.createAccessTokens();
+            Assertions.fail("Not expected to reach this point");
+        } catch (Exception e) {
+            assertThat(e.getMessage())
+                    .contains("environment variable OAUTH2_ACCESS_TOKEN_URL cannot be converted to an URI");
+        }
+    }
+
+    @Test
+    public void usinEnvCreatesBuilder() {
+        environmentVariables.set("OAUTH2_ACCESS_TOKEN_URL", "https://somwhere.test/tokens");
+        AccessTokensBuilder builder = Tokens.createAccessTokens();
+        Assertions.assertThat(builder).isNotNull();
+    }
 
 }
