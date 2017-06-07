@@ -43,9 +43,11 @@ class AccessTokenHandler implements Consumer<AccessTokenDto>, Function<File, Acc
     private final Logger LOG = LoggerFactory.getLogger(AccessTokenHandler.class);
 
     private final Map<Object, AccessToken> target;
+    private final TokenContentExtractor tokenContentExtractor;
 
-    AccessTokenHandler(Map<Object, AccessToken> target) {
+    AccessTokenHandler(Map<Object, AccessToken> target, TokenContentExtractor tokenContentExtractor) {
         this.target = requireNonNull(target, "'target' should never be null");
+        this.tokenContentExtractor = requireNonNull(tokenContentExtractor, "'tokenContentExtractor' should never be null");
     }
 
     @Override
@@ -60,7 +62,7 @@ class AccessTokenHandler implements Consumer<AccessTokenDto>, Function<File, Acc
         try {
             String secret = readContent(tokenSecretFile.getAbsolutePath());
             String type = readContent(tokenSecretFile.toPath().resolveSibling(name + TOKEN_TYPE).toString());
-            return new AccessTokenDto(secret, type, name);
+            return new AccessTokenDto(tokenContentExtractor.extract(secret, type), name);
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
             return null;

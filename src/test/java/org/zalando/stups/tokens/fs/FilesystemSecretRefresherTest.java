@@ -67,6 +67,7 @@ public class FilesystemSecretRefresherTest {
                       .done()
                   .whenUsingFilesystemSecrets()
                       .validateTokensOnStartup()
+                      .usingTokenContentExtractor(new DefaultFileSystemTokenContentExtractor())
                       .done()
                   .start();
             Assertions.fail("Exception expected");

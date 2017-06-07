@@ -29,7 +29,7 @@ class SecretsHandler extends AccessTokenHandler {
 
     SecretsHandler(Map<String, Secret> target) {
         // make parent happy
-        super(new HashMap<>());
+        super(new HashMap<>(), new DefaultFileSystemTokenContentExtractor());
         this.target =requireNonNull(target, "'target' should not be null");
     }
 

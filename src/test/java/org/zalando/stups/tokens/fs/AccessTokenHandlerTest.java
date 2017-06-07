@@ -40,7 +40,7 @@ public class AccessTokenHandlerTest {
 
     @Test
     public void testReadTokens() {
-        FilesystemReader<?> reader = new AccessTokenHandler(accessTokens).getFilesystemReader();
+        FilesystemReader<?> reader = new AccessTokenHandler(accessTokens, new DefaultFileSystemTokenContentExtractor()).getFilesystemReader();
         reader.run();
         Assertions.assertThat(accessTokens).containsKeys("myfirst");
         Assertions.assertThat(accessTokens).doesNotContainKey("mybasic");

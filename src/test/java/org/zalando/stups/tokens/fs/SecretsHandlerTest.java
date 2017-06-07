@@ -43,7 +43,11 @@ public class SecretsHandlerTest {
         FilesystemReader<?> reader = new SecretsHandler(secrets).getFilesystemReader();
         reader.run();
         Assertions.assertThat(secrets).isNotEmpty();
-        Assertions.assertThat(secrets).containsKeys("mybasic","myfirst");
+        Assertions.assertThat(secrets).containsKeys("mybasic", "myfirst");
+
+        Secret mybasicSecret = secrets.get("mybasic");
+        Assertions.assertThat(mybasicSecret.getType()).isEqualTo("Basic");
+        Assertions.assertThat(mybasicSecret.getValue());
 
     }
 

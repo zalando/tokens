@@ -46,7 +46,9 @@ public class FilesystemSecretRefresher extends AbstractAccessTokenRefresher impl
         LOG.info("Starting to refresh tokens regularly from filesystem ...");
 
         // access-tokens
-        FilesystemReader<?> reader = new AccessTokenHandler(accessTokens).getFilesystemReader();
+        FilesystemReader<?> reader = new AccessTokenHandler(accessTokens,
+                configuration.getFilesystemSecretsRefresherConfiguration().getTokenContentExtractor())
+                        .getFilesystemReader();
 
         if (configuration.getFilesystemSecretsRefresherConfiguration().isValidateTokensOnStartup()) {
             reader.readFromFilesystem();
