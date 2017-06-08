@@ -29,16 +29,25 @@
             <name>Tobias Sarnowski</name>
             <email>tobias.sarnowski@zalando.de</email>
             <organization>Zalando SE</organization>
+            <organizationUrl>https://tech.zalando.com/</organizationUrl>
         </developer>
         <developer>
             <name>Joerg Bellmann</name>
             <email>joerg.bellmann@zalando.de</email>
             <organization>Zalando SE</organization>
+            <organizationUrl>https://tech.zalando.com/</organizationUrl>
         </developer>
         <developer>
             <name>Andre Hartmann</name>
             <email>andre.hartmann@zalando.de</email>
             <organization>Zalando SE</organization>
+            <organizationUrl>https://tech.zalando.com/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Willi Schönborn</name>
+            <email>willi.schoenborn@zalando.de</email>
+            <organization>Zalando SE</organization>
+            <organizationUrl>https://tech.zalando.com/</organizationUrl>
         </developer>
     </developers>
 
