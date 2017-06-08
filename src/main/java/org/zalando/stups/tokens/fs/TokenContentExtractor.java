@@ -17,18 +17,8 @@ package org.zalando.stups.tokens.fs;
 
 import org.zalando.stups.tokens.AccessToken;
 
-class AccessTokenDto extends AccessToken {
+interface TokenContentExtractor {
 
-    private final String name;
-
-    AccessTokenDto(AccessToken accessToken, String name) {
-        super(accessToken.getToken(), accessToken.getType(), accessToken.getInitialValidSeconds(),
-                accessToken.getValidUntil(), accessToken.getCreationTimestamp());
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+    AccessToken extract(String token, String type);
 
 }

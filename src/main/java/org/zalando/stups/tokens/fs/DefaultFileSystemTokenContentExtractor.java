@@ -17,18 +17,17 @@ package org.zalando.stups.tokens.fs;
 
 import org.zalando.stups.tokens.AccessToken;
 
-class AccessTokenDto extends AccessToken {
+/**
+ * If the token is not a JWT, there are no information available.
+ * 
+ * @author jbellmann
+ *
+ */
+class DefaultFileSystemTokenContentExtractor implements TokenContentExtractor {
 
-    private final String name;
-
-    AccessTokenDto(AccessToken accessToken, String name) {
-        super(accessToken.getToken(), accessToken.getType(), accessToken.getInitialValidSeconds(),
-                accessToken.getValidUntil(), accessToken.getCreationTimestamp());
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
+    @Override
+    public AccessToken extract(String token, String type) {
+        return new AccessToken(token, type, -1, null);
     }
 
 }

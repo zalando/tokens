@@ -25,6 +25,8 @@ public class FilesystemSecretsRefresherConfiguration {
 
     private boolean validateTokensOnStartup = false;
 
+    private TokenContentExtractor tokenContentExtractor = new JwtFileSystemTokenContentExtractor();
+
     public FilesystemSecretsRefresherConfiguration(AccessTokensBuilder parent) {
         this.parent = requireNonNull(parent, "'accessTokensBuilder' should never be null");
     }
@@ -34,11 +36,20 @@ public class FilesystemSecretsRefresherConfiguration {
         return this;
     }
 
+    public FilesystemSecretsRefresherConfiguration usingTokenContentExtractor(TokenContentExtractor tokenContentExtractor) {
+        this.tokenContentExtractor = requireNonNull(tokenContentExtractor, "'tokenContentExtractor' should never be null");
+        return this;
+    }
+
     public boolean isValidateTokensOnStartup() {
         return this.validateTokensOnStartup;
     }
 
     public AccessTokensBuilder done() {
         return this.parent;
+    }
+
+    public TokenContentExtractor getTokenContentExtractor() {
+        return this.tokenContentExtractor;
     }
 }

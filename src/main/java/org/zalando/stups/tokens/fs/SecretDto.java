@@ -15,8 +15,6 @@
  */
 package org.zalando.stups.tokens.fs;
 
-import java.util.StringJoiner;
-
 import org.zalando.stups.tokens.Secret;
 
 class SecretDto implements Secret {
@@ -44,10 +42,6 @@ class SecretDto implements Secret {
     @Override
     public String getValue() {
         return secret;
-    }
-
-    public String headerValue() {
-        return new StringJoiner(DELIMITER).add(type).add(secret).toString();
     }
 
 }
