@@ -47,11 +47,7 @@ class Closed implements State {
 
     @Override
     public void onSuccess() {
-        // TODO, we can also reset the counter here
-        // what to prefer
-        if (errorCount.get() > 0) {
-            errorCount.decrementAndGet();
-        }
+        errorCount.set(0);
     }
 
     @Override
