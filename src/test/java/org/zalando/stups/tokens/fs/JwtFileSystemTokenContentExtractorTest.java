@@ -25,7 +25,7 @@ import org.zalando.stups.tokens.AccessToken;
 
 public class JwtFileSystemTokenContentExtractorTest {
 
-    private final String jwt = "987654321.eyJzdWIiOiJmOGQ2N3J0NS01YWM1LTQ5OGQtYWE2YS0wOTc0MTMwZGU3ZjUiLCAiaHR0cHM6Ly9leGFtcGxlLm9yZy9yZWFsbSI6ICJ1c2VycyIsICJodHRwczovL2V4YW1wbGUub3JnL3Rva2VuIiA6ICJCZWFyZXIiLCAiaHR0cHM6Ly9leGFtcGxlLm9yZy9tYW5hZ2VkLWlkIjogInVzZXIxIiwgImF1dGhfdGltZSI6IDE0OTYzMTM4NDEsICJpc3MiOiAiaHR0cHM6Ly9leGFtcGxlLm9yZyIsICJleHAiOiAxNDk2MzE3NDQxLCAiaWF0IjogMTQ5NjMxMzgzMX0=.1234567890";
+    private final String jwt = "987654321.eyJzdWIiOiJmOGQ2N3J0NS01YWM1LTQ5OGQtYWE2YS0wOTc0MTMwZGU3ZjUiLCAiaHR0cHM6Ly9leGFtcGxlLm9yZy9yZWFsbSI6ICJ1c2VycyIsICJodHRwczovL2V4YW1wbGUub3JnL3Rva2VuIiA6ICJCZWFyZXIiLCAiaHR0cHM6Ly9leGFtcGxlLm9yZy9tYW5hZ2VkLWlkIjogInVzZXIxIiwgImF1dGhfdGltZSI6IDE0OTYzMTM4NDEsICJpc3MiOiAiaHR0cHM6Ly9leGFtcGxlLm9yZyIsICJleHAiOiAxNDk2MzE3NDQxLCAiaWF0IjogMTQ5NjMxMzgzMX0.1234567890";
     private final String token = UUID.randomUUID().toString();
 
     @Test
@@ -46,4 +46,5 @@ public class JwtFileSystemTokenContentExtractorTest {
         assertThat(at.getValidUntil()).isNull();
         assertThat(at.getInitialValidSeconds()).isLessThan(0);
     }
+
 }

@@ -25,12 +25,16 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zalando.stups.tokens.AccessToken;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JwtFileSystemTokenContentExtractor implements TokenContentExtractor {
+
+    private final Logger logger = LoggerFactory.getLogger(JwtFileSystemTokenContentExtractor.class);
 
     private final ObjectMapper om = new ObjectMapper();
 
@@ -50,6 +54,7 @@ public class JwtFileSystemTokenContentExtractor implements TokenContentExtractor
             }
             return empty();
         } catch (Exception e) {
+            logger.warn(e.getMessage());
             return empty();
         }
     }

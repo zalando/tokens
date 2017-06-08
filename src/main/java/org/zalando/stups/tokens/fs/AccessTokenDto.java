@@ -21,7 +21,7 @@ class AccessTokenDto extends AccessToken {
 
     private final String name;
 
-    public AccessTokenDto(AccessToken accessToken, String name) {
+    AccessTokenDto(AccessToken accessToken, String name) {
         super(accessToken.getToken(), accessToken.getType(), accessToken.getInitialValidSeconds(),
                 accessToken.getValidUntil(), accessToken.getCreationTimestamp());
         this.name = name;
