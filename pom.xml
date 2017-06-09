@@ -49,6 +49,12 @@
             <organization>Zalando SE</organization>
             <organizationUrl>https://tech.zalando.com/</organizationUrl>
         </developer>
+        <developer>
+            <name>Vadim Shaigorodskiy</name>
+            <email>vadim.shaigorodskiy@zalando.de</email>
+            <organization>Zalando SE</organization>
+            <organizationUrl>https://tech.zalando.com/</organizationUrl>
+        </developer>
     </developers>
 
     <properties>
