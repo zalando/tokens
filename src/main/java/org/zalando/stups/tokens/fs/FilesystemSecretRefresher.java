@@ -23,11 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zalando.stups.tokens.AbstractAccessTokenRefresher;
-import org.zalando.stups.tokens.ClientCredentials;
-import org.zalando.stups.tokens.Secret;
-import org.zalando.stups.tokens.Secrets;
-import org.zalando.stups.tokens.TokenRefresherConfiguration;
+import org.zalando.stups.tokens.*;
 
 public class FilesystemSecretRefresher extends AbstractAccessTokenRefresher implements Secrets {
 
@@ -72,10 +68,10 @@ public class FilesystemSecretRefresher extends AbstractAccessTokenRefresher impl
     }
 
     //@formatter:off
-    protected List<?> findMissingTokens() {
+    private List<?> findMissingTokens() {
         return configuration.getAccessTokenConfigurations()
                             .stream()
-                            .map(atc -> atc.getTokenId())
+                            .map(AccessTokenConfiguration::getTokenId)
                             .filter(tokenId -> !accessTokens.containsKey(tokenId))
                             .collect(toList());
     }

@@ -42,7 +42,7 @@ public abstract class AbstractAccessTokenRefresher implements AccessTokens {
 
     protected void initializeFixedTokensFromEnvironment() {
         final String csv = getFixedToken();
-        if (csv != null) {
+        if (csv != null && !csv.trim().isEmpty()) {
             LOG.info("Initializing fixed access tokens from {} environment variable..", FIXED_TOKENS_ENV_VAR);
 
             final String[] tokens = csv.split(",");

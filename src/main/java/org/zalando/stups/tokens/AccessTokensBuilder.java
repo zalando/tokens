@@ -557,8 +557,8 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
      *         for any of your configured <i>tokenIds</i>.
      */
     public AccessTokens start() {
-        if (accessTokenConfigurations.size() == 0) {
-            throw new IllegalArgumentException("no scopes defined");
+        if (accessTokenConfigurations.isEmpty()) {
+            throw new IllegalArgumentException("No tokens configured");
         }
 
         locked = true;
