@@ -15,9 +15,10 @@
  */
 package org.zalando.stups.tokens;
 
-import java.io.File;
-
 import org.apache.http.util.Args;
+
+import java.io.File;
+import java.util.Optional;
 
 /**
  * Replacement to make it compatible with Java7.
@@ -48,17 +49,16 @@ public class FileSupplier {
     }
 
     public static File getCredentialsDir() {
-        String dir = System.getenv("CREDENTIALS_DIR");
-        if (dir == null) {
+        return credentialsDir()
+                .map(File::new)
+                .orElseThrow(() -> new IllegalStateException(
+                        "environment variable or application property CREDENTIALS_DIR not set"
+                ));
+    }
 
-            // this for testing
-            dir = System.getProperty("CREDENTIALS_DIR");
-            if (dir == null) {
-                throw new IllegalStateException("environment variable CREDENTIALS_DIR not set");
-            }
-        }
-
-        return new File(dir);
+    public static Optional<String> credentialsDir() {
+        Optional<String> optionalDir = Optional.ofNullable(System.getenv("CREDENTIALS_DIR"));
+        return optionalDir.isPresent() ? optionalDir : Optional.ofNullable(System.getProperty("CREDENTIALS_DIR"));
     }
 
 }

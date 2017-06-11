@@ -15,13 +15,6 @@
  */
 package org.zalando.stups.tokens;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.concurrent.ScheduledExecutorService;
-
 import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -31,6 +24,14 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.mockito.internal.util.io.IOUtil;
+import org.zalando.stups.tokens.fs.FilesystemSecretRefresher;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.concurrent.ScheduledExecutorService;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * 
@@ -119,7 +120,7 @@ public class AccessTokenBuilderTest {
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void accessTokenConfigurationWithouScopesShouldFail() {
+	public void accessTokenConfigurationWithoutScopesShouldFail() {
 		Tokens.createAccessTokensWithUri(uri).start();
 	}
 
@@ -167,4 +168,14 @@ public class AccessTokenBuilderTest {
         Assertions.assertThat(builder).isNotNull();
     }
 
+	@Test
+	public void checkCorrectRefresherUsed() throws Exception {
+		environmentVariables.set("OAUTH2_ACCESS_TOKEN_URL", "https://somwhere.test/tokens");
+		AccessTokensBuilder builder = Tokens.createAccessTokens();
+		AbstractAccessTokenRefresher refresher = builder.getAccessTokenRefresher();
+		assertThat(refresher instanceof FilesystemSecretRefresher);
+
+		System.getProperties().remove(CREDENTIALS_DIR);
+		assertThat(refresher instanceof AccessTokenRefresher);
+	}
 }
