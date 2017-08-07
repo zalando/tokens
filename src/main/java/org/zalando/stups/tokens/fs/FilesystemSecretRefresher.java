@@ -68,7 +68,7 @@ public class FilesystemSecretRefresher extends AbstractAccessTokenRefresher impl
     }
 
     //@formatter:off
-    private List<?> findMissingTokens() {
+    protected List<?> findMissingTokens() {
         return configuration.getAccessTokenConfigurations()
                             .stream()
                             .map(AccessTokenConfiguration::getTokenId)
