@@ -26,6 +26,8 @@ import org.apache.http.util.Args;
  */
 public class FileSupplier {
 
+    private static final String CREDENTIALS_DIR_PROP = "CREDENTIALS_DIR";
+
     private File file;
     private final String filename;
 
@@ -48,13 +50,15 @@ public class FileSupplier {
     }
 
     public static File getCredentialsDir() {
-        String dir = System.getenv("CREDENTIALS_DIR");
+        String dir = System.getenv(CREDENTIALS_DIR_PROP);
         if (dir == null) {
 
             // this for testing
-            dir = System.getProperty("CREDENTIALS_DIR");
+            dir = System.getProperty(CREDENTIALS_DIR_PROP);
             if (dir == null) {
-                throw new IllegalStateException("environment variable CREDENTIALS_DIR not set");
+                throw new IllegalStateException(
+                        String.format("environment variable %s not set", CREDENTIALS_DIR_PROP)
+                );
             }
         }
 
