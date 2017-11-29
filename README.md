@@ -6,7 +6,7 @@
 [![Javadocs](http://www.javadoc.io/badge/org.zalando.stups/tokens.svg)](http://www.javadoc.io/doc/org.zalando.stups/tokens)
 ![Maven Central](https://img.shields.io/maven-central/v/org.zalando.stups/tokens.svg)
 [![Coverage Status](https://coveralls.io/repos/zalando-stups/tokens/badge.svg?branch=master)](https://coveralls.io/r/zalando-stups/tokens?branch=master)
-[![codecov.io](https://codecov.io/github/zalando-stups/tokens/coverage.svg?branch=master)](https://codecov.io/github/zalando-stups/tokens?branch=master)
+[![codecov.io](https://codecov.io/github/zalando/tokens/coverage.svg?branch=master)](https://codecov.io/github/zalando/tokens?branch=master)
 
 ### Project Features and Functionality
 
