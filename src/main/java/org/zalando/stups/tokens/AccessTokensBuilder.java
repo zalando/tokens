@@ -27,6 +27,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zalando.stups.tokens.fs.FilesystemSecretRefresher;
 import org.zalando.stups.tokens.fs.FilesystemSecretsRefresherConfiguration;
 import org.zalando.stups.tokens.mcb.MCBConfig;
@@ -46,6 +48,9 @@ import org.zalando.stups.tokens.mcb.MCBConfig;
  *
  */
 public class AccessTokensBuilder implements TokenRefresherConfiguration {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AccessTokensBuilder.class);
+
     private final URI accessTokenUri;
     private URI tokenInfoUri;
 
@@ -599,6 +604,8 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         try {
             return getCredentialsDir().list(forSuffix("-token-secret")).length > 0;
         } catch (Exception e) {
+            LOG.warn(e.getMessage());
+            LOG.warn("Looking for files with suffix '-token-secret' failed. Assume default STUPS environment.");
             return false;
         }
     }

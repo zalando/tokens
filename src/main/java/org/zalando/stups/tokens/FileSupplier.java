@@ -26,6 +26,8 @@ import org.apache.http.util.Args;
  */
 public class FileSupplier {
 
+    private static final String DEFAULT_CREDENTIALS_DIR = "/meta/credentials";
+
     private static final String CREDENTIALS_DIR_PROP = "CREDENTIALS_DIR";
 
     private File file;
@@ -53,12 +55,15 @@ public class FileSupplier {
         String dir = System.getenv(CREDENTIALS_DIR_PROP);
         if (dir == null) {
 
-            // this for testing
             dir = System.getProperty(CREDENTIALS_DIR_PROP);
             if (dir == null) {
-                throw new IllegalStateException(
-                        String.format("environment variable %s not set", CREDENTIALS_DIR_PROP)
-                );
+                // to avoid some configuration on developers
+                if (new File(DEFAULT_CREDENTIALS_DIR).exists() && new File(DEFAULT_CREDENTIALS_DIR).isDirectory()) {
+                    return new File(DEFAULT_CREDENTIALS_DIR);
+                } else {
+                    throw new IllegalStateException(
+                            String.format("environment variable %s not set and default '/meta/credentials' not exists or not a directory.", CREDENTIALS_DIR_PROP));
+                }
             }
         }
 
