@@ -3,10 +3,10 @@
 **Tokens** is a Java library for verifying and storing OAuth 2.0 service access tokens. It is resilient, configurable, and production-tested, and works with all JVM languages.
 
 [![Build Status](https://travis-ci.org/zalando/tokens.svg?branch=master)](https://travis-ci.org/zalando/tokens)
-[![Javadoc](https://javadoc-emblem.rhcloud.com/doc/org.zalando.stups/tokens/badge.svg)](http://www.javadoc.io/doc/org.zalando.stups/tokens)
+[![Javadocs](http://www.javadoc.io/badge/org.zalando.stups/tokens.svg)](http://www.javadoc.io/doc/org.zalando.stups/tokens)
 ![Maven Central](https://img.shields.io/maven-central/v/org.zalando.stups/tokens.svg)
 [![Coverage Status](https://coveralls.io/repos/zalando-stups/tokens/badge.svg?branch=master)](https://coveralls.io/r/zalando-stups/tokens?branch=master)
-[![codecov.io](https://codecov.io/github/zalando-stups/tokens/coverage.svg?branch=master)](https://codecov.io/github/zalando-stups/tokens?branch=master)
+[![codecov.io](https://codecov.io/github/zalando/tokens/coverage.svg?branch=master)](https://codecov.io/github/zalando/tokens?branch=master)
 
 ### Project Features and Functionality
 
