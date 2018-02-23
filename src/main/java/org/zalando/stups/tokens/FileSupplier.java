@@ -62,7 +62,7 @@ public class FileSupplier {
                     return new File(DEFAULT_CREDENTIALS_DIR);
                 } else {
                     throw new IllegalStateException(
-                            String.format("environment variable %s not set and default '/meta/credentials' not exists or not a directory.", CREDENTIALS_DIR_PROP));
+                            String.format("environment variable %s not set and default '%s' not exists or not a directory.", CREDENTIALS_DIR_PROP, DEFAULT_CREDENTIALS_DIR));
                 }
             }
         }
