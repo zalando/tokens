@@ -15,6 +15,13 @@
  */
 package org.zalando.stups.tokens;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.concurrent.ScheduledExecutorService;
+
 import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -24,14 +31,6 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.mockito.internal.util.io.IOUtil;
-import org.zalando.stups.tokens.fs.FilesystemSecretRefresher;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.concurrent.ScheduledExecutorService;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * 
@@ -94,7 +93,7 @@ public class AccessTokenBuilderTest {
 	public void shouldItBePossibleToGetTokensWithoutScopesDefined() {
 		// this is possible at the moment
 		AccessTokens accessTokens = Tokens.createAccessTokensWithUri(uri).usingClientCredentialsProvider(ccp)
-				.usingUserCredentialsProvider(ucp).usingHttpProviderFactory(hpf).manageToken(new Object()).done()
+				.usingUserCredentialsProvider(ucp).usingHttpProviderFactory(hpf).manageToken("TOKEN_2").done()
 				.start();
 
 		Assertions.assertThat(accessTokens).isNotNull();
@@ -103,7 +102,7 @@ public class AccessTokenBuilderTest {
 	@Test
 	public void buildAccessTokensWithDefault() throws IOException {
 
-		AccessTokens accessTokens = Tokens.createAccessTokensWithUri(uri).manageToken(new Object()).done().start();
+		AccessTokens accessTokens = Tokens.createAccessTokensWithUri(uri).manageToken("TOKEN_1").done().start();
 
 		Assertions.assertThat(accessTokens).isNotNull();
 	}
