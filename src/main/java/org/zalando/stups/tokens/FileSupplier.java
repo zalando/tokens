@@ -15,9 +15,10 @@
  */
 package org.zalando.stups.tokens;
 
-import java.io.File;
-
 import org.apache.http.util.Args;
+
+import java.io.File;
+import java.util.Optional;
 
 /**
  * Replacement to make it compatible with Java7.
@@ -52,22 +53,24 @@ public class FileSupplier {
     }
 
     public static File getCredentialsDir() {
-        String dir = System.getenv(CREDENTIALS_DIR_PROP);
-        if (dir == null) {
-
-            dir = System.getProperty(CREDENTIALS_DIR_PROP);
-            if (dir == null) {
-                // to avoid some configuration on developers
-                if (new File(DEFAULT_CREDENTIALS_DIR).exists() && new File(DEFAULT_CREDENTIALS_DIR).isDirectory()) {
-                    return new File(DEFAULT_CREDENTIALS_DIR);
-                } else {
-                    throw new IllegalStateException(
-                            String.format("environment variable %s not set and default '%s' does not exist or is not a directory.", CREDENTIALS_DIR_PROP, DEFAULT_CREDENTIALS_DIR));
-                }
-            }
-        }
-
-        return new File(dir);
+        return credentialsDir()
+                .map(File::new)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("environment variable %s not set and default '%s' does not exist or is not a directory.", CREDENTIALS_DIR_PROP, DEFAULT_CREDENTIALS_DIR)
+                ));
     }
 
+    public static Optional<String> credentialsDir() {
+        Optional<String> optionalDir = Optional.ofNullable(System.getenv("CREDENTIALS_DIR"));
+        optionalDir = optionalDir.isPresent() ? optionalDir : Optional.ofNullable(System.getProperty("CREDENTIALS_DIR"));
+        return optionalDir.isPresent() ? optionalDir : defaultCredentialsDir();
+    }
+
+    protected static Optional<String> defaultCredentialsDir(){
+        if (new File(DEFAULT_CREDENTIALS_DIR).exists() && new File(DEFAULT_CREDENTIALS_DIR).isDirectory()) {
+            return Optional.of(DEFAULT_CREDENTIALS_DIR);
+        } else {
+            return Optional.empty();
+        }
+    }
 }
