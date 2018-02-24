@@ -562,27 +562,6 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
      *         for any of your configured <i>tokenIds</i>.
      */
     public AccessTokens start() {
-//        if (accessTokenConfigurations.isEmpty()) {
-//            throw new IllegalArgumentException("No tokens configured");
-//        }
-//
-//        locked = true;
-//        if (clientCredentialsProvider == null) {
-//
-//            // use default
-//            clientCredentialsProvider = new JsonFileBackedClientCredentialsProvider();
-//        }
-//
-//        if (userCredentialsProvider == null) {
-//
-//            // use default
-//            userCredentialsProvider = new JsonFileBackedUserCredentialsProvider();
-//        }
-//
-//        if (httpProviderFactory == null) {
-//            this.httpProviderFactory = new ClosableHttpProviderFactory();
-//        }
-
         final AbstractAccessTokenRefresher refresher = getAccessTokenRefresher();
         refresher.start();
         return refresher;
@@ -599,6 +578,7 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         }
         LOG.warn("Looking for files with suffix '-token-secret' failed. Assume default STUPS environment.");
 
+        // Now we are in STUPS mode, check precondition and defaults
         if (accessTokenConfigurations.isEmpty()) {
             throw new IllegalArgumentException("No tokens configured");
         }
