@@ -16,9 +16,9 @@
 package org.zalando.stups.tokens;
 
 import static org.zalando.stups.tokens.EndsWithFilenameFilter.forSuffix;
-import static org.zalando.stups.tokens.FileSupplier.getCredentialsDir;
 import static org.zalando.stups.tokens.util.Objects.notNull;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashSet;
@@ -469,7 +469,7 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         return this;
     }
 
-    public FilesystemSecretsRefresherConfiguration whenUsingFilesystemSecrets(){
+    public FilesystemSecretsRefresherConfiguration whenUsingFilesystemSecrets() {
         return this.filesystemSecretsRefresherConfiguration;
     }
 
@@ -562,6 +562,43 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
      *         for any of your configured <i>tokenIds</i>.
      */
     public AccessTokens start() {
+//        if (accessTokenConfigurations.isEmpty()) {
+//            throw new IllegalArgumentException("No tokens configured");
+//        }
+//
+//        locked = true;
+//        if (clientCredentialsProvider == null) {
+//
+//            // use default
+//            clientCredentialsProvider = new JsonFileBackedClientCredentialsProvider();
+//        }
+//
+//        if (userCredentialsProvider == null) {
+//
+//            // use default
+//            userCredentialsProvider = new JsonFileBackedUserCredentialsProvider();
+//        }
+//
+//        if (httpProviderFactory == null) {
+//            this.httpProviderFactory = new ClosableHttpProviderFactory();
+//        }
+
+        final AbstractAccessTokenRefresher refresher = getAccessTokenRefresher();
+        refresher.start();
+        return refresher;
+    }
+
+    @Override
+    public HttpConfig getHttpConfig() {
+        return httpConfig;
+    }
+
+    protected AbstractAccessTokenRefresher getAccessTokenRefresher() {
+        if(isFilesystemSecretsLayout()){
+            return new FilesystemSecretRefresher(this);
+        }
+        LOG.warn("Looking for files with suffix '-token-secret' failed. Assume default STUPS environment.");
+
         if (accessTokenConfigurations.isEmpty()) {
             throw new IllegalArgumentException("No tokens configured");
         }
@@ -583,31 +620,17 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
             this.httpProviderFactory = new ClosableHttpProviderFactory();
         }
 
-        final AbstractAccessTokenRefresher refresher = getAccessTokenRefresher();
-        refresher.start();
-        return refresher;
-    }
-
-    @Override
-    public HttpConfig getHttpConfig() {
-        return httpConfig;
-    }
-
-    protected AbstractAccessTokenRefresher getAccessTokenRefresher() {
-        if(isFilesystemSecretsLayout()){
-            return new FilesystemSecretRefresher(this);
-        }
         return new AccessTokenRefresher(this);
     }
 
     private boolean isFilesystemSecretsLayout() {
-        try {
-            return getCredentialsDir().list(forSuffix("-token-secret")).length > 0;
-        } catch (Exception e) {
-            LOG.warn(e.getMessage());
-            LOG.warn("Looking for files with suffix '-token-secret' failed. Assume default STUPS environment.");
-            return false;
-        }
+        return FileSupplier
+                .credentialsDir()
+                .map(dir -> {
+                    String[] files = new File(dir).list(forSuffix("-token-secret"));
+                    return files != null && files.length > 0;
+                })
+                .orElse(Boolean.FALSE);
     }
 
     @Override
