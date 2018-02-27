@@ -603,7 +603,7 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         return new AccessTokenRefresher(this);
     }
 
-    private boolean isFilesystemSecretsLayout() {
+    public static boolean isFilesystemSecretsLayout() {
         return FileSupplier
                 .credentialsDir()
                 .map(dir -> {
