@@ -576,7 +576,7 @@ public class AccessTokensBuilder implements TokenRefresherConfiguration {
         if(isFilesystemSecretsLayout()){
             return new FilesystemSecretRefresher(this);
         }
-        LOG.warn("Looking for files with suffix '-token-secret' failed. Assume default STUPS environment.");
+        LOG.info("Looking for files with suffix '-token-secret' failed. Assume default STUPS environment.");
 
         // Now we are in STUPS mode, check precondition and defaults
         if (accessTokenConfigurations.isEmpty()) {
