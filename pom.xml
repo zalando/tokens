@@ -68,8 +68,8 @@
     </properties>
 
     <scm>
-        <connection>scm:git:https://github.com/zalando-stups/tokens.git</connection>
-        <developerConnection>scm:git:https://github.com/zalando-stups/tokens.git</developerConnection>
+        <connection>scm:git:git@github.com:zalando/tokens.git</connection>
+        <developerConnection>scm:git:git@github.com:zalando/tokens.git</developerConnection>
         <url>https://github.com/zalando-stups/tokens</url>
         <tag>HEAD</tag>
     </scm>
