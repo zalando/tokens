@@ -15,13 +15,13 @@
  */
 package org.zalando.stups.tokens;
 
-import java.io.File;
-
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 /**
  * @author  jbellmann
@@ -70,19 +70,16 @@ public class FileSupplierTest {
         supplier.get();
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testNoCredentialsDirSet() {
         if (System.getenv("CREDENTIALS_DIR") != null) {
             LOG.warn("ENV 'CREDENTIALS_DIR' was set so we skip");
             return;
         }
-        try {
-            FileSupplier supplier = new FileSupplier("notExistent");
-            Assert.assertNotNull(supplier);
-            supplier.get();
-            Assertions.fail("expect an exception, when 'CREDENTIALS_DIR' not set in environment");
-        } catch (IllegalStateException t) {
-        }
+        FileSupplier supplier = new FileSupplier("notExistent");
+        Assert.assertNotNull(supplier);
+        supplier.get();
+        Assertions.fail("expect an exception, when 'CREDENTIALS_DIR' not set in environment");
     }
 
 }

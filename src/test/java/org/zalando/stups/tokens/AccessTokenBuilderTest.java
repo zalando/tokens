@@ -93,7 +93,7 @@ public class AccessTokenBuilderTest {
 	public void shouldItBePossibleToGetTokensWithoutScopesDefined() {
 		// this is possible at the moment
 		AccessTokens accessTokens = Tokens.createAccessTokensWithUri(uri).usingClientCredentialsProvider(ccp)
-				.usingUserCredentialsProvider(ucp).usingHttpProviderFactory(hpf).manageToken(new Object()).done()
+				.usingUserCredentialsProvider(ucp).usingHttpProviderFactory(hpf).manageToken("TOKEN_2").done()
 				.start();
 
 		Assertions.assertThat(accessTokens).isNotNull();
@@ -102,7 +102,7 @@ public class AccessTokenBuilderTest {
 	@Test
 	public void buildAccessTokensWithDefault() throws IOException {
 
-		AccessTokens accessTokens = Tokens.createAccessTokensWithUri(uri).manageToken(new Object()).done().start();
+		AccessTokens accessTokens = Tokens.createAccessTokensWithUri(uri).manageToken("TOKEN_1").done().start();
 
 		Assertions.assertThat(accessTokens).isNotNull();
 	}
@@ -118,23 +118,23 @@ public class AccessTokenBuilderTest {
 
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void accessTokenConfigurationWithouScopesShouldFail() {
-		Tokens.createAccessTokensWithUri(uri).start();
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void accessTokenConfigurationWithoutScopesShouldFail() {
+        Tokens.createAccessTokensWithUri(uri).start();
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	public void providedExecutorServiceShouldNotBeNull() {
-		Tokens.createAccessTokensWithUri(uri).existingExecutorService(null);
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void providedExecutorServiceShouldNotBeNull() {
+        Tokens.createAccessTokensWithUri(uri).existingExecutorService(null);
+    }
 
-	@Test
-	public void defaultExecutorServiceShouldNotBeNull() {
-		AccessTokensBuilder builder = Tokens.createAccessTokensWithUri(uri);
-		ScheduledExecutorService executor = builder.getExecutorService();
-		Assertions.assertThat(executor).isNotNull();
-		executor.shutdownNow();
-	}
+    @Test
+    public void defaultExecutorServiceShouldNotBeNull() {
+        AccessTokensBuilder builder = Tokens.createAccessTokensWithUri(uri);
+        ScheduledExecutorService executor = builder.getExecutorService();
+        Assertions.assertThat(executor).isNotNull();
+        executor.shutdownNow();
+    }
 
     @Test
     public void noEnvironmentSet() {
@@ -166,5 +166,4 @@ public class AccessTokenBuilderTest {
         AccessTokensBuilder builder = Tokens.createAccessTokens();
         Assertions.assertThat(builder).isNotNull();
     }
-
 }
