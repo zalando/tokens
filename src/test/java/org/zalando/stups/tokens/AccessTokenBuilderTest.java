@@ -166,16 +166,4 @@ public class AccessTokenBuilderTest {
         AccessTokensBuilder builder = Tokens.createAccessTokens();
         Assertions.assertThat(builder).isNotNull();
     }
-
-
-//    @Test
-//    public void checkCorrectRefresherUsed() throws Exception {
-//        environmentVariables.set("OAUTH2_ACCESS_TOKEN_URL", "https://somwhere.test/tokens");
-//        AccessTokensBuilder builder = Tokens.createAccessTokens();
-//        AbstractAccessTokenRefresher refresher = builder.getAccessTokenRefresher();
-//        assertThat(refresher instanceof FilesystemSecretRefresher);
-//
-//        System.getProperties().remove(CREDENTIALS_DIR);
-//        assertThat(refresher instanceof AccessTokenRefresher);
-//    }
 }
