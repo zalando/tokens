@@ -61,8 +61,8 @@ public class FileSupplier {
     }
 
     public static Optional<String> credentialsDir() {
-        Optional<String> optionalDir = Optional.ofNullable(System.getenv("CREDENTIALS_DIR"));
-        optionalDir = optionalDir.isPresent() ? optionalDir : Optional.ofNullable(System.getProperty("CREDENTIALS_DIR"));
+        Optional<String> optionalDir = Optional.ofNullable(System.getenv(CREDENTIALS_DIR_PROP));
+        optionalDir = optionalDir.isPresent() ? optionalDir : Optional.ofNullable(System.getProperty(CREDENTIALS_DIR_PROP));
         return optionalDir.isPresent() ? optionalDir : defaultCredentialsDir();
     }
 
