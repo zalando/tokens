@@ -15,17 +15,24 @@
  */
 package org.zalando.stups.tokens;
 
+import static java.lang.String.format;
+
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractAccessTokenRefresher implements AccessTokens {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractAccessTokenRefresher.class);
+
+    private static final String NOT_AVAILABLE_TEMPLATE = "No token available for tokenId '%s'. Tokens are available for the following tokenIds %s";
+    private static final String EXPIRED_TEMPLATE = "AccessToken for tokenId '%s' expired.";
 
     private static final long ONE_YEAR_SECONDS = TimeUnit.DAYS.toSeconds(365);
     private static final String FIXED_TOKENS_ENV_VAR = "OAUTH2_ACCESS_TOKENS";
@@ -34,6 +41,8 @@ public abstract class AbstractAccessTokenRefresher implements AccessTokens {
     protected final ScheduledExecutorService scheduler;
 
     protected final ConcurrentHashMap<Object, AccessToken> accessTokens = new ConcurrentHashMap<>();
+
+    private String availableTokenIds;
 
     public AbstractAccessTokenRefresher(TokenRefresherConfiguration configuration) {
         this.configuration = configuration;
@@ -80,14 +89,25 @@ public abstract class AbstractAccessTokenRefresher implements AccessTokens {
     public AccessToken getAccessToken(final Object tokenId) throws AccessTokenUnavailableException {
         final AccessToken token = accessTokens.get(tokenId);
         if (token == null) {
-            throw new AccessTokenUnavailableException("no token available");
+            throw new AccessTokenUnavailableException(format(NOT_AVAILABLE_TEMPLATE, tokenId.toString(), getAvailableTokenIds()));
         }
 
         if (token.isExpired()) {
-            throw new AccessTokenUnavailableException("token expired");
+            throw new AccessTokenUnavailableException(format(EXPIRED_TEMPLATE, tokenId.toString()));
         }
 
         return token;
+    }
+
+    protected String getAvailableTokenIds() {
+        if(availableTokenIds == null) {
+            List<String> tokenIds = Lists.newArrayList();
+            accessTokens.forEachKey(Long.MAX_VALUE, key -> {
+                tokenIds.add(key.toString());
+            });
+            availableTokenIds = tokenIds.isEmpty() ? "[]" : tokenIds.toString();
+        }
+        return availableTokenIds;
     }
 
     @Override
