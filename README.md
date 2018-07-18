@@ -43,7 +43,31 @@ Add it with:
 
 ``compile('org.zalando.stups:tokens:${version}') ``
 
-### Usage
+### Usage in Zalandos K8s environment (with `PlatformCredentialsSet`)
+
+It uses `/meta/credentials` as a default folder to look for provided tokens by `PlatformCredentialsSet`.
+
+```java
+import org.zalando.stups.tokens.Tokens;
+import org.zalando.stups.tokens.AccessTokens;
+
+AccessTokens tokens = Tokens.createAccessTokensWithUri(new URI("https://this.url.will.be.ignored"))
+                            .start();
+
+while (true) {
+    final String token = tokens.get("exampleRO");
+
+    Request.Get("https://api.example.com")
+           .addHeader("Authorization", "Bearer " + token)
+           .execute():
+
+    Thread.sleep(1000);
+}
+```
+
+Want to migrate from STUPS to K8s? [See the hints](#migration-from-zalandos-stups-env-to-zalandos-k8s-env).
+
+### Usage in Zalandos STUPS environment
 
 ```java
 import org.zalando.stups.tokens.Tokens;
@@ -68,6 +92,43 @@ while (true) {
 
     Thread.sleep(1000);
 }
+```
+
+### Migration from Zalandos STUPS env to Zalandos K8s env
+
+Your code can stay as is.
+
+A common issue is not mounting the the credentials. Please use the example below as a guide line.
+
+```
+...
+          volumeMounts:
+          - name: "{{ APPLICATION }}-credentials"
+            mountPath: /meta/credentials
+            readOnly: true
+      volumes:
+        - name: "{{ APPLICATION }}-credentials"
+          secret:
+            secretName: "{{ APPLICATION }}-credentials"
+```
+
+Please also make sure that token identifiers/names must equal the respective items in `credentials.yaml`::
+
+```
+apiVersion: "zalando.org/v1"
+kind: PlatformCredentialsSet
+metadata:
+   name: "{{ APPLICATION }}-credentials"
+spec:
+   application: "{{ APPLICATION }}"
+   tokens:
+     exampleRW:
+       privileges:
+         - com.zalando::read
+         - com.zalando::write
+     exampleRO:
+       privileges:
+         - com.zalando::read
 ```
 
 ### Local Testing
