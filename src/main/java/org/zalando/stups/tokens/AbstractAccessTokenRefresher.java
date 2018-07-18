@@ -17,13 +17,13 @@ package org.zalando.stups.tokens;
 
 import static java.lang.String.format;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +101,7 @@ public abstract class AbstractAccessTokenRefresher implements AccessTokens {
 
     protected String getAvailableTokenIds() {
         if(availableTokenIds == null) {
-            List<String> tokenIds = Lists.newArrayList();
+            List<String> tokenIds = new ArrayList<String>();
             accessTokens.forEachKey(Long.MAX_VALUE, key -> {
                 tokenIds.add(key.toString());
             });
