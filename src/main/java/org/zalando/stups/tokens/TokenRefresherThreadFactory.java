@@ -15,15 +15,9 @@
  */
 package org.zalando.stups.tokens;
 
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Custom-{@link ThreadFactory} to be used by the
- * {@link ScheduledExecutorService} for {@link AccessTokenRefresher}.
- *
- */
 public final class TokenRefresherThreadFactory implements ThreadFactory {
     private static final String THREAD_NAME_PREFIX = "token-refresher-";
     private final AtomicInteger counter = new AtomicInteger(0);

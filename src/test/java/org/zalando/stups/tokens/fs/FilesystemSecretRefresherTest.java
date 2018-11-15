@@ -16,15 +16,13 @@
 package org.zalando.stups.tokens.fs;
 
 import java.net.URI;
-import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.zalando.stups.tokens.AccessTokens;
-import org.zalando.stups.tokens.Secrets;
 import org.zalando.stups.tokens.Tokens;
+import org.zalando.stups.tokens.TokensMissingException;
 
 public class FilesystemSecretRefresherTest {
 
@@ -37,19 +35,6 @@ public class FilesystemSecretRefresherTest {
     public void tearDown() {
         System.getProperties().remove("CREDENTIALS_DIR");
     }
-
-    //@formatter:off
-    @Test
-    public void test() throws InterruptedException {
-        AccessTokens at = Tokens.createAccessTokensWithUri(URI.create("http://we.use.filesystemsecrets.and.do.not.care.about.this"))
-            .manageToken("noexistent")
-                .addScope("read::all")
-                .done()
-            .start();
-        TimeUnit.SECONDS.sleep(10);
-        at.stop();
-    }
-    //@formatter:on
 
     //@formatter:off
     @Test
@@ -67,7 +52,6 @@ public class FilesystemSecretRefresherTest {
                       .done()
                   .whenUsingFilesystemSecrets()
                       .validateTokensOnStartup()
-                      .usingTokenContentExtractor(new DefaultFileSystemTokenContentExtractor())
                       .done()
                   .start();
             Assertions.fail("Exception expected");
@@ -78,19 +62,4 @@ public class FilesystemSecretRefresherTest {
     }
     //@formatter:on
 
-    //@formatter:off
-    @Test
-    public void testPolymorph() throws InterruptedException {
-        AccessTokens at = Tokens.createAccessTokensWithUri(URI.create("http://we.use.filesystemsecrets.and.do.not.care.about.this"))
-            .manageToken("noexistent")
-                .addScope("read::all")
-                .done()
-            .start();
-        Assertions.assertThat(at).isInstanceOfAny(AccessTokens.class, Secrets.class);
-
-        TimeUnit.SECONDS.sleep(2);
-        Assertions.assertThat(((Secrets)at).getClient("kio")).isNotNull();
-        at.stop();
-    }
-    //@formatter:on
 }

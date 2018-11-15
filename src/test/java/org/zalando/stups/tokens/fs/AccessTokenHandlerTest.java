@@ -23,6 +23,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.zalando.stups.tokens.AccessToken;
+import org.zalando.stups.tokens.AccessTokenHandler;
+import org.zalando.stups.tokens.DefaultFileSystemTokenContentExtractor;
+import org.zalando.stups.tokens.FilesystemReader;
 
 public class AccessTokenHandlerTest {
 

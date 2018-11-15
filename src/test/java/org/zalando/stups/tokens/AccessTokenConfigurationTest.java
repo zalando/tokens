@@ -48,20 +48,6 @@ public class AccessTokenConfigurationTest {
 	}
 
 	@Test
-	public void defaultGrantTypeShouldBeDefaultGrantType() {
-		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
-		Assertions.assertThat(configuration.getGrantType()).isEqualTo(AccessTokenConfiguration.DEFAULT_GRANT_TYPE);
-		Assertions.assertThat(configuration.getGrantType()).isNotEmpty();
-	}
-
-	@Test
-	public void defaultGrantTypeShouldBePassword() {
-		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);
-		Assertions.assertThat(configuration.getGrantType()).isEqualTo(AccessTokenConfiguration.DEFAULT_GRANT_TYPE);
-		Assertions.assertThat(configuration.getGrantType()).isEqualTo(DEFAULT_GRANT_TYPE_SHOULD_BE_PASSWORD);
-	}
-
-	@Test
 	public void addScope() {
 		String scope = "somescope";
 		AccessTokenConfiguration configuration = new AccessTokenConfiguration(new Object(), builder);

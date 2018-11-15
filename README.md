@@ -51,7 +51,15 @@ It uses `/meta/credentials` as a default folder to look for provided tokens by `
 import org.zalando.stups.tokens.Tokens;
 import org.zalando.stups.tokens.AccessTokens;
 
-AccessTokens tokens = Tokens.createAccessTokensWithUri(new URI("https://this.url.will.be.ignored"))
+AccessTokens tokens = Tokens.createAccessTokens()
+                            .manageToken("exampleRW")
+                                .addScope("read")
+                                .addScope("write")
+                                .done()
+                            .manageToken("exampleRO")
+                                .addScope("read")
+                                .done()
+                            
                             .start();
 
 while (true) {

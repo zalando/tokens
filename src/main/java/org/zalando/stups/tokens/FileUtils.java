@@ -15,13 +15,14 @@
  */
 package org.zalando.stups.tokens;
 
-import java.net.URI;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-class CloseableTokenVerifierProvider implements TokenVerifierProvider {
+class FileUtils {
 
-    @Override
-    public TokenVerifier create(URI tokenInfoUri, HttpConfig httpConfig, MetricsListener metricsListener) {
-        return new CloseableTokenVerifier(tokenInfoUri, httpConfig, metricsListener);
+    static String readContent(String fullpath) throws IOException {
+        return new String(Files.readAllBytes(Paths.get(fullpath))).trim();
     }
 
 }

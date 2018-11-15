@@ -13,27 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.zalando.stups.tokens.fs;
+package org.zalando.stups.tokens;
 
-import java.util.List;
+class AccessTokenDto extends AccessToken {
 
-public class TokensMissingException extends RuntimeException {
+    private final String name;
 
-    private static final String MESSAGE_LAYOUT = "The following token-configurations couldn't be found : %s";
-    private static final long serialVersionUID = 1L;
-    private final List<?> missing;
-
-    public TokensMissingException(List<?> missingTokens) {
-        this.missing = missingTokens;
+    AccessTokenDto(AccessToken accessToken, String name) {
+        super(accessToken.getToken(), accessToken.getType(), accessToken.getInitialValidSeconds(),
+                accessToken.getExpiresAt(), accessToken.getCreatedAt());
+        this.name = name;
     }
 
-    @Override
-    public String getMessage() {
-        return String.format(MESSAGE_LAYOUT, missing.toString());
-    }
-
-    public int getMissingTokensCount() {
-        return missing.size();
+    public String getName() {
+        return name;
     }
 
 }

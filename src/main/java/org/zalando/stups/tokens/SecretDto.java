@@ -15,10 +15,33 @@
  */
 package org.zalando.stups.tokens;
 
-import java.io.Closeable;
+import org.zalando.stups.tokens.Secret;
 
-public interface TokenVerifier extends Closeable {
+class SecretDto implements Secret {
 
-    boolean isTokenValid(String token);
+    private static final String DELIMITER = " ";
+    private final String name;
+    private final String type;
+    private final String secret;
+
+    SecretDto(String name, String type, String secret) {
+        this.name = name;
+        this.type = type;
+        this.secret = secret;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public String getValue() {
+        return secret;
+    }
 
 }

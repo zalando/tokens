@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import org.junit.Test;
 import org.zalando.stups.tokens.AccessToken;
+import org.zalando.stups.tokens.JwtFileSystemTokenContentExtractor;
 
 public class JwtFileSystemTokenContentExtractorTest {
 
@@ -33,8 +34,8 @@ public class JwtFileSystemTokenContentExtractorTest {
         JwtFileSystemTokenContentExtractor e = new JwtFileSystemTokenContentExtractor();
         AccessToken at = e.extract(jwt, "Bearer");
         assertThat(at).isNotNull();
-        assertThat(at.getValidUntil()).isNotNull();
-        assertThat(at.getValidUntil()).isBefore(new Date());
+        assertThat(at.getExpiresAt()).isNotNull();
+        assertThat(at.getExpiresAt()).isBefore(new Date());
         assertThat(at.getInitialValidSeconds()).isLessThan(0);
     }
 
@@ -43,7 +44,7 @@ public class JwtFileSystemTokenContentExtractorTest {
         JwtFileSystemTokenContentExtractor e = new JwtFileSystemTokenContentExtractor();
         AccessToken at = e.extract(token, "Bearer");
         assertThat(at).isNotNull();
-        assertThat(at.getValidUntil()).isNull();
+        assertThat(at.getExpiresAt()).isNull();
         assertThat(at.getInitialValidSeconds()).isLessThan(0);
     }
 

@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.zalando.stups.tokens.fs;
+package org.zalando.stups.tokens;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import org.zalando.stups.tokens.AccessToken;
 
-class FileUtils {
+interface TokenContentExtractor {
 
-    static String readContent(String fullpath) throws IOException {
-        return new String(Files.readAllBytes(Paths.get(fullpath))).trim();
-    }
+    AccessToken extract(String token, String type);
 
 }

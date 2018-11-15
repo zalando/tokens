@@ -22,7 +22,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.zalando.stups.tokens.FilesystemReader;
 import org.zalando.stups.tokens.Secret;
+import org.zalando.stups.tokens.SecretsHandler;
 
 public class SecretsHandlerTest {
 

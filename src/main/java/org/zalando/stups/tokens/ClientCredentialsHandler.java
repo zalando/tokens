@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.zalando.stups.tokens.fs;
+package org.zalando.stups.tokens;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static org.zalando.stups.tokens.fs.FileUtils.readContent;
+import static org.zalando.stups.tokens.FileUtils.readContent;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -31,8 +31,6 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zalando.stups.tokens.ClientCredentials;
-import org.zalando.stups.tokens.EndsWithFilenameFilter;
-import org.zalando.stups.tokens.SimpleClientCredentials;
 
 class ClientCredentialsHandler implements Consumer<SimpleClientCredentials>, Function<File, SimpleClientCredentials>,
         Predicate<SimpleClientCredentials>, Supplier<FilenameFilter> {

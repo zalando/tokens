@@ -23,6 +23,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.zalando.stups.tokens.ClientCredentials;
+import org.zalando.stups.tokens.ClientCredentialsHandler;
+import org.zalando.stups.tokens.FilesystemReader;
 
 public class ClientCredentialsHandlerTest {
 

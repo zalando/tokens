@@ -15,10 +15,25 @@
  */
 package org.zalando.stups.tokens;
 
-import java.net.URI;
+import java.util.List;
 
-public interface TokenVerifierProvider {
+public class TokensMissingException extends RuntimeException {
 
-    TokenVerifier create(URI tokenInfoUri, HttpConfig httpConfig, MetricsListener metricsListener);
+    private static final String MESSAGE_LAYOUT = "The following token-configurations couldn't be found : %s";
+    private static final long serialVersionUID = 1L;
+    private final List<?> missing;
+
+    public TokensMissingException(List<?> missingTokens) {
+        this.missing = missingTokens;
+    }
+
+    @Override
+    public String getMessage() {
+        return String.format(MESSAGE_LAYOUT, missing.toString());
+    }
+
+    public int getMissingTokensCount() {
+        return missing.size();
+    }
 
 }

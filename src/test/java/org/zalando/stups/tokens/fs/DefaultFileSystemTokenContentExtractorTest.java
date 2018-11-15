@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import org.junit.Test;
 import org.zalando.stups.tokens.AccessToken;
+import org.zalando.stups.tokens.DefaultFileSystemTokenContentExtractor;
 
 public class DefaultFileSystemTokenContentExtractorTest {
 
