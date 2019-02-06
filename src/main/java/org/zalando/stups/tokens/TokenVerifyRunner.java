@@ -53,7 +53,7 @@ class TokenVerifyRunner implements Runnable, Closeable {
             this.tokenVerifier = configuration.getTokenVerifierProvider().create(configuration.getTokenInfoUri(),
                     configuration.getHttpConfig(), configuration.getMetricsListener());
         } else {
-            LOG.warn("No AccessToken-Verification enabled because no 'tokenInfoUri' was configured");
+            LOG.info("No AccessToken-Verification enabled because no 'tokenInfoUri' was configured");
         }
     }
 
