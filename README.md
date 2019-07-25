@@ -98,7 +98,7 @@ while (true) {
 
 Your code can stay as is.
 
-A common issue is not mounting the the credentials. Please use the example below as a guide line.
+A common issue is not mounting the credentials. Please use the example below as a guide line.
 
 ```
 ...
