@@ -17,7 +17,7 @@ Some of the features Tokens offers:
 - configuration flexibility; specify multiple tokens with different scopes
 - the ability to inject fixed OAuth2 access tokens
 
-Tokens can be useful to devs (at any company, large or small) who are working with highly-distributed microservices deployed in the cloud and need to authenticate the traffic generated when accessing APIs. For example, if your team wants to consume an API with OAuth2 credentials, Tokens will fetch the tokens for you. Then you just [add scopes](#Usage) in the token. 
+Tokens can be useful to devs (at any company, large or small) who are working with highly-distributed microservices deployed in the cloud and need to authenticate the traffic generated when accessing APIs. For example, if your team wants to consume an API with OAuth2 credentials, Tokens will fetch the tokens for you. Then you just [add scopes](#Usage) in the token (configuration based for k8s environment, or directly in code for Zalando STUPS environment). 
 
 When creating tokens, it's easy to make a lot of mistakes. Tokens aims to save you hassle and time.
 
