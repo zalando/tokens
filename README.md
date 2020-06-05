@@ -43,7 +43,7 @@ Add it with:
 
 ``compile('org.zalando.stups:tokens:${version}') ``
 
-### Usage in Zalandos K8s environment (with `PlatformCredentialsSet`)
+### Usage in Zalando's Kubernetes (K8s) environment (with `PlatformCredentialsSet`)
 
 It uses `/meta/credentials` as a default folder to look for provided tokens by `PlatformCredentialsSet`.
 
@@ -67,7 +67,24 @@ while (true) {
 
 Want to migrate from STUPS to K8s? [See the hints](#migration-from-zalandos-stups-env-to-zalandos-k8s-env).
 
-### Usage in Zalandos STUPS environment
+## Troubleshooting
+
+You may encounter the following problem if you initialise the `AccessTokens` object and immediately use it to acquire a token:
+
+```
+org.zalando.stups.tokens.AccessTokenUnavailableException: No token available for
+ tokenId 'someToken'. Tokens are available for the following tokenIds [someToken]
+```
+
+This seems to happen because the filesystem token refresher initialises asynchronously on Kubernetes. You can work around this problem by forcing the token refresher to read and validate tokens eagerly and synchronously during initialisation:
+
+```java
+Tokens.createAccessTokensWithUri(new URI(authURI))
+        .whenUsingFilesystemSecrets().validateTokensOnStartup().done()
+        .manageToken(tokenId)
+```
+
+### Usage in Zalando's STUPS environment
 
 ```java
 import org.zalando.stups.tokens.Tokens;
