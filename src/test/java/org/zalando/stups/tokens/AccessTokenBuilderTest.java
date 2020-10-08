@@ -15,6 +15,7 @@
  */
 package org.zalando.stups.tokens;
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
@@ -27,7 +28,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.mockito.internal.util.io.IOUtil;
@@ -48,9 +48,6 @@ public class AccessTokenBuilderTest {
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
 	@Before
 	public void createCredentials() throws IOException {
@@ -150,9 +147,9 @@ public class AccessTokenBuilderTest {
 
     @Test
     public void notAnUri_OAUTH2_ACCESS_TOKEN_URL() {
-        environmentVariables.set("OAUTH2_ACCESS_TOKEN_URL", "::::");
         try {
-            Tokens.createAccessTokens();
+			withEnvironmentVariable("OAUTH2_ACCESS_TOKEN_URL", "::::")
+					.execute(Tokens::createAccessTokens);
             Assertions.fail("Not expected to reach this point");
         } catch (Exception e) {
             assertThat(e.getMessage())
@@ -161,9 +158,9 @@ public class AccessTokenBuilderTest {
     }
 
     @Test
-    public void usinEnvCreatesBuilder() {
-        environmentVariables.set("OAUTH2_ACCESS_TOKEN_URL", "https://somwhere.test/tokens");
-        AccessTokensBuilder builder = Tokens.createAccessTokens();
+    public void usinEnvCreatesBuilder() throws Exception {
+        AccessTokensBuilder builder = withEnvironmentVariable("OAUTH2_ACCESS_TOKEN_URL", "https://somwhere.test/tokens")
+						.execute(Tokens::createAccessTokens);
         Assertions.assertThat(builder).isNotNull();
     }
 }
