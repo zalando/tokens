@@ -213,12 +213,6 @@
 
     <profiles>
         <profile>
-            <id>travis</id>
-            <properties>
-                <coveralls.dryRun>false</coveralls.dryRun>
-            </properties>
-        </profile>
-        <profile>
             <id>github-actions</id>
             <properties>
                 <coveralls.dryRun>false</coveralls.dryRun>
