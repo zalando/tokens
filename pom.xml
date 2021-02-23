@@ -210,6 +210,7 @@
                 <version>4.3.0</version>
                 <configuration>
                     <dryRun>${coveralls.dryRun}</dryRun>
+                    <repoToken>${env.COVERALLS_REPO_TOKEN}</repoToken>
                     <jacocoReports>
                         <jacocoReport>target/site/jacoco/jacoco.xml</jacocoReport>
                     </jacocoReports>
@@ -220,7 +221,7 @@
 
     <profiles>
         <profile>
-            <id>travis</id>
+            <id>github-actions</id>
             <properties>
                 <coveralls.dryRun>false</coveralls.dryRun>
             </properties>
