@@ -204,29 +204,8 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>4.3.0</version>
-                <configuration>
-                    <dryRun>${coveralls.dryRun}</dryRun>
-                    <repoToken>${env.COVERALLS_REPO_TOKEN}</repoToken>
-                    <jacocoReports>
-                        <jacocoReport>target/site/jacoco/jacoco.xml</jacocoReport>
-                    </jacocoReports>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>github-actions</id>
-            <properties>
-                <coveralls.dryRun>false</coveralls.dryRun>
-            </properties>
-        </profile>
-    </profiles>
 
     <distributionManagement>
         <snapshotRepository>
