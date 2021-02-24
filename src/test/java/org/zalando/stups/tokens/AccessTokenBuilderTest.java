@@ -41,10 +41,10 @@ public class AccessTokenBuilderTest {
 
 	private static final String CREDENTIALS_DIR = "CREDENTIALS_DIR";
 	private static final String HTTP_EXAMPLE_ORG = "http://example.org";
-	private URI uri = URI.create(HTTP_EXAMPLE_ORG);
-	private ClientCredentialsProvider ccp = Mockito.mock(ClientCredentialsProvider.class);
-	private UserCredentialsProvider ucp = Mockito.mock(UserCredentialsProvider.class);
-	private HttpProviderFactory hpf = Mockito.mock(HttpProviderFactory.class);
+	private final URI uri = URI.create(HTTP_EXAMPLE_ORG);
+	private final ClientCredentialsProvider ccp = Mockito.mock(ClientCredentialsProvider.class);
+	private final UserCredentialsProvider ucp = Mockito.mock(UserCredentialsProvider.class);
+	private final HttpProviderFactory hpf = Mockito.mock(HttpProviderFactory.class);
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
@@ -97,7 +97,7 @@ public class AccessTokenBuilderTest {
 	}
 
 	@Test
-	public void buildAccessTokensWithDefault() throws IOException {
+	public void buildAccessTokensWithDefault() {
 
 		AccessTokens accessTokens = Tokens.createAccessTokensWithUri(uri).manageToken("TOKEN_1").done().start();
 
@@ -158,7 +158,7 @@ public class AccessTokenBuilderTest {
     }
 
     @Test
-    public void usinEnvCreatesBuilder() throws Exception {
+    public void usingEnvCreatesBuilder() throws Exception {
         AccessTokensBuilder builder = withEnvironmentVariable("OAUTH2_ACCESS_TOKEN_URL", "https://somwhere.test/tokens")
 						.execute(Tokens::createAccessTokens);
         Assertions.assertThat(builder).isNotNull();
