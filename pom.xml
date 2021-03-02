@@ -14,6 +14,7 @@
     <name>Tokens</name>
     <description>
         A Java library that keeps OAuth 2.0 service access tokens in memory for your usage.
+        Test
     </description>
     <url>https://github.com/zalando-stups/tokens</url>
 
