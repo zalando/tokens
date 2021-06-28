@@ -17,7 +17,7 @@ Some of the features Tokens offers:
 - configuration flexibility; specify multiple tokens with different scopes
 - the ability to inject fixed OAuth2 access tokens
 
-Tokens can be useful to devs (at any company, large or small) who are working with highly-distributed microservices deployed in the cloud and need to authenticate the traffic generated when accessing APIs. For example, if your team wants to consume an API with OAuth2 credentials, Tokens will fetch the tokens for you. Then you just [add scopes](#Usage) in the token. 
+Tokens can be useful to devs (at any company, large or small) who are working with highly-distributed microservices deployed in the cloud and need to authenticate the traffic generated when accessing APIs. For example, if your team wants to consume an API with OAuth2 credentials, Tokens will fetch the tokens for you. Then you just [add scopes](#Usage) in the token (configuration based for k8s environment, or directly in code for Zalando STUPS environment). 
 
 When creating tokens, it's easy to make a lot of mistakes. Tokens aims to save you hassle and time.
 
@@ -43,7 +43,9 @@ Add it with:
 
 ``compile('org.zalando.stups:tokens:${version}') ``
 
-### Usage in Zalandos K8s environment (with `PlatformCredentialsSet`)
+### Usage
+
+#### Usage in Zalandos K8s environment (with `PlatformCredentialsSet`)
 
 It uses `/meta/credentials` as a default folder to look for provided tokens by `PlatformCredentialsSet`.
 
@@ -67,7 +69,7 @@ while (true) {
 
 Want to migrate from STUPS to K8s? [See the hints](#migration-from-zalandos-stups-env-to-zalandos-k8s-env).
 
-### Usage in Zalandos STUPS environment
+#### Usage in Zalandos STUPS environment
 
 ```java
 import org.zalando.stups.tokens.Tokens;
@@ -93,6 +95,19 @@ while (true) {
     Thread.sleep(1000);
 }
 ```
+
+#### Local Testing
+
+With Tokens, you can inject fixed OAuth2 access tokens via the `OAUTH2_ACCESS_TOKENS` environment variable and test applications locally with personal OAuth2 tokens. As an example:
+
+```bash
+$ MY_TOKEN_1=$(zign token -n mytok1)
+$ MY_TOKEN_2=$(zign token -n mytok2)
+$ export OAUTH2_ACCESS_TOKENS=mytok1=$MY_TOKEN_1,mytok2=$MY_TOKEN_2
+$ lein repl # start my local Clojure app using the tokens library
+```
+
+In production on EC2 instances, Tokens fetches access tokens by requesting an authorization server with credentials, found in `client.json` and `user.json`. It's also possible to provide `client.json` and `user.json` with valid content and point this library to that directory.
 
 ### Migration from Zalandos STUPS env to Zalandos K8s env
 
@@ -130,19 +145,6 @@ spec:
        privileges:
          - com.zalando::read
 ```
-
-### Local Testing
-
-With Tokens, you can inject fixed OAuth2 access tokens via the `OAUTH2_ACCESS_TOKENS` environment variable and test applications locally with personal OAuth2 tokens. As an example:
-
-```bash
-$ MY_TOKEN_1=$(zign token -n mytok1)
-$ MY_TOKEN_2=$(zign token -n mytok2)
-$ export OAUTH2_ACCESS_TOKENS=mytok1=$MY_TOKEN_1,mytok2=$MY_TOKEN_2
-$ lein repl # start my local Clojure app using the tokens library
-```
-
-In production on EC2 instances, Tokens fetches access tokens by requesting an authorization server with credentials, found in `client.json` and `user.json`. It's also possible to provide `client.json` and `user.json` with valid content and point this library to that directory.
 
 ### Contributing
 
