@@ -15,6 +15,7 @@
  */
 package org.zalando.stups.tokens;
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
@@ -27,7 +28,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.mockito.internal.util.io.IOUtil;
@@ -41,16 +41,13 @@ public class AccessTokenBuilderTest {
 
 	private static final String CREDENTIALS_DIR = "CREDENTIALS_DIR";
 	private static final String HTTP_EXAMPLE_ORG = "http://example.org";
-	private URI uri = URI.create(HTTP_EXAMPLE_ORG);
-	private ClientCredentialsProvider ccp = Mockito.mock(ClientCredentialsProvider.class);
-	private UserCredentialsProvider ucp = Mockito.mock(UserCredentialsProvider.class);
-	private HttpProviderFactory hpf = Mockito.mock(HttpProviderFactory.class);
+	private final URI uri = URI.create(HTTP_EXAMPLE_ORG);
+	private final ClientCredentialsProvider ccp = Mockito.mock(ClientCredentialsProvider.class);
+	private final UserCredentialsProvider ucp = Mockito.mock(UserCredentialsProvider.class);
+	private final HttpProviderFactory hpf = Mockito.mock(HttpProviderFactory.class);
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
 	@Before
 	public void createCredentials() throws IOException {
@@ -100,7 +97,7 @@ public class AccessTokenBuilderTest {
 	}
 
 	@Test
-	public void buildAccessTokensWithDefault() throws IOException {
+	public void buildAccessTokensWithDefault() {
 
 		AccessTokens accessTokens = Tokens.createAccessTokensWithUri(uri).manageToken("TOKEN_1").done().start();
 
@@ -150,9 +147,9 @@ public class AccessTokenBuilderTest {
 
     @Test
     public void notAnUri_OAUTH2_ACCESS_TOKEN_URL() {
-        environmentVariables.set("OAUTH2_ACCESS_TOKEN_URL", "::::");
         try {
-            Tokens.createAccessTokens();
+			withEnvironmentVariable("OAUTH2_ACCESS_TOKEN_URL", "::::")
+					.execute(Tokens::createAccessTokens);
             Assertions.fail("Not expected to reach this point");
         } catch (Exception e) {
             assertThat(e.getMessage())
@@ -161,9 +158,9 @@ public class AccessTokenBuilderTest {
     }
 
     @Test
-    public void usinEnvCreatesBuilder() {
-        environmentVariables.set("OAUTH2_ACCESS_TOKEN_URL", "https://somwhere.test/tokens");
-        AccessTokensBuilder builder = Tokens.createAccessTokens();
+    public void usingEnvCreatesBuilder() throws Exception {
+        AccessTokensBuilder builder = withEnvironmentVariable("OAUTH2_ACCESS_TOKEN_URL", "https://somwhere.test/tokens")
+						.execute(Tokens::createAccessTokens);
         Assertions.assertThat(builder).isNotNull();
     }
 }
