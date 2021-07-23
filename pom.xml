@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.zalando.stups.build</groupId>
         <artifactId>stups-parent</artifactId>
         <version>7</version>
-        <relativePath/>
+        <relativePath />
     </parent>
     <groupId>org.zalando.stups</groupId>
     <artifactId>tokens</artifactId>
-    <version>0.13.1-SNAPSHOT</version>
+    <version>0.14.0</version>
 
     <name>Tokens</name>
     <description>
@@ -74,7 +73,7 @@
         <connection>scm:git:git@github.com:zalando/tokens.git</connection>
         <developerConnection>scm:git:git@github.com:zalando/tokens.git</developerConnection>
         <url>https://github.com/zalando-stups/tokens</url>
-        <tag>HEAD</tag>
+        <tag>0.14.0</tag>
     </scm>
 
     <dependencies>
