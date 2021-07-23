@@ -10,12 +10,12 @@
 
 ### Project Features and Functionality
 
-Some of the features Tokens offers:
+Some features Tokens offers:
 
-- support for credential rotation, by reading them on-demand from the file system
-- extensiblity with a credentials provider
-- configuration flexibility; specify multiple tokens with different scopes
-- the ability to inject fixed OAuth2 access tokens
+- Support for credential rotation, by reading them on-demand from the file system
+- Extensibility with a credentials provider
+- Configuration flexibility; specify multiple tokens with different scopes
+- Ability to inject fixed OAuth2 access tokens
 
 Tokens can be useful to devs (at any company, large or small) who are working with highly-distributed microservices deployed in the cloud and need to authenticate the traffic generated when accessing APIs. For example, if your team wants to consume an API with OAuth2 credentials, Tokens will fetch the tokens for you. Then you just [add scopes](#Usage) in the token. 
 
@@ -23,7 +23,7 @@ When creating tokens, it's easy to make a lot of mistakes. Tokens aims to save y
 
 ### Prerequisites
 
-- Java 8
+- Java 11
 - Maven
 - Gradle
 
@@ -43,7 +43,7 @@ Add it with:
 
 ``compile('org.zalando.stups:tokens:${version}') ``
 
-### Usage in Zalandos K8s environment (with `PlatformCredentialsSet`)
+### Usage in Zalando K8s environment (with `PlatformCredentialsSet`)
 
 It uses `/meta/credentials` as a default folder to look for provided tokens by `PlatformCredentialsSet`.
 
