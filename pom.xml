@@ -9,7 +9,7 @@
     </parent>
     <groupId>org.zalando.stups</groupId>
     <artifactId>tokens</artifactId>
-    <version>0.14.2-SNAPSHOT</version>
+    <version>0.14.2</version>
 
     <name>Tokens</name>
     <description>
@@ -75,7 +75,7 @@
         <connection>scm:git:git@github.com:zalando/tokens.git</connection>
         <developerConnection>scm:git:git@github.com:zalando/tokens.git</developerConnection>
         <url>https://github.com/zalando-stups/tokens</url>
-        <tag>HEAD</tag>
+        <tag>0.14.2</tag>
     </scm>
 
     <dependencies>
