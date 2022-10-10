@@ -15,13 +15,13 @@
  */
 package org.zalando.stups.tokens;
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
+
 import java.util.Arrays;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +31,6 @@ public class AbstractAccessTokenRefresherTest {
     private static final String FIXED_TOKENS = "one=DSAFDASASDFDA,two=DSFADFADFADFADFA,three=ADAFDAFADFAFEWRDFADFASDF";
     private static final String EXPECTED_MESSAGE = "No token available for tokenId 'four'. Tokens are available for the following tokenIds [one, two, three]";
 
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-
     @Test
     public void testListToString() {
         List<String> keys = Arrays.asList("One", "Two", "Three");
@@ -41,11 +38,11 @@ public class AbstractAccessTokenRefresherTest {
     }
 
     @Test
-    public void testExceptionMessage() {
-        environmentVariables.set("OAUTH2_ACCESS_TOKENS", FIXED_TOKENS);
+    public void testExceptionMessage() throws Exception {
         TokenRefresherConfiguration configuration = Mockito.mock(TokenRefresherConfiguration.class);
         AbstractAccessTokenRefresher refresher = new TestTokenRefresher(configuration);
-        refresher.initializeFixedTokensFromEnvironment();
+        withEnvironmentVariable("OAUTH2_ACCESS_TOKENS", FIXED_TOKENS)
+                .execute(refresher::initializeFixedTokensFromEnvironment);
         String availableTokenIds = refresher.getAvailableTokenIds();
         Assertions.assertThat(availableTokenIds).isEqualTo("[one, two, three]");
         try {
